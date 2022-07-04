@@ -1,9 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/roles/roles.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  UpdateDateColumn,
+  ManyToMany,
 } from 'typeorm';
 
 @Entity('users')
@@ -12,7 +15,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({ example: 'Фомин Никита', description: 'ФИО' })
+  @ApiProperty({ example: 'Иванов Иван', description: 'ФИО' })
   @Column()
   name: string;
 
@@ -35,9 +38,21 @@ export class User {
   @Column({ nullable: true })
   banReason: string;
 
+  @ApiProperty({ description: 'Роли пользователя' })
+  @ManyToMany((type) => Role, (role) => role.users)
+  roles: Role[];
+
+  @ApiProperty({
+    example: '2022-07-04 14:31:42.45068+03',
+    description: 'Дата создания',
+  })
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
 
-  @CreateDateColumn({ type: 'timestamptz' })
+  @ApiProperty({
+    example: '2022-07-04 14:31:42.45068+03',
+    description: 'Дата обновления',
+  })
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }
