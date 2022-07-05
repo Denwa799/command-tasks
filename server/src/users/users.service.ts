@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/roles/roles.service';
 import { Repository } from 'typeorm';
 import { AddRoleDto } from './dto/add-role.dto';
+import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './users.entity';
 
@@ -53,5 +54,14 @@ export class UsersService {
       'Пользователь или роль не найдены',
       HttpStatus.NOT_FOUND,
     );
+  }
+
+  async ban(dto: BanUserDto) {
+    const user = await this.userRepository.findOneById(dto.userId);
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+    user.banned = true;
+    user.banReason = dto.banReason;
+    await this.userRepository.save(user);
   }
 }

@@ -11,6 +11,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/auth-roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AddRoleDto } from './dto/add-role.dto';
+import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -54,5 +55,14 @@ export class UsersController {
   @Post('/role')
   addRole(@Body() dto: AddRoleDto) {
     return this.usersService.addRole(dto);
+  }
+
+  @ApiOperation({ summary: 'Забанить пользователя по id' })
+  @ApiResponse({ status: 200 })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Post('/ban')
+  ban(@Body() dto: BanUserDto) {
+    return this.usersService.ban(dto);
   }
 }

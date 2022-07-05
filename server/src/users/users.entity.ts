@@ -29,7 +29,7 @@ export class User {
 
   @ApiProperty({ example: 'true', description: 'Забанен или нет' })
   @Column({ default: false })
-  banned: string;
+  banned: boolean;
 
   @ApiProperty({
     example: 'За плохое поведение',
