@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsDate, IsNumber, IsString, Length } from 'class-validator';
 import { User } from 'src/users/users.entity';
 import {
   Entity,
@@ -14,14 +15,18 @@ import {
 export class Role {
   @ApiProperty({ example: '1', description: 'Уникальный идентификатор' })
   @PrimaryGeneratedColumn()
+  @IsNumber()
   id: number;
 
   @ApiProperty({ example: 'admin', description: 'Уникальное значение роли' })
   @Column({ unique: true })
+  @IsString()
+  @Length(3, 15)
   value: string;
 
   @ApiProperty({ example: 'Администратор', description: 'Описание роли' })
   @Column({ unique: true })
+  @IsString()
   description: string;
 
   @ApiProperty({ description: 'Пользователи с этой ролью' })
@@ -34,6 +39,7 @@ export class Role {
     description: 'Дата создания',
   })
   @CreateDateColumn({ type: 'timestamptz' })
+  @IsDate()
   createdAt: Date;
 
   @ApiProperty({
@@ -41,5 +47,6 @@ export class Role {
     description: 'Дата обновления',
   })
   @UpdateDateColumn({ type: 'timestamptz' })
+  @IsDate()
   updatedAt: Date;
 }
