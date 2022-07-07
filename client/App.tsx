@@ -1,11 +1,11 @@
 import React from 'react';
 import {AuthProvider} from 'providers/AuthProvider';
-import {AuthScreen} from 'screens/Auth';
+import {AppNavigation} from 'navigation';
 
 const App = () => {
   return (
     <AuthProvider>
-      <AuthScreen />
+      <AppNavigation />
     </AuthProvider>
   );
 };

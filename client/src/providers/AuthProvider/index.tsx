@@ -16,17 +16,14 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const loginHandler = useCallback(async (email: string, password: string) => {
     try {
       const response = await LoginService(`${authPath}login`, email, password);
-      console.log(response.data);
+      setToken(response.data.token);
       setIsLoadingInitial(false);
     } catch (error: any) {
-      console.log(error);
       Alert.alert('Ошибка авторизации');
     } finally {
       setIsLoading(false);
     }
   }, []);
-
-  console.log(`${authPath}login`);
 
   const value = useMemo(
     () => ({
