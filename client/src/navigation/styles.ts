@@ -8,4 +8,8 @@ export const styles = StyleSheet.create({
     borderTopColor: THEME.BACK_SECOND,
     borderTopWidth: 1,
   },
+  label: {
+    fontSize: 11,
+    paddingBottom: 2,
+  },
 });
