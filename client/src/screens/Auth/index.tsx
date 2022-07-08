@@ -8,7 +8,7 @@ import {IAuthData} from './types';
 import {AppButton} from 'components/AppButton';
 
 export const AuthScreen: FC = () => {
-  const {isLoading, login, token} = useAuth();
+  const {isLoading, login} = useAuth();
   const [data, setData] = useState<IAuthData>({} as IAuthData);
   const [isReg, setIsReg] = useState(false);
   const {email, password, name} = data;

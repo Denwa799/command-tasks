@@ -7,11 +7,11 @@ import {BottomNavigation} from './BottomNavigation';
 const Stack = createNativeStackNavigator();
 
 export const AuthNavigation = () => {
-  const {token} = useAuth();
+  const {user} = useAuth();
 
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {token ? (
+      {user && user.token ? (
         <Stack.Screen name="Main" component={BottomNavigation} />
       ) : (
         <Stack.Screen name="Auth" component={AuthScreen} />

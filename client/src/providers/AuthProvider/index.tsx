@@ -1,25 +1,75 @@
 import {LoginService} from 'api';
 import {variables} from 'constants/variables';
-import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
+import React, {
+  createContext,
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {Alert} from 'react-native';
-import {IAuthContext, IAuthProvider} from './types';
+import {IAuthContext, IAuthProvider, IUser} from './types';
+import EncryptedStorage from 'react-native-encrypted-storage';
+import {AppPositionContainer} from 'components/AppPositionContainer';
+import {AppLoader} from 'components/AppLoader';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthProvider: FC<IAuthProvider> = ({children}) => {
-  const [token, setToken] = useState('');
-  const [isLoadingInitial, setIsLoadingInitial] = useState(true);
+  const [user, setUser] = useState<IUser | null>({} as IUser);
+  const [isCheck, setIsCheck] = useState(false);
+  const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const authPath = `${variables.API_URL}${variables.AUTH}`;
 
+  useEffect(() => {
+    const checkSession = async () => {
+      setIsLoading(true);
+      try {
+        const session = await EncryptedStorage.getItem('user_session');
+        if (session) {
+          setUser(JSON.parse(session));
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsAuthLoad(false);
+        setIsLoading(false);
+      }
+    };
+
+    checkSession();
+  }, [isCheck]);
+
   const loginHandler = useCallback(async (email: string, password: string) => {
+    setIsLoading(true);
     try {
       const response = await LoginService(`${authPath}login`, email, password);
-      setToken(response.data.token);
-      setIsLoadingInitial(false);
-    } catch (error: any) {
+      await EncryptedStorage.setItem(
+        'user_session',
+        JSON.stringify({
+          token: response.data.token,
+        }),
+      );
+      setIsCheck(isCheck => !isCheck);
+    } catch (error) {
       Alert.alert('Ошибка авторизации');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const logoutHandler = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      await EncryptedStorage.removeItem('user_session');
+      setIsCheck(isCheck => !isCheck);
+    } catch (error) {
+      Alert.alert('Ошибка выхода');
     } finally {
       setIsLoading(false);
     }
@@ -27,12 +77,22 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
 
   const value = useMemo(
     () => ({
-      token,
+      user,
       isLoading,
       login: loginHandler,
+      logout: logoutHandler,
     }),
-    [token, isLoading],
+    [user, isLoading],
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {isAuthLoad && (
+        <AppPositionContainer isCenter>
+          <AppLoader />
+        </AppPositionContainer>
+      )}
+      {!isAuthLoad && children}
+    </AuthContext.Provider>
+  );
 };
