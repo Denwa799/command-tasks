@@ -1,16 +1,12 @@
 import React from 'react';
-import {
-  View,
-  Text,
-} from 'react-native';
-import { Main } from '@components/Main';
+import {AuthProvider} from 'providers/AuthProvider';
+import {AppNavigation} from 'navigation';
 
 const App = () => {
   return (
-    <View>
-      <Text>React</Text>
-      <Main/>
-    </View>
+    <AuthProvider>
+      <AppNavigation />
+    </AuthProvider>
   );
 };
 

@@ -7,9 +7,19 @@ module.exports = {
         root: ['./src'],
         extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
         alias: {
-          "@components": "./src/components"
-        }
-      }
-    ]
-  ]
+          '@components': './src/components',
+          '@constants': './src/constants',
+          '@providers': './src/providers',
+        },
+      },
+    ],
+    [
+      'module:react-native-dotenv',
+      {
+        envName: 'APP_ENV',
+        moduleName: '@env',
+        path: '.env',
+      },
+    ],
+  ],
 };

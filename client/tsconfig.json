@@ -14,6 +14,8 @@
       "paths": {
         "*": ["src/*"],
         "@components/*": ["src/components/*"],
+        "@constants/*": ["src/constants/*"],
+        "@providers/*": ["src/providers/*"],
       },
     },
     "exclude": [

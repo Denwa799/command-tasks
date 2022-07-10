@@ -35,12 +35,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.commandtasks",
+    package = "com.command_tasks",
 )
 
 android_resource(
     name = "res",
-    package = "com.commandtasks",
+    package = "com.command_tasks",
     res = "src/main/res",
 )
 
