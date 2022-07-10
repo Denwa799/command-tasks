@@ -1,4 +1,4 @@
-import {LoginService} from 'api';
+import {LoginService, RegistrationService} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -45,6 +45,31 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     checkSession();
   }, [isCheck]);
 
+  const registerHandler = useCallback(
+    async (email: string, password: string, name: string = 'Нет имени') => {
+      setIsLoading(true);
+      try {
+        const response = await RegistrationService(
+          `${authPath}registration`,
+          email,
+          password,
+          name,
+        );
+        await EncryptedStorage.setItem(
+          'user_session',
+          JSON.stringify({
+            token: response.data.token,
+          }),
+        );
+      } catch (error) {
+        Alert.alert('Ошибка регистрации');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
+
   const loginHandler = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -80,6 +105,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       user,
       isLoading,
       login: loginHandler,
+      register: registerHandler,
       logout: logoutHandler,
     }),
     [user, isLoading],

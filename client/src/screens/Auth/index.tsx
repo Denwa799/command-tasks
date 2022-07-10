@@ -2,13 +2,13 @@ import React, {FC, useCallback, useState} from 'react';
 import {AppField} from 'components/AppField';
 import {AppLoader} from 'components/AppLoader';
 import {useAuth} from 'hooks/useAuth';
-import {Text, View} from 'react-native';
+import {Pressable, Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAuthData} from './types';
 import {AppButton} from 'components/AppButton';
 
 export const AuthScreen: FC = () => {
-  const {isLoading, login} = useAuth();
+  const {isLoading, login, register} = useAuth();
   const [data, setData] = useState<IAuthData>({} as IAuthData);
   const [isReg, setIsReg] = useState(false);
   const {email, password, name} = data;
@@ -41,6 +41,10 @@ export const AuthScreen: FC = () => {
     [data],
   );
 
+  const onReg = useCallback(() => {
+    setIsReg(isReg => !isReg);
+  }, []);
+
   const authHandler = useCallback(async () => {
     if (!email || email.length < 8) {
       return setIsEmailError(true);
@@ -52,7 +56,9 @@ export const AuthScreen: FC = () => {
       return setIsPasswordError(true);
     }
 
-    // if (isReg) await register(email, password, name);
+    if (isReg) {
+      await register(email, password, name);
+    }
     await login(email, password);
 
     setData({} as IAuthData);
@@ -97,6 +103,11 @@ export const AuthScreen: FC = () => {
                 onPress={authHandler}
                 title={isReg ? 'Зарегистрироваться' : 'Авторизоваться'}
               />
+              <Pressable onPress={onReg} style={styles.regBtn}>
+                <Text style={styles.text}>
+                  {isReg ? 'Авторизация' : 'Регистрация'}
+                </Text>
+              </Pressable>
             </>
           )}
         </View>

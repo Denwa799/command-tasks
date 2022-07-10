@@ -23,6 +23,10 @@ export const styles = StyleSheet.create({
     marginBottom: 9,
     fontSize: SIZES.h2,
   },
+  regBtn: {
+    width: '30%',
+    marginLeft: 'auto',
+  },
   text: {
     color: THEME.TEXT_COLOR,
     fontWeight: 'bold',
