@@ -54,7 +54,7 @@ export class User {
   banReason: string;
 
   @ApiProperty({ description: 'Роли пользователя' })
-  @ManyToMany((type) => Role, (role) => role.users)
+  @ManyToMany(() => Role, (role) => role.users)
   roles: Role[];
 
   @ApiProperty({

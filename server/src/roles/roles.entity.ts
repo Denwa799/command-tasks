@@ -30,7 +30,7 @@ export class Role {
   description: string;
 
   @ApiProperty({ description: 'Пользователи с этой ролью' })
-  @ManyToMany((type) => User, (user) => user.roles)
+  @ManyToMany(() => User, (user) => user.roles)
   @JoinTable()
   users: User[];
 

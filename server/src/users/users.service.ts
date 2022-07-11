@@ -35,7 +35,7 @@ export class UsersService {
   }
 
   async delete(id: number): Promise<User | undefined> {
-    const user = await this.userRepository.findOneById(id);
+    const user = await this.userRepository.findOneBy({ id });
     return this.userRepository.remove(user);
   }
 
@@ -57,7 +57,7 @@ export class UsersService {
   }
 
   async ban(dto: BanUserDto) {
-    const user = await this.userRepository.findOneById(dto.userId);
+    const user = await this.userRepository.findOneBy({ id: dto.userId });
     if (!user)
       throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
     user.banned = true;
