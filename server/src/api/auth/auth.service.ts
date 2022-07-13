@@ -23,10 +23,15 @@ export class AuthService {
     const user = await this.validateUser(userDto);
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    return tokens;
+    const response = {
+      email: user.email,
+      name: user.name,
+      tokens,
+    };
+    return response;
   }
 
-  async registration(userDto: CreateUserDto): Promise<Tokens> {
+  async registration(userDto: CreateUserDto) {
     const candidate = await this.userService.findUserByEmail(userDto.email);
     if (candidate) {
       throw new HttpException(
@@ -41,7 +46,12 @@ export class AuthService {
     });
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
-    return tokens;
+    const response = {
+      email: user.email,
+      name: user.name,
+      tokens,
+    };
+    return response;
   }
 
   async logout(userId: number) {

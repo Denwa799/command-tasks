@@ -24,7 +24,7 @@ export class AuthController {
   @Public()
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  login(@Body() userDto: LoginUserDto): Promise<Tokens> {
+  login(@Body() userDto: LoginUserDto) {
     return this.authService.login(userDto);
   }
 
@@ -33,7 +33,7 @@ export class AuthController {
   @Public()
   @Post('/registration')
   @HttpCode(HttpStatus.CREATED)
-  registration(@Body() userDto: CreateUserDto): Promise<Tokens> {
+  registration(@Body() userDto: CreateUserDto) {
     return this.authService.registration(userDto);
   }
 
