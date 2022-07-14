@@ -1,9 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { RolesModule } from './roles/roles.module';
+import { AuthModule } from './api/auth/auth.module';
+import { UsersModule } from './api/users/users.module';
+import { RolesModule } from './api/roles/roles.module';
+import { TeamsModule } from './api/teams/teams.module';
+import { ProjectsModule } from './api/projects/projects.module';
+import { TasksModule } from './api/tasks/tasks.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AccessTokenGuard } from './api/auth/guards';
 
 @Module({
   imports: [
@@ -23,6 +28,15 @@ import { RolesModule } from './roles/roles.module';
     AuthModule,
     UsersModule,
     RolesModule,
+    TeamsModule,
+    ProjectsModule,
+    TasksModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AccessTokenGuard,
+    },
   ],
 })
 export class AppModule {}
