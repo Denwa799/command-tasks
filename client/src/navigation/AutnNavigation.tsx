@@ -11,7 +11,7 @@ export const AuthNavigation = () => {
 
   return (
     <Stack.Navigator screenOptions={{headerShown: false}}>
-      {user && user.token ? (
+      {user && user.access_token ? (
         <Stack.Screen name="Main" component={BottomNavigation} />
       ) : (
         <Stack.Screen name="Auth" component={AuthScreen} />

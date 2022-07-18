@@ -1,12 +1,12 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {THEME} from 'constants/theme';
 import React from 'react';
-import {MainScreen} from 'screens/Main';
 import {ProfileScreen} from 'screens/Profile';
 import {styles} from './styles';
 import {ITabBarIcon} from './types';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Anticon from 'react-native-vector-icons/AntDesign';
+import {TaskNavigation} from './TaskNavigation';
 
 const Tab = createBottomTabNavigator();
 
@@ -23,7 +23,7 @@ export const BottomNavigation = () => {
       }}>
       <Tab.Screen
         name="MainScreen"
-        component={MainScreen}
+        component={TaskNavigation}
         options={{
           tabBarLabel: 'Задачи',
           tabBarIcon: (options: ITabBarIcon) => (

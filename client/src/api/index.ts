@@ -20,3 +20,28 @@ export const RegistrationService = (
     password: password,
   });
 };
+
+export const RefreshService = (api: string, tokenRefresh: string = '') => {
+  return axios.post(
+    `${api}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${tokenRefresh}`,
+      },
+    },
+  );
+};
+
+export const GetService = (
+  api: string,
+  tokenBearer: string = '',
+  params = {},
+) => {
+  return axios.get(`${api}`, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+    params,
+  });
+};

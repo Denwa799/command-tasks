@@ -1,4 +1,4 @@
-import {LoginService, RegistrationService} from 'api';
+import {LoginService, RefreshService, RegistrationService} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -17,7 +17,7 @@ import {AppLoader} from 'components/AppLoader';
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthProvider: FC<IAuthProvider> = ({children}) => {
-  const [user, setUser] = useState<IUser | null>({} as IUser);
+  const [user, setUser] = useState<IUser | null>(null);
   const [isCheck, setIsCheck] = useState(false);
   const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +35,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           setUser(null);
         }
       } catch (error) {
-        console.log(error);
+        console.log('Установка пользователя в стейт', error);
       } finally {
         setIsAuthLoad(false);
         setIsLoading(false);
@@ -58,7 +58,10 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
         await EncryptedStorage.setItem(
           'user_session',
           JSON.stringify({
-            token: response.data.token,
+            email: response.data.email,
+            name: response.data.name,
+            access_token: response.data.tokens.access_token,
+            refresh_token: response.data.tokens.refresh_token,
           }),
         );
       } catch (error) {
@@ -77,10 +80,13 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       await EncryptedStorage.setItem(
         'user_session',
         JSON.stringify({
-          token: response.data.token,
+          email: response.data.email,
+          name: response.data.name,
+          access_token: response.data.tokens.access_token,
+          refresh_token: response.data.tokens.refresh_token,
         }),
       );
-      setIsCheck(isCheck => !isCheck);
+      setIsCheck(prev => !prev);
     } catch (error) {
       Alert.alert('Ошибка авторизации');
     } finally {
@@ -92,12 +98,43 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     setIsLoading(true);
     try {
       await EncryptedStorage.removeItem('user_session');
-      setIsCheck(isCheck => !isCheck);
+      setIsCheck(prev => !prev);
     } catch (error) {
       Alert.alert('Ошибка выхода');
     } finally {
       setIsLoading(false);
     }
+  }, []);
+
+  const refreshHandler = useCallback(async () => {
+    try {
+      const session = await EncryptedStorage.getItem('user_session');
+      if (session) {
+        const userSession = await JSON.parse(session);
+        const response = await RefreshService(
+          `${authPath}refresh`,
+          userSession?.refresh_token,
+        );
+        await EncryptedStorage.setItem(
+          'user_session',
+          JSON.stringify({
+            email: response.data.email,
+            name: response.data.name,
+            access_token: response.data.tokens.access_token,
+            refresh_token: response.data.tokens.refresh_token,
+          }),
+        );
+        setIsCheck(prev => !prev);
+      }
+    } catch (error) {
+      console.log('Ошибка обновления токена', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fourteenMinutes = 840000;
+
+    setInterval(() => refreshHandler(), fourteenMinutes);
   }, []);
 
   const value = useMemo(

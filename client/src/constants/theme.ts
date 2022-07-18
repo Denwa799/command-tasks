@@ -33,7 +33,7 @@ const DARK_THEME = {
 };
 
 const colorScheme = Appearance.getColorScheme();
-export const THEME = colorScheme === 'light' ? LIGHT_THEME : DARK_THEME;
+export const THEME = colorScheme === 'dark' ? DARK_THEME : LIGHT_THEME;
 
 export const SIZES = {
   // global sizes

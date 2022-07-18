@@ -13,5 +13,8 @@ export interface IAuthProvider {
 }
 
 export interface IUser {
-  token: string;
+  email: string;
+  name: string;
+  access_token: string;
+  refresh_token: string;
 }
