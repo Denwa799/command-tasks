@@ -45,3 +45,17 @@ export const GetService = (
     params,
   });
 };
+
+export const PostService = <T>(
+  api: string,
+  tokenBearer: string = '',
+  data: T,
+) => {
+  console.log(data);
+
+  return axios.post(`${api}`, data, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};

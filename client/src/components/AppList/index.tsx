@@ -9,6 +9,8 @@ export const AppList: FC<IAppList> = ({
   style,
   onDelete,
   onChange,
+  refreshing,
+  onRefresh,
 }) => {
   return (
     <View>
@@ -16,6 +18,8 @@ export const AppList: FC<IAppList> = ({
         data={data}
         style={style}
         keyExtractor={item => item.id.toString()}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         renderItem={({item}) => (
           <AppCard
             id={item.id}

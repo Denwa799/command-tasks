@@ -14,6 +14,8 @@ const LIGHT_THEME = {
   YELLOW_COLOR: '#ffdc10',
   GREEN_COLOR: '#3ead13',
   WHITE_COLOR: '#fff',
+  BLACK_COLOR: '#000',
+  BLACK_60_COLOR: 'rgba(17,17,19,0.6)',
 };
 
 const DARK_THEME = {
@@ -30,6 +32,8 @@ const DARK_THEME = {
   YELLOW_COLOR: '#ffdc10',
   GREEN_COLOR: '#3ead13',
   WHITE_COLOR: '#f1f1f1',
+  BLACK_COLOR: '#000',
+  BLACK_60_COLOR: 'rgba(17,17,19,0.6)',
 };
 
 const colorScheme = Appearance.getColorScheme();
@@ -40,6 +44,7 @@ export const SIZES = {
   base: 8,
   font: 14,
   radius: 9,
+  radiusSecond: 15,
   padding: 24,
 
   // font sizes

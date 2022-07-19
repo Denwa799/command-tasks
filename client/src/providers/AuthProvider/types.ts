@@ -1,4 +1,4 @@
-import React from 'react';
+import {ReactNode} from 'react';
 
 export interface IAuthContext {
   user: IUser | null;
@@ -9,7 +9,7 @@ export interface IAuthContext {
 }
 
 export interface IAuthProvider {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export interface IUser {

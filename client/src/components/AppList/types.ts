@@ -4,4 +4,6 @@ export interface IAppList {
   style?: Object;
   onDelete?: (_id: string) => void;
   onChange?: (_id: string, name: string) => void;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }

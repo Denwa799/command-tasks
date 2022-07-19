@@ -42,7 +42,7 @@ export const AuthScreen: FC = () => {
   );
 
   const onReg = useCallback(() => {
-    setIsReg(isReg => !isReg);
+    setIsReg(prev => !prev);
   }, []);
 
   const authHandler = useCallback(async () => {

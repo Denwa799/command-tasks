@@ -1,11 +1,13 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {AppIconButton} from 'components/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {useTeams} from 'hooks/useTeams';
-import React, {useEffect} from 'react';
-import {View} from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Alert, View} from 'react-native';
+import {Modals} from './Modals';
 import {styles} from './styles';
 import {TeamScreenNavigateType} from './types';
 
@@ -13,25 +15,55 @@ export const MainScreen = () => {
   const route = useRoute();
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
-  const {teams, isLoading} = useTeams();
+  const {teams, teamsIsLoading, fetchTeams} = useTeams();
+
+  const [createIsOpen, setCreateIsOpen] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({
       title: 'Команды',
     });
+
+    fetchTeams();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    try {
+      fetchTeams();
+    } catch {
+      Alert.alert('Ошибка обновления');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  const onAdd = useCallback(() => {
+    setCreateIsOpen(true);
   }, []);
 
   console.log(teams);
 
   return (
     <View style={styles.main}>
-      {isLoading ? (
+      {teamsIsLoading ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
       ) : (
-        <View>
-          <AppList data={teams} />
+        <View style={styles.content}>
+          <AppList
+            data={teams}
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            style={styles.list}
+          />
+          <AppIconButton onPress={onAdd} />
+          <Modals
+            createIsOpen={createIsOpen}
+            setCreateIsOpen={setCreateIsOpen}
+          />
         </View>
       )}
     </View>

@@ -21,6 +21,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const [isCheck, setIsCheck] = useState(false);
   const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFirstRefresh, setIsFirstRefresh] = useState(true);
 
   const authPath = `${variables.API_URL}${variables.AUTH}`;
 
@@ -28,22 +29,25 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     const checkSession = async () => {
       setIsLoading(true);
       try {
-        const session = await EncryptedStorage.getItem('user_session');
-        if (session) {
-          setUser(JSON.parse(session));
-        } else {
-          setUser(null);
+        if (!isFirstRefresh) {
+          const session = await EncryptedStorage.getItem('user_session');
+          if (session) {
+            setUser(JSON.parse(session));
+          } else {
+            setUser(null);
+          }
+          setIsAuthLoad(false);
         }
       } catch (error) {
         console.log('Установка пользователя в стейт', error);
-      } finally {
         setIsAuthLoad(false);
+      } finally {
         setIsLoading(false);
       }
     };
 
     checkSession();
-  }, [isCheck]);
+  }, [isCheck, isFirstRefresh]);
 
   const registerHandler = useCallback(
     async (email: string, password: string, name: string = 'Нет имени') => {
@@ -115,6 +119,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           `${authPath}refresh`,
           userSession?.refresh_token,
         );
+        console.log('session', userSession);
         await EncryptedStorage.setItem(
           'user_session',
           JSON.stringify({
@@ -124,16 +129,19 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
             refresh_token: response.data.tokens.refresh_token,
           }),
         );
+        setIsFirstRefresh(false);
         setIsCheck(prev => !prev);
       }
     } catch (error) {
       console.log('Ошибка обновления токена', error);
+    } finally {
+      setIsFirstRefresh(false);
     }
   }, []);
 
   useEffect(() => {
     const fourteenMinutes = 840000;
-
+    refreshHandler();
     setInterval(() => refreshHandler(), fourteenMinutes);
   }, []);
 
@@ -150,12 +158,13 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {isAuthLoad && (
+      {isAuthLoad || isFirstRefresh ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
+      ) : (
+        children
       )}
-      {!isAuthLoad && children}
     </AuthContext.Provider>
   );
 };
