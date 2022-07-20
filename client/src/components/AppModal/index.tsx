@@ -30,7 +30,8 @@ export const AppModal: FC<IAppModal> = ({
               styles.modal,
               orientation === 'LANDSCAPE' && styles.scroll,
               style,
-            ]}>
+            ]}
+            keyboardShouldPersistTaps="handled">
             {children}
           </ScrollView>
         </>

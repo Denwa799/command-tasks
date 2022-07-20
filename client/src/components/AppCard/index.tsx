@@ -1,9 +1,18 @@
-import {BOX_SHADOW} from 'constants/theme';
+import {BOX_SHADOW, THEME} from 'constants/theme';
 import {AppContainer} from 'layouts/AppContainer';
 import React, {FC, useCallback} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import {
+  Appearance,
+  Text,
+  TouchableHighlight,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {styles} from './styles';
 import {IAppCard} from './types';
+import Anticon from 'react-native-vector-icons/AntDesign';
+
+const colorScheme = Appearance.getColorScheme();
 
 export const AppCard: FC<IAppCard> = ({
   id,
@@ -36,6 +45,17 @@ export const AppCard: FC<IAppCard> = ({
           onPress={onOpen ? () => onOpen(item) : openHandler}>
           <Text style={styles.text}>{text}</Text>
         </TouchableOpacity>
+        <TouchableHighlight
+          onPress={onDelete ? () => onDelete(id) : deleteHandler}
+          underlayColor="none">
+          <Anticon
+            name="delete"
+            size={24}
+            color={
+              colorScheme === 'dark' ? THEME.TEXT_COLOR : THEME.SECOND_COLOR
+            }
+          />
+        </TouchableHighlight>
       </View>
     </AppContainer>
   );

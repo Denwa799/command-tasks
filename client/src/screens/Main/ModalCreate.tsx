@@ -10,11 +10,13 @@ import {IModalCreate} from './types';
 export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
   const [name, setName] = useState('');
   const [isNameError, setIsNameError] = useState(false);
+  const [dangerNameText, setDangerNameText] = useState('Пустое поле');
 
   const {createTeam, fetchTeams} = useTeams();
 
   useEffect(() => {
     setName('');
+    setIsNameError(false);
   }, [isOpen]);
 
   const nameHandler = useCallback(
@@ -30,6 +32,19 @@ export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
   }, []);
 
   const onCreate = useCallback(async () => {
+    if (!name || name.length < 3 || name.length > 50) {
+      if (name.length < 3) {
+        setDangerNameText('Меньше 3 символов');
+      }
+      if (name.length > 50) {
+        setDangerNameText('Больше 50 символов');
+      }
+      if (!name) {
+        setDangerNameText('Пустое поле');
+      }
+      return setIsNameError(true);
+    }
+
     await createTeam(name);
     await fetchTeams();
     setIsOpen(false);
@@ -42,6 +57,7 @@ export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
         placeholder={'Введите название'}
         onChange={nameHandler}
         isDanger={isNameError}
+        dangerText={dangerNameText}
       />
       <View style={styles.modalBtns}>
         <AppNativeButton

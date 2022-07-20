@@ -12,7 +12,7 @@ export const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 20,
     paddingLeft: 20,
-    paddingRight: 10,
+    paddingRight: 15,
     borderRadius: SIZES.radius,
     flexDirection: 'row',
     justifyContent: 'space-between',
