@@ -30,7 +30,8 @@ export class ProjectsService {
     const projects = await this.projectRepository.find({
       relations: ['team', 'tasks'],
     });
-    return projects;
+    if (projects) return projects;
+    throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
   }
 
   async getProjectById(id: number) {
@@ -38,11 +39,13 @@ export class ProjectsService {
       where: { id },
       relations: ['tasks'],
     });
-    return project;
+    if (project) return project;
+    throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
   }
 
   async delete(id: number): Promise<Project | undefined> {
     const project = await this.projectRepository.findOneBy({ id });
-    return this.projectRepository.remove(project);
+    if (project) return this.projectRepository.remove(project);
+    throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
   }
 }

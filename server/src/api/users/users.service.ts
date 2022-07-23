@@ -18,12 +18,14 @@ export class UsersService {
   async createUser(dto: CreateUserDto) {
     const role = await this.roleService.getRoleByValue('user');
     const user = await this.userRepository.create({ ...dto, roles: [role] });
-    return this.userRepository.save(user);
+    if (user) return this.userRepository.save(user);
+    throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
 
   async getAllUsers() {
     const users = await this.userRepository.find({ relations: ['roles'] });
-    return users;
+    if (users) return users;
+    throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
 
   async findUserByEmail(email: string): Promise<User | undefined> {
@@ -31,7 +33,8 @@ export class UsersService {
       where: { email },
       relations: ['roles'],
     });
-    return user;
+    if (user) return user;
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async findUserById(id: number): Promise<User | undefined> {
@@ -39,7 +42,8 @@ export class UsersService {
       where: { id },
       relations: ['roles'],
     });
-    return user;
+    if (user) return user;
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async addRefreshToken(id: number, hashedToken: string | null) {
@@ -59,7 +63,8 @@ export class UsersService {
 
   async delete(id: number): Promise<User | undefined> {
     const user = await this.userRepository.findOneBy({ id });
-    return this.userRepository.remove(user);
+    if (user) return this.userRepository.remove(user);
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async addRole(dto: AddRoleDto) {

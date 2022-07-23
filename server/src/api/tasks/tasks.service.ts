@@ -32,11 +32,13 @@ export class TasksService {
 
   async getAllTasks() {
     const tasks = await this.taskRepository.find({ relations: ['project'] });
-    return tasks;
+    if (tasks) return tasks;
+    throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
   }
 
   async delete(id: number): Promise<Task | undefined> {
     const task = await this.taskRepository.findOneBy({ id });
-    return this.taskRepository.remove(task);
+    if (task) return this.taskRepository.remove(task);
+    throw new HttpException('Задача не найдена', HttpStatus.NOT_FOUND);
   }
 }
