@@ -20,3 +20,50 @@ export const RegistrationService = (
     password: password,
   });
 };
+
+export const RefreshService = (api: string, tokenRefresh: string = '') => {
+  return axios.post(
+    `${api}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${tokenRefresh}`,
+      },
+    },
+  );
+};
+
+export const GetService = (
+  api: string,
+  tokenBearer: string = '',
+  params = {},
+) => {
+  return axios.get(`${api}`, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+    params,
+  });
+};
+
+export const PostService = <T>(
+  api: string,
+  tokenBearer: string = '',
+  data: T,
+) => {
+  console.log(data);
+
+  return axios.post(`${api}`, data, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};
+
+export const DeleteService = (api: string, tokenBearer: string = '') => {
+  return axios.delete(`${api}`, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};

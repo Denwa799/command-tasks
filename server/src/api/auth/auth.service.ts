@@ -70,7 +70,11 @@ export class AuthService {
       if (refreshTokenEquals) {
         const tokens = await this.generateTokens(user);
         await this.updateRtHash(user.id, tokens.refresh_token);
-        return tokens;
+        return {
+          email: user.email,
+          name: user.name,
+          tokens,
+        };
       }
       throw new HttpException('Доступ запрещен', HttpStatus.BAD_REQUEST);
     }

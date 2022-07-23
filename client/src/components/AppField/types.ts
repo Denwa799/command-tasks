@@ -5,4 +5,5 @@ export interface IAppField {
   isSecure?: boolean;
   isDanger?: boolean;
   dangerText?: string;
+  style?: Object;
 }

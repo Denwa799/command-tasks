@@ -11,6 +11,7 @@ export const AppField: FC<IAppField> = ({
   isSecure,
   isDanger,
   dangerText = 'Пустое поле',
+  style,
 }) => {
   return (
     <>
@@ -20,7 +21,7 @@ export const AppField: FC<IAppField> = ({
         value={value}
         secureTextEntry={isSecure}
         autoCapitalize="none"
-        style={[styles.input, isDanger && styles.dangerInput]}
+        style={[styles.input, isDanger && styles.dangerInput, style]}
         placeholderTextColor={THEME.SECOND_TEXT_COLOR}
       />
       {isDanger && <Text style={styles.dangerText}>{dangerText}</Text>}
