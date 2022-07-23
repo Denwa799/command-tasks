@@ -1,6 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './projects.entity';
 import { ProjectsService } from './projects.service';
 
@@ -24,16 +33,23 @@ export class ProjectsController {
   }
 
   @ApiOperation({ summary: 'Получение проекта по id' })
-  @ApiResponse({ status: 200, type: [Project] })
+  @ApiResponse({ status: 200, type: Project })
   @Get(':id')
   findProjectById(@Param('id') id: number) {
     return this.projectsService.getProjectById(id);
   }
 
   @ApiOperation({ summary: 'Удаление проекта по id' })
-  @ApiResponse({ status: 200, type: [Project] })
+  @ApiResponse({ status: 200, type: Project })
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.projectsService.delete(id);
+  }
+
+  @ApiOperation({ summary: 'Обновление проекта по id' })
+  @ApiResponse({ status: 200, type: Project })
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateDto: UpdateProjectDto) {
+    return this.projectsService.update(id, updateDto);
   }
 }

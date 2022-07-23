@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { RolesGuard } from '../auth/guards';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
 
@@ -40,12 +42,19 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Удаление пользователя по id' })
-  @ApiResponse({ status: 200, type: [User] })
+  @ApiResponse({ status: 200, type: User })
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.usersService.delete(id);
+  }
+
+  @ApiOperation({ summary: 'Обновление пользователя по id' })
+  @ApiResponse({ status: 200, type: User })
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateDto: UpdateUserDto) {
+    return this.usersService.update(id, updateDto);
   }
 
   @ApiOperation({ summary: 'Выдать роль' })

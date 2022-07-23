@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 
 @Injectable()
@@ -18,28 +19,32 @@ export class UsersService {
   async createUser(dto: CreateUserDto) {
     const role = await this.roleService.getRoleByValue('user');
     const user = await this.userRepository.create({ ...dto, roles: [role] });
-    return this.userRepository.save(user);
+    if (user) return this.userRepository.save(user);
+    throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
 
   async getAllUsers() {
     const users = await this.userRepository.find({ relations: ['roles'] });
-    return users;
+    if (users) return users;
+    throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
 
-  async findUserByEmail(email: string): Promise<User | undefined> {
+  async findUserByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email },
       relations: ['roles'],
     });
-    return user;
+    if (user) return user;
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async findUserById(id: number): Promise<User | undefined> {
+  async findUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['roles'],
     });
-    return user;
+    if (user) return user;
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async addRefreshToken(id: number, hashedToken: string | null) {
@@ -57,9 +62,21 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async delete(id: number): Promise<User | undefined> {
+  async delete(id: number): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
-    return this.userRepository.remove(user);
+    if (user) return this.userRepository.remove(user);
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+  }
+
+  async update(id: number, dto: UpdateUserDto): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user) {
+      const newUser = await this.userRepository.merge(user, {
+        name: dto.name,
+      });
+      return this.userRepository.save(newUser);
+    }
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async addRole(dto: AddRoleDto) {

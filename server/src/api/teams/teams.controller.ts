@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -32,9 +33,16 @@ export class TeamsController {
   }
 
   @ApiOperation({ summary: 'Удаление команды по id' })
-  @ApiResponse({ status: 200, type: [Team] })
+  @ApiResponse({ status: 200, type: Team })
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.teamsService.delete(id);
+  }
+
+  @ApiOperation({ summary: 'Обновление команды по id' })
+  @ApiResponse({ status: 200, type: Team })
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() teamDto: CreateTeamDto) {
+    return this.teamsService.update(id, teamDto);
   }
 }
