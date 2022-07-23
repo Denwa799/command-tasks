@@ -1,15 +1,15 @@
 export interface ITeam {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface IProject {
-  id: string;
+  id: number;
   name: string;
 }
 
 export interface ITask {
-  id: string;
+  id: number;
   text: string;
   status: 'notCompleted' | 'inProgress' | 'done';
   responsible: string;

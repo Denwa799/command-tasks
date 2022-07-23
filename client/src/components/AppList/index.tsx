@@ -17,6 +17,7 @@ export const AppList: FC<IAppList> = ({
       <FlatList
         data={data}
         style={style}
+        showsVerticalScrollIndicator={false}
         keyExtractor={item => item.id.toString()}
         refreshing={refreshing}
         onRefresh={onRefresh}

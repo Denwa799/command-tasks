@@ -59,3 +59,11 @@ export const PostService = <T>(
     },
   });
 };
+
+export const DeleteService = (api: string, tokenBearer: string = '') => {
+  return axios.delete(`${api}`, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};

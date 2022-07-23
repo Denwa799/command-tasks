@@ -1,4 +1,4 @@
-import {THEME} from 'constants/theme';
+import {SIZES, THEME} from 'constants/theme';
 import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -12,6 +12,12 @@ export const styles = StyleSheet.create({
   },
   list: {
     height: '95%',
+  },
+  modalText: {
+    fontSize: SIZES.body2,
+    color: THEME.TEXT_COLOR,
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   modalBtns: {
     flex: 1,

@@ -119,7 +119,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           `${authPath}refresh`,
           userSession?.refresh_token,
         );
-        console.log('session', userSession);
         await EncryptedStorage.setItem(
           'user_session',
           JSON.stringify({

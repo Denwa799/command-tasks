@@ -18,7 +18,10 @@ export const MainScreen = () => {
   const {teams, teamsIsLoading, fetchTeams} = useTeams();
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
+  const [deleteIsOpen, setDeleteIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const [id, setId] = useState(0);
 
   useEffect(() => {
     navigation.setOptions({
@@ -43,7 +46,10 @@ export const MainScreen = () => {
     setCreateIsOpen(true);
   }, []);
 
-  console.log(teams);
+  const onDelete = useCallback((itemId: number) => {
+    setId(itemId);
+    setDeleteIsOpen(true);
+  }, []);
 
   return (
     <View style={styles.main}>
@@ -58,11 +64,15 @@ export const MainScreen = () => {
             refreshing={isRefreshing}
             onRefresh={onRefresh}
             style={styles.list}
+            onDelete={onDelete}
           />
           <AppIconButton onPress={onAdd} />
           <Modals
             createIsOpen={createIsOpen}
             setCreateIsOpen={setCreateIsOpen}
+            id={id}
+            deleteIsOpen={deleteIsOpen}
+            setDeleteIsOpen={setDeleteIsOpen}
           />
         </View>
       )}
