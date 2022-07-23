@@ -23,6 +23,6 @@ export const styles = StyleSheet.create({
     color: colorScheme === 'dark' ? THEME.TEXT_COLOR : THEME.SECOND_COLOR,
   },
   cardHandler: {
-    width: '80%',
+    width: '75%',
   },
 });

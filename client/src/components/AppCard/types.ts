@@ -6,5 +6,5 @@ export interface IAppCard {
   item: any;
   onOpen?: (item: any) => void;
   onDelete?: (id: number) => void;
-  onChange?: (id: string, name: string) => void;
+  onChange?: (id: number, name: string) => void;
 }
