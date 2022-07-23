@@ -46,6 +46,17 @@ export const AppCard: FC<IAppCard> = ({
           <Text style={styles.text}>{text}</Text>
         </TouchableOpacity>
         <TouchableHighlight
+          onPress={onChange ? () => onChange(id, text) : changeHandler}
+          underlayColor="none">
+          <Anticon
+            name="edit"
+            size={24}
+            color={
+              colorScheme === 'dark' ? THEME.TEXT_COLOR : THEME.SECOND_COLOR
+            }
+          />
+        </TouchableHighlight>
+        <TouchableHighlight
           onPress={onDelete ? () => onDelete(id) : deleteHandler}
           underlayColor="none">
           <Anticon
