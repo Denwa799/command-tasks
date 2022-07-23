@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { TeamsService } from 'src/api/teams/teams.service';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './projects.entity';
 
 @Injectable()
@@ -43,9 +44,20 @@ export class ProjectsService {
     throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
   }
 
-  async delete(id: number): Promise<Project | undefined> {
+  async delete(id: number): Promise<Project> {
     const project = await this.projectRepository.findOneBy({ id });
     if (project) return this.projectRepository.remove(project);
+    throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
+  }
+
+  async update(id: number, dto: UpdateProjectDto): Promise<Project> {
+    const project = await this.projectRepository.findOneBy({ id });
+    if (project) {
+      const newProject = await this.projectRepository.merge(project, {
+        name: dto.name,
+      });
+      return this.projectRepository.save(newProject);
+    }
     throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
   }
 }

@@ -1,6 +1,15 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
 
@@ -24,9 +33,16 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: 'Удаление задачи по id' })
-  @ApiResponse({ status: 200, type: [Task] })
+  @ApiResponse({ status: 200, type: Task })
   @Delete(':id')
   delete(@Param('id') id: number) {
     return this.tasksService.delete(id);
+  }
+
+  @ApiOperation({ summary: 'Обновление задачи по id' })
+  @ApiResponse({ status: 200, type: Task })
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateDto: UpdateTaskDto) {
+    return this.tasksService.update(id, updateDto);
   }
 }

@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
@@ -36,5 +44,12 @@ export class RolesController {
   @Get('/:value')
   getByValue(@Param('value') value: string) {
     return this.roleService.getRoleByValue(value);
+  }
+
+  @ApiOperation({ summary: 'Обновление роли по id' })
+  @ApiResponse({ status: 200, type: Role })
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() updateDto: CreateRoleDto) {
+    return this.roleService.update(id, updateDto);
   }
 }

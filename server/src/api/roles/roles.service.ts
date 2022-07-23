@@ -27,4 +27,16 @@ export class RolesService {
     if (role) return role;
     throw new HttpException('Роль не найдена', HttpStatus.NOT_FOUND);
   }
+
+  async update(id: number, dto: CreateRoleDto): Promise<Role> {
+    const role = await this.roleRepository.findOneBy({ id });
+    if (role) {
+      const newRole = await this.roleRepository.merge(role, {
+        value: dto.value,
+        description: dto.description,
+      });
+      return this.roleRepository.save(newRole);
+    }
+    throw new HttpException('Роль не найдена', HttpStatus.NOT_FOUND);
+  }
 }

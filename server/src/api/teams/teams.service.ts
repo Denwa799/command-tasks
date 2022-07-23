@@ -29,9 +29,20 @@ export class TeamsService {
     throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);
   }
 
-  async delete(id: number): Promise<Team | undefined> {
+  async delete(id: number): Promise<Team> {
     const team = await this.teamRepository.findOneBy({ id });
     if (team) return this.teamRepository.remove(team);
+    throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);
+  }
+
+  async update(id: number, dto: CreateTeamDto): Promise<Team> {
+    const team = await this.teamRepository.findOneBy({ id });
+    if (team) {
+      const newTeam = await this.teamRepository.merge(team, {
+        name: dto.name,
+      });
+      return this.teamRepository.save(newTeam);
+    }
     throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);
   }
 }
