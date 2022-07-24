@@ -4,6 +4,7 @@ import {AppIconButton} from 'components/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
+import {teamRoute, teamsRoute} from 'constants/variables';
 import {useTeams} from 'hooks/useTeams';
 import {ITeam} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
@@ -14,8 +15,6 @@ import {IMainScreen, TeamScreenNavigateType} from './types';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
-  const teamsRoute = 'Teams';
-  const teamRoute = 'Team';
 
   const routeName = useMemo(() => {
     if (route.name === teamRoute) {
@@ -114,6 +113,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             changeIsOpen={changeIsOpen}
             setChangeIsOpen={setChangeIsOpen}
             text={text}
+            teamId={route.name === teamRoute && params.teamId}
           />
         </View>
       )}

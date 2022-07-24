@@ -17,11 +17,13 @@ export interface IModals {
   setChangeIsOpen: (value: boolean) => void;
   id: number;
   text: string;
+  teamId?: number;
 }
 
 export interface IModalCreate {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  teamId?: number;
 }
 
 export interface IModalChange {

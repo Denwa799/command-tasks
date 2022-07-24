@@ -44,9 +44,6 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
         const response = await GetService(`${teamsPath}/${id}`, tokenBearer);
-
-        console.log('team');
-
         setTeam(response.data);
       } else {
         throw new Error('Ошибка сессии');

@@ -7,3 +7,6 @@ export const variables = {
   PROJECTS,
   TASKS,
 };
+
+export const teamsRoute = 'Teams';
+export const teamRoute = 'Team';
