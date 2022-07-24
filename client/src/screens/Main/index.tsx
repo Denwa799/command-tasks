@@ -14,8 +14,11 @@ import {IMainScreen, TeamScreenNavigateType} from './types';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
+  const teamsRoute = 'Teams';
+  const teamRoute = 'Team';
+
   const routeName = useMemo(() => {
-    if (route.name === 'Team') {
+    if (route.name === teamRoute) {
       return 'Проекты';
     }
     return 'Команды';
@@ -24,7 +27,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
 
-  const {teams, teamsIsLoading, fetchTeams} = useTeams();
+  const {teams, teamsIsLoading, team, teamIsLoading, fetchTeams, fetchTeam} =
+    useTeams();
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -35,37 +39,38 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const [text, setText] = useState('');
 
   const data = useMemo(() => {
-    if (route.name === 'Team') {
-      return params.projects;
+    if (route.name === teamRoute) {
+      return team?.projects;
     }
     return teams;
-  }, [teams, params, route.name]);
+  }, [teams, team, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
       title: routeName,
     });
 
-    route.name === 'Teams' && fetchTeams();
+    route.name === teamsRoute && fetchTeams();
   }, []);
 
-  const onOpen = useCallback((team: ITeam) => {
-    navigation.navigate('Team', {
-      teamId: team.id,
-      projects: team.projects,
+  const onOpen = useCallback(async (itemTeam: ITeam) => {
+    await fetchTeam(itemTeam.id);
+    navigation.navigate(teamRoute, {
+      teamId: itemTeam.id,
     });
   }, []);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
     try {
-      fetchTeams();
+      route.name === teamsRoute && fetchTeams();
+      route.name === teamRoute && fetchTeam(params.teamId);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [params]);
 
   const onAdd = useCallback(() => {
     setCreateIsOpen(true);
@@ -84,7 +89,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   return (
     <View style={styles.main}>
-      {teamsIsLoading ? (
+      {teamsIsLoading || (route.name === teamRoute && teamIsLoading) ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>

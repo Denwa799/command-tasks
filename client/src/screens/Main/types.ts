@@ -1,9 +1,6 @@
-import {IProject} from 'models/ITasks';
-
 export type TeamScreenNavigateType = {
   Team: {
     teamId: number;
-    projects: IProject[];
   };
 };
 

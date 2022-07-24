@@ -10,7 +10,10 @@ export const TeamsContext = createContext<ITeamsContext>({} as ITeamsContext);
 
 export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [teams, setTeams] = useState<ITeam[] | null>(null);
+  const [team, setTeam] = useState<ITeam | null>(null);
+
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
+  const [teamIsLoading, setTeamIsLoading] = useState(false);
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
   const [updateIsLoading, setUpdateIsLoading] = useState(false);
@@ -28,9 +31,31 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
+      console.log(error);
       Alert.alert('Ошибка загрузки списка команд');
     } finally {
       setTeamsIsLoading(false);
+    }
+  }, []);
+
+  const fetchTeam = useCallback(async (id: number) => {
+    setTeamIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        const response = await GetService(`${teamsPath}/${id}`, tokenBearer);
+
+        console.log('team');
+
+        setTeam(response.data);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка загрузки команды');
+    } finally {
+      setTeamIsLoading(false);
     }
   }, []);
 
@@ -92,16 +117,27 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       teams,
+      team,
       teamsIsLoading,
+      teamIsLoading,
       createIsLoading,
       deleteIsLoading,
       updateIsLoading,
       fetchTeams,
+      fetchTeam,
       createTeam,
       deleteTeam,
       updateTeam,
     }),
-    [teams, teamsIsLoading, createIsLoading, deleteIsLoading, updateIsLoading],
+    [
+      teams,
+      teamsIsLoading,
+      team,
+      teamIsLoading,
+      createIsLoading,
+      deleteIsLoading,
+      updateIsLoading,
+    ],
   );
 
   return (
