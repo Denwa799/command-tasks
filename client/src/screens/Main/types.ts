@@ -1,8 +1,15 @@
+import {IProject} from 'models/ITasks';
+
 export type TeamScreenNavigateType = {
   Team: {
-    teamId: string;
+    teamId: number;
+    projects: IProject[];
   };
 };
+
+export interface IMainScreen {
+  route: any;
+}
 
 export interface IModals {
   createIsOpen: boolean;
