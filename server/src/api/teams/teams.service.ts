@@ -24,7 +24,10 @@ export class TeamsService {
   }
 
   async getTeamById(id: number) {
-    const team = await this.teamRepository.findOneBy({ id });
+    const team = await this.teamRepository.findOne({
+      where: { id },
+      relations: ['projects'],
+    });
     if (team) return team;
     throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);
   }

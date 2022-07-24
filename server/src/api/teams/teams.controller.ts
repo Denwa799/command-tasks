@@ -32,6 +32,13 @@ export class TeamsController {
     return this.teamsService.getAllTeams();
   }
 
+  @ApiOperation({ summary: 'Получение команды по id' })
+  @ApiResponse({ status: 200, type: Team })
+  @Get(':id')
+  findTeamById(@Param('id') id: number) {
+    return this.teamsService.getTeamById(id);
+  }
+
   @ApiOperation({ summary: 'Удаление команды по id' })
   @ApiResponse({ status: 200, type: Team })
   @Delete(':id')
