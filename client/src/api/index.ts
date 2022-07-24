@@ -23,7 +23,7 @@ export const RegistrationService = (
 
 export const RefreshService = (api: string, tokenRefresh: string = '') => {
   return axios.post(
-    `${api}`,
+    api,
     {},
     {
       headers: {
@@ -38,7 +38,7 @@ export const GetService = (
   tokenBearer: string = '',
   params = {},
 ) => {
-  return axios.get(`${api}`, {
+  return axios.get(api, {
     headers: {
       Authorization: `Bearer ${tokenBearer}`,
     },
@@ -51,9 +51,7 @@ export const PostService = <T>(
   tokenBearer: string = '',
   data: T,
 ) => {
-  console.log(data);
-
-  return axios.post(`${api}`, data, {
+  return axios.post(api, data, {
     headers: {
       Authorization: `Bearer ${tokenBearer}`,
     },
@@ -61,7 +59,19 @@ export const PostService = <T>(
 };
 
 export const DeleteService = (api: string, tokenBearer: string = '') => {
-  return axios.delete(`${api}`, {
+  return axios.delete(api, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};
+
+export const PatchService = <T>(
+  api: string,
+  tokenBearer: string = '',
+  data: T,
+) => {
+  return axios.patch(api, data, {
     headers: {
       Authorization: `Bearer ${tokenBearer}`,
     },

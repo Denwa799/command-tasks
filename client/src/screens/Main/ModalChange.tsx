@@ -5,17 +5,22 @@ import {useTeams} from 'hooks/useTeams';
 import React, {FC, useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {styles} from './styles';
-import {IModalCreate} from './types';
+import {IModalChange} from './types';
 
-export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
+export const ModalChange: FC<IModalChange> = ({
+  isOpen,
+  setIsOpen,
+  id,
+  text,
+}) => {
   const [name, setName] = useState('');
   const [isNameError, setIsNameError] = useState(false);
   const [dangerNameText, setDangerNameText] = useState('Пустое поле');
 
-  const {createTeam, fetchTeams, createIsLoading} = useTeams();
+  const {updateTeam, fetchTeams, updateIsLoading} = useTeams();
 
   useEffect(() => {
-    setName('');
+    setName(text);
     setIsNameError(false);
   }, [isOpen]);
 
@@ -24,14 +29,14 @@ export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
       setName(value);
       setIsNameError(false);
     },
-    [name],
+    [id, name],
   );
 
   const onClose = useCallback(() => {
     setIsOpen(false);
   }, []);
 
-  const onCreate = useCallback(async () => {
+  const onSave = useCallback(async () => {
     if (!name || name.length < 3 || name.length > 50) {
       if (name.length < 3) {
         setDangerNameText('Меньше 3 символов');
@@ -45,10 +50,10 @@ export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
       return setIsNameError(true);
     }
 
-    await createTeam(name);
+    await updateTeam(id, name);
     await fetchTeams();
     setIsOpen(false);
-  }, [name]);
+  }, [id, name]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -66,10 +71,10 @@ export const ModalCreate: FC<IModalCreate> = ({isOpen, setIsOpen}) => {
           onPress={onClose}
         />
         <AppNativeButton
-          title="Добавить"
+          title="Сохранить"
           styleContainer={styles.modalBtn}
-          onPress={onCreate}
-          disabled={createIsLoading}
+          onPress={onSave}
+          disabled={updateIsLoading}
         />
       </View>
     </AppModal>

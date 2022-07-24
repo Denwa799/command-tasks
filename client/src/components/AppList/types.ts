@@ -3,7 +3,7 @@ export interface IAppList {
   onOpen?: (item: any) => void;
   style?: Object;
   onDelete?: (id: number) => void;
-  onChange?: (id: number, name: string) => void;
+  onChange?: (id: number, text: string) => void;
   refreshing?: boolean;
   onRefresh?: () => void;
 }
