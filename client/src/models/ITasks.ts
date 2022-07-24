@@ -1,6 +1,7 @@
 export interface ITeam {
   id: number;
   name: string;
+  projects: IProject[];
 }
 
 export interface IProject {

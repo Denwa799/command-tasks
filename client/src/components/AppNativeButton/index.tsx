@@ -7,10 +7,16 @@ export const AppNativeButton: FC<IAppNativeButton> = ({
   title,
   styleContainer,
   onPress,
+  disabled,
 }) => {
   return (
     <View style={styleContainer}>
-      <Button title={title} color={THEME.MAIN_COLOR} onPress={onPress} />
+      <Button
+        title={title}
+        color={THEME.MAIN_COLOR}
+        onPress={onPress}
+        disabled={disabled}
+      />
     </View>
   );
 };

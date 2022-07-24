@@ -7,7 +7,7 @@ import {styles} from './styles';
 import {useTeams} from 'hooks/useTeams';
 
 const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id}) => {
-  const {fetchTeams, deleteTeam} = useTeams();
+  const {fetchTeams, deleteTeam, deleteIsLoading} = useTeams();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -24,7 +24,7 @@ const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id}) => {
       <Text style={styles.modalText}>Удалить?</Text>
       <View style={styles.modalBtns}>
         <AppNativeButton
-          title="Отменить"
+          title="Закрыть"
           styleContainer={styles.modalBtn}
           onPress={onClose}
         />
@@ -32,6 +32,7 @@ const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id}) => {
           title="Удалить"
           styleContainer={styles.modalBtn}
           onPress={onDelete}
+          disabled={deleteIsLoading}
         />
       </View>
     </AppModal>

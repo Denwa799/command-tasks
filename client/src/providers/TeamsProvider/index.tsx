@@ -1,4 +1,4 @@
-import {DeleteService, GetService, PostService} from 'api';
+import {DeleteService, GetService, PatchService, PostService} from 'api';
 import {variables} from 'constants/variables';
 import {ITeam} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
@@ -13,6 +13,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
+  const [updateIsLoading, setUpdateIsLoading] = useState(false);
 
   const teamsPath = `${variables.API_URL}${variables.TEAMS}`;
 
@@ -39,7 +40,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
         await PostService(`${teamsPath}`, tokenBearer, {
-          name: name,
+          name,
         });
       } else {
         throw new Error('Ошибка сессии');
@@ -69,17 +70,38 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     }
   }, []);
 
+  const updateTeam = useCallback(async (id: number, name: string) => {
+    setUpdateIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await PatchService(`${teamsPath}/${id}`, tokenBearer, {
+          name,
+        });
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка обновления команды');
+    } finally {
+      setUpdateIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       teams,
       teamsIsLoading,
       createIsLoading,
       deleteIsLoading,
+      updateIsLoading,
       fetchTeams,
       createTeam,
       deleteTeam,
+      updateTeam,
     }),
-    [teams, teamsIsLoading, createIsLoading, deleteIsLoading],
+    [teams, teamsIsLoading, createIsLoading, deleteIsLoading, updateIsLoading],
   );
 
   return (
