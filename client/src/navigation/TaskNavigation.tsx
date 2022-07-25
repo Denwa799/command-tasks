@@ -13,7 +13,7 @@ export const TaskNavigation = () => {
           backgroundColor: THEME.BACK_COLOR,
         },
         headerTintColor: THEME.TEXT_COLOR,
-        animation: 'none',
+        animation: 'fade_from_bottom',
       }}>
       <Stack.Screen name="Teams" component={MainScreen} />
       <Stack.Screen name="Team" component={MainScreen} />

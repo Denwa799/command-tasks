@@ -82,8 +82,6 @@ export const AppCard: FC<IAppCard> = ({
     console.log('Редактировать');
   }, []);
 
-  console.log(status);
-
   return (
     <AppContainer>
       <View style={cardStyles}>
