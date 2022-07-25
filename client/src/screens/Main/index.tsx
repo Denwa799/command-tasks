@@ -119,6 +119,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             onOpen={onOpen}
             onDelete={onDelete}
             onChange={onChange}
+            isColors={route.name === projectRoute}
           />
           <AppIconButton onPress={onAdd} />
           <Modals

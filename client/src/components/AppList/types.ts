@@ -6,4 +6,5 @@ export interface IAppList {
   onChange?: (id: number, text: string) => void;
   refreshing?: boolean;
   onRefresh?: () => void;
+  isColors?: boolean;
 }

@@ -13,6 +13,6 @@ export interface IProject {
 export interface ITask {
   id: number;
   text: string;
-  status: 'notCompleted' | 'inProgress' | 'done';
+  status: 'overdue' | 'inProgress' | 'done';
   responsible: string;
 }

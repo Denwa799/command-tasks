@@ -11,6 +11,7 @@ export const AppList: FC<IAppList> = ({
   onChange,
   refreshing,
   onRefresh,
+  isColors,
 }) => {
   return (
     <View>
@@ -29,6 +30,10 @@ export const AppList: FC<IAppList> = ({
             onOpen={onOpen}
             onDelete={onDelete}
             onChange={onChange}
+            isColors={isColors}
+            responsible={item?.responsible}
+            status={item?.status}
+            isUrgently={item?.isUrgently}
           />
         )}
       />
