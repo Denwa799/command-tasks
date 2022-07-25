@@ -10,3 +10,4 @@ export const variables = {
 
 export const teamsRoute = 'Teams';
 export const teamRoute = 'Team';
+export const projectRoute = 'Project';

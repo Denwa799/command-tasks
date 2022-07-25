@@ -7,6 +7,7 @@ export interface ITeam {
 export interface IProject {
   id: number;
   name: string;
+  tasks: ITask[];
 }
 
 export interface ITask {

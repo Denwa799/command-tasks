@@ -4,7 +4,7 @@ import {IProject} from 'models/ITasks';
 import {IProjectsContext, IProjectsProvider} from './types';
 import {Alert} from 'react-native';
 import {getAccessToken} from 'utils/getAccessToken';
-import {DeleteService, PatchService, PostService} from 'api';
+import {DeleteService, GetService, PatchService, PostService} from 'api';
 
 export const ProjectsContext = createContext<IProjectsContext>(
   {} as IProjectsContext,
@@ -13,11 +13,30 @@ export const ProjectsContext = createContext<IProjectsContext>(
 export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
   const [project, setProject] = useState<IProject | null>(null);
 
+  const [projectIsLoading, setProjectIsLoading] = useState(false);
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
   const [updateIsLoading, setUpdateIsLoading] = useState(false);
 
   const projectsPath = `${variables.API_URL}${variables.PROJECTS}`;
+
+  const fetchProject = useCallback(async (id: number) => {
+    setProjectIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        const response = await GetService(`${projectsPath}/${id}`, tokenBearer);
+        setProject(response.data);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка загрузки проекта');
+    } finally {
+      setProjectIsLoading(false);
+    }
+  }, []);
 
   const createProject = useCallback(async (teamId: number, name: string) => {
     setCreateIsLoading(true);
@@ -81,11 +100,19 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
       createIsLoading,
       deleteIsLoading,
       updateIsLoading,
+      projectIsLoading,
       createProject,
       deleteProject,
       updateProject,
+      fetchProject,
     }),
-    [project, createIsLoading, deleteIsLoading, updateIsLoading],
+    [
+      project,
+      createIsLoading,
+      deleteIsLoading,
+      updateIsLoading,
+      projectIsLoading,
+    ],
   );
 
   return (

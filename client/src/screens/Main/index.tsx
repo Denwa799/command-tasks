@@ -4,9 +4,10 @@ import {AppIconButton} from 'components/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
-import {teamRoute, teamsRoute} from 'constants/variables';
+import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {ITeam} from 'models/ITasks';
+import {IProject, ITeam} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, View} from 'react-native';
 import {Modals} from './Modals';
@@ -20,6 +21,9 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     if (route.name === teamRoute) {
       return 'Проекты';
     }
+    if (route.name === projectRoute) {
+      return 'Задачи';
+    }
     return 'Команды';
   }, [route.name]);
 
@@ -28,6 +32,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const {teams, teamsIsLoading, team, teamIsLoading, fetchTeams, fetchTeam} =
     useTeams();
+  const {project, fetchProject} = useProjects();
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -41,8 +46,11 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     if (route.name === teamRoute) {
       return team?.projects;
     }
+    if (route.name === projectRoute) {
+      return project?.tasks;
+    }
     return teams;
-  }, [teams, team, route.name]);
+  }, [teams, team, project, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -52,11 +60,19 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     route.name === teamsRoute && fetchTeams();
   }, []);
 
-  const onOpen = useCallback(async (itemTeam: ITeam) => {
-    await fetchTeam(itemTeam.id);
-    navigation.navigate(teamRoute, {
-      teamId: itemTeam.id,
-    });
+  const onOpen = useCallback(async (item: ITeam | IProject) => {
+    if (route.name === teamsRoute) {
+      await fetchTeam(item.id);
+      navigation.navigate(teamRoute, {
+        teamId: item.id,
+      });
+    }
+    if (route.name === teamRoute) {
+      await fetchProject(item.id);
+      navigation.navigate(projectRoute, {
+        projectId: item.id,
+      });
+    }
   }, []);
 
   const onRefresh = useCallback(() => {
@@ -64,6 +80,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     try {
       route.name === teamsRoute && fetchTeams();
       route.name === teamRoute && fetchTeam(params.teamId);
+      route.name === projectRoute && fetchProject(params.projectId);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {

@@ -2,6 +2,9 @@ export type TeamScreenNavigateType = {
   Team: {
     teamId: number;
   };
+  Project: {
+    projectId: number;
+  };
 };
 
 export interface IMainScreen {
