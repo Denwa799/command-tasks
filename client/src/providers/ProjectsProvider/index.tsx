@@ -4,7 +4,7 @@ import {IProject} from 'models/ITasks';
 import {IProjectsContext, IProjectsProvider} from './types';
 import {Alert} from 'react-native';
 import {getAccessToken} from 'utils/getAccessToken';
-import {DeleteService, PostService} from 'api';
+import {DeleteService, PatchService, PostService} from 'api';
 
 export const ProjectsContext = createContext<IProjectsContext>(
   {} as IProjectsContext,
@@ -15,6 +15,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
 
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
+  const [updateIsLoading, setUpdateIsLoading] = useState(false);
 
   const projectsPath = `${variables.API_URL}${variables.PROJECTS}`;
 
@@ -55,15 +56,36 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
     }
   }, []);
 
+  const updateProject = useCallback(async (id: number, name: string) => {
+    setUpdateIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await PatchService(`${projectsPath}/${id}`, tokenBearer, {
+          name,
+        });
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка обновления проекта');
+    } finally {
+      setUpdateIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       project,
       createIsLoading,
       deleteIsLoading,
+      updateIsLoading,
       createProject,
       deleteProject,
+      updateProject,
     }),
-    [project, createIsLoading],
+    [project, createIsLoading, deleteIsLoading, updateIsLoading],
   );
 
   return (

@@ -33,6 +33,7 @@ export const Modals: FC<IModals> = ({
         setIsOpen={setChangeIsOpen}
         id={id}
         text={text}
+        teamId={teamId}
       />
     </>
   );

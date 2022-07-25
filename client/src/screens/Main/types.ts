@@ -31,6 +31,7 @@ export interface IModalChange {
   setIsOpen: (value: boolean) => void;
   id: number;
   text: string;
+  teamId?: number;
 }
 
 export interface IModalDelete {
