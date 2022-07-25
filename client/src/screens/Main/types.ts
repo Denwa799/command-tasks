@@ -37,4 +37,5 @@ export interface IModalDelete {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   id: number;
+  teamId?: number;
 }

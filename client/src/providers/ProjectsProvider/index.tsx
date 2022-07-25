@@ -4,7 +4,7 @@ import {IProject} from 'models/ITasks';
 import {IProjectsContext, IProjectsProvider} from './types';
 import {Alert} from 'react-native';
 import {getAccessToken} from 'utils/getAccessToken';
-import {PostService} from 'api';
+import {DeleteService, PostService} from 'api';
 
 export const ProjectsContext = createContext<IProjectsContext>(
   {} as IProjectsContext,
@@ -14,6 +14,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
   const [project, setProject] = useState<IProject | null>(null);
 
   const [createIsLoading, setCreateIsLoading] = useState(false);
+  const [deleteIsLoading, setDeleteIsLoading] = useState(false);
 
   const projectsPath = `${variables.API_URL}${variables.PROJECTS}`;
 
@@ -31,9 +32,26 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
       }
     } catch (error) {
       console.log(error);
-      Alert.alert('Ошибка создания команды');
+      Alert.alert('Ошибка создания проекта');
     } finally {
       setCreateIsLoading(false);
+    }
+  }, []);
+
+  const deleteProject = useCallback(async (id: number) => {
+    setDeleteIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await DeleteService(`${projectsPath}/${id}`, tokenBearer);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка удаления проекта');
+    } finally {
+      setDeleteIsLoading(false);
     }
   }, []);
 
@@ -41,7 +59,9 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
     () => ({
       project,
       createIsLoading,
+      deleteIsLoading,
       createProject,
+      deleteProject,
     }),
     [project, createIsLoading],
   );

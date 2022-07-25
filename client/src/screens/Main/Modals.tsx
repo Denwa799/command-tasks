@@ -22,7 +22,12 @@ export const Modals: FC<IModals> = ({
         setIsOpen={setCreateIsOpen}
         teamId={teamId}
       />
-      <ModalDelete isOpen={deleteIsOpen} setIsOpen={setDeleteIsOpen} id={id} />
+      <ModalDelete
+        isOpen={deleteIsOpen}
+        setIsOpen={setDeleteIsOpen}
+        id={id}
+        teamId={teamId}
+      />
       <ModalChange
         isOpen={changeIsOpen}
         setIsOpen={setChangeIsOpen}
