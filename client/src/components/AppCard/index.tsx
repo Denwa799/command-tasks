@@ -40,7 +40,7 @@ export const AppCard: FC<IAppCard> = ({
       status === inProgressStatus && isUrgently && styles.yellowBack,
       status === doneStatus && isUrgently && styles.greenBack,
     ];
-  }, [isColors, status]);
+  }, [isColors, status, isUrgently]);
 
   const textStyles = useMemo(() => {
     return [
@@ -49,7 +49,7 @@ export const AppCard: FC<IAppCard> = ({
       isUrgently && styles.colorUrgently,
       status === inProgressStatus && isUrgently && styles.blackText,
     ];
-  }, [isColors, status]);
+  }, [isColors, status, isUrgently]);
 
   const responsibleStyles = useMemo(() => {
     return [
@@ -57,7 +57,7 @@ export const AppCard: FC<IAppCard> = ({
       isUrgently && styles.colorUrgently,
       status === inProgressStatus && isUrgently && styles.blackText,
     ];
-  }, [isColors, status]);
+  }, [isColors, status, isUrgently]);
 
   const iconColor = useMemo(() => {
     if (isColors) {
@@ -70,7 +70,7 @@ export const AppCard: FC<IAppCard> = ({
       return colorScheme === 'dark' ? THEME.WHITE_COLOR : THEME.WHITE_COLOR;
     }
     return colorScheme === 'dark' ? THEME.TEXT_COLOR : THEME.SECOND_COLOR;
-  }, [colorScheme, isColors, status]);
+  }, [colorScheme, isColors, status, isUrgently]);
 
   const openHandler = useCallback(() => {
     console.log('Открыть');

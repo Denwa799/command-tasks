@@ -102,13 +102,13 @@ export const ModalCreate: FC<IModalCreate> = ({
 
     if (route.name === projectRoute) {
       if (!responsible || responsible.length < 3 || responsible.length > 50) {
-        if (text.length < 3) {
+        if (responsible.length < 3) {
           setDangerResponsibleText('Меньше 3 символов');
         }
-        if (text.length > 50) {
+        if (responsible.length > 50) {
           setDangerResponsibleText('Больше 50 символов');
         }
-        if (!text) {
+        if (!responsible) {
           setDangerResponsibleText('Пустое поле');
         }
         return setIsResponsibleError(true);

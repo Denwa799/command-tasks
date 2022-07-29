@@ -15,6 +15,8 @@ export interface ITask {
   text: string;
   status: TaskStatusType;
   responsible: string;
+  date: Date;
+  isUrgently: boolean;
 }
 
 export type TaskStatusType = 'overdue' | 'inProgress' | 'done';
