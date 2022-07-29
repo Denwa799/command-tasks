@@ -7,11 +7,14 @@ export interface ITeam {
 export interface IProject {
   id: number;
   name: string;
+  tasks: ITask[];
 }
 
 export interface ITask {
   id: number;
   text: string;
-  status: 'notCompleted' | 'inProgress' | 'done';
+  status: TaskStatusType;
   responsible: string;
 }
+
+export type TaskStatusType = 'overdue' | 'inProgress' | 'done';

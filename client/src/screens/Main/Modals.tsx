@@ -13,16 +13,38 @@ export const Modals: FC<IModals> = ({
   changeIsOpen,
   setChangeIsOpen,
   text,
+  teamId,
+  projectId,
+  responsible,
+  status,
+  isUrgently,
+  date,
 }) => {
   return (
     <>
-      <ModalCreate isOpen={createIsOpen} setIsOpen={setCreateIsOpen} />
-      <ModalDelete isOpen={deleteIsOpen} setIsOpen={setDeleteIsOpen} id={id} />
+      <ModalCreate
+        isOpen={createIsOpen}
+        setIsOpen={setCreateIsOpen}
+        teamId={teamId}
+        projectId={projectId}
+      />
+      <ModalDelete
+        isOpen={deleteIsOpen}
+        setIsOpen={setDeleteIsOpen}
+        id={id}
+        teamId={teamId}
+        projectId={projectId}
+      />
       <ModalChange
         isOpen={changeIsOpen}
         setIsOpen={setChangeIsOpen}
         id={id}
         text={text}
+        teamId={teamId}
+        responsible={responsible}
+        status={status}
+        isUrgently={isUrgently}
+        date={date}
       />
     </>
   );

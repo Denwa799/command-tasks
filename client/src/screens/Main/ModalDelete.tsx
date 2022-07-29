@@ -5,19 +5,40 @@ import {Text, View} from 'react-native';
 import {IModalDelete} from './types';
 import {styles} from './styles';
 import {useTeams} from 'hooks/useTeams';
+import {useRoute} from '@react-navigation/native';
+import {useProjects} from 'hooks/useProjects';
+import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useTasks} from 'hooks/useTasks';
 
-const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id}) => {
-  const {fetchTeams, deleteTeam, deleteIsLoading} = useTeams();
+const ModalDelete: FC<IModalDelete> = ({
+  isOpen,
+  setIsOpen,
+  id,
+  teamId,
+  projectId,
+}) => {
+  const route = useRoute();
+
+  const {fetchTeams, fetchTeam, deleteTeam, deleteIsLoading} = useTeams();
+  const {deleteProject, fetchProject} = useProjects();
+  const {deleteTask} = useTasks();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
   }, []);
 
   const onDelete = useCallback(async () => {
-    await deleteTeam(id);
-    await fetchTeams();
+    route.name === teamsRoute && (await deleteTeam(id));
+    route.name === teamsRoute && (await fetchTeams());
+
+    route.name === teamRoute && teamId && (await deleteProject(id));
+    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+
+    route.name === projectRoute && projectId && (await deleteTask(id));
+    route.name === projectRoute && projectId && (await fetchProject(projectId));
+
     setIsOpen(false);
-  }, [id]);
+  }, [id, teamId, projectId]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>

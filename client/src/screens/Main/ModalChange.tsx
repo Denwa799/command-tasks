@@ -1,9 +1,23 @@
+import {useRoute} from '@react-navigation/native';
+import {AppCheckBox} from 'components/AppCheckBox';
+import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
 import {AppNativeButton} from 'components/AppNativeButton';
+import {AppText} from 'components/AppText';
+import {AppTextButton} from 'components/AppTextButton';
+import {
+  doneStatus,
+  inProgressStatus,
+  projectRoute,
+  teamRoute,
+  teamsRoute,
+} from 'constants/variables';
+import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import React, {FC, useCallback, useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {TaskStatusType} from 'models/ITasks';
+import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import {styles} from './styles';
 import {IModalChange} from './types';
 
@@ -12,58 +26,153 @@ export const ModalChange: FC<IModalChange> = ({
   setIsOpen,
   id,
   text,
+  teamId,
+  responsible,
+  status,
+  isUrgently,
+  date,
 }) => {
-  const [name, setName] = useState('');
-  const [isNameError, setIsNameError] = useState(false);
-  const [dangerNameText, setDangerNameText] = useState('Пустое поле');
+  const route = useRoute();
 
-  const {updateTeam, fetchTeams, updateIsLoading} = useTeams();
+  const [textValue, setTextValue] = useState('');
+  const [isTextError, setIsTextError] = useState(false);
+  const [dangerText, setDangerText] = useState('Пустое поле');
+
+  const [responsibleValue, setResponsibleValue] = useState('');
+  const [isResponsibleError, setIsResponsibleError] = useState(false);
+  const [dangerResponsibleText, setDangerResponsibleText] =
+    useState('Пустое поле');
+
+  const [isUrgentlyValue, setIsUrgentlyValue] = useState(false);
+
+  const [statusValue, setStatusValue] = useState<TaskStatusType>();
+  const [isDone, setIsDone] = useState(false);
+
+  const [dateValue, setDateValue] = useState<Date>(
+    useMemo(() => {
+      return new Date();
+    }, []),
+  );
+  const [isPickerOpen, setIsPickerOpen] = useState(false);
+
+  const {updateTeam, fetchTeams, fetchTeam, updateIsLoading} = useTeams();
+  const {updateProject} = useProjects();
 
   useEffect(() => {
-    setName(text);
-    setIsNameError(false);
+    setTextValue(text);
+    setIsTextError(false);
+    responsible && setResponsibleValue(responsible);
+    status && setStatusValue(status);
+    isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
+    date !== undefined && setDateValue(date);
   }, [isOpen]);
 
-  const nameHandler = useCallback(
+  useEffect(() => {
+    statusValue === doneStatus && setIsDone(true);
+    statusValue !== doneStatus && setIsDone(false);
+  }, [statusValue]);
+
+  const textHandler = useCallback(
     (value: string) => {
-      setName(value);
-      setIsNameError(false);
+      setTextValue(value);
+      setIsTextError(false);
     },
-    [id, name],
+    [id, textValue],
   );
+
+  const responsibleHandler = useCallback(
+    (value: string) => {
+      setResponsibleValue(value);
+      setIsResponsibleError(false);
+    },
+    [responsibleValue],
+  );
+
+  const isUrgentlyHandler = useCallback(() => {
+    setIsUrgentlyValue(value => !value);
+  }, [isUrgentlyValue]);
+
+  const statusHandler = useCallback(() => {
+    if (statusValue === inProgressStatus) {
+      return setStatusValue(doneStatus);
+    }
+    return setStatusValue(inProgressStatus);
+  }, [statusValue]);
+
+  const onDateConfirm = useCallback((newDate: Date) => {
+    setIsPickerOpen(false);
+    setDateValue(newDate);
+  }, []);
+
+  const onDateCancel = useCallback(() => {
+    setIsPickerOpen(false);
+  }, []);
 
   const onClose = useCallback(() => {
     setIsOpen(false);
   }, []);
 
   const onSave = useCallback(async () => {
-    if (!name || name.length < 3 || name.length > 50) {
-      if (name.length < 3) {
-        setDangerNameText('Меньше 3 символов');
+    if (!textValue || textValue.length < 3 || textValue.length > 50) {
+      if (textValue.length < 3) {
+        setDangerText('Меньше 3 символов');
       }
-      if (name.length > 50) {
-        setDangerNameText('Больше 50 символов');
+      if (textValue.length > 50) {
+        setDangerText('Больше 50 символов');
       }
-      if (!name) {
-        setDangerNameText('Пустое поле');
+      if (!textValue) {
+        setDangerText('Пустое поле');
       }
-      return setIsNameError(true);
+      return setIsTextError(true);
     }
 
-    await updateTeam(id, name);
-    await fetchTeams();
+    route.name === teamsRoute && (await updateTeam(id, textValue));
+    route.name === teamsRoute && (await fetchTeams());
+
+    route.name === teamRoute && teamId && (await updateProject(id, textValue));
+    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+
     setIsOpen(false);
-  }, [id, name]);
+  }, [id, textValue, teamId]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
       <AppField
-        value={name}
-        placeholder={'Введите название'}
-        onChange={nameHandler}
-        isDanger={isNameError}
-        dangerText={dangerNameText}
+        value={textValue}
+        placeholder={'Введите текст'}
+        onChange={textHandler}
+        isDanger={isTextError}
+        dangerText={dangerText}
       />
+      {route.name === projectRoute && (
+        <>
+          <AppField
+            value={responsibleValue}
+            placeholder={'Введите ответственного'}
+            onChange={responsibleHandler}
+            isDanger={isResponsibleError}
+            dangerText={dangerResponsibleText}
+          />
+          <TouchableOpacity
+            style={styles.checkbox}
+            activeOpacity={1}
+            onPress={isUrgentlyHandler}>
+            <AppCheckBox
+              value={isUrgentlyValue}
+              onValueChange={isUrgentlyHandler}
+            />
+            <AppText>Срочно</AppText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.checkbox}
+            activeOpacity={1}
+            onPress={statusHandler}>
+            <AppCheckBox value={isDone} onValueChange={statusHandler} />
+            <AppText>Выполнено</AppText>
+          </TouchableOpacity>
+        </>
+      )}
+
       <View style={styles.modalBtns}>
         <AppNativeButton
           title="Закрыть"

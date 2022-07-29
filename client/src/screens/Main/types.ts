@@ -1,9 +1,11 @@
-import {IProject} from 'models/ITasks';
+import {TaskStatusType} from 'models/ITasks';
 
 export type TeamScreenNavigateType = {
   Team: {
     teamId: number;
-    projects: IProject[];
+  };
+  Project: {
+    projectId: number;
   };
 };
 
@@ -20,11 +22,19 @@ export interface IModals {
   setChangeIsOpen: (value: boolean) => void;
   id: number;
   text: string;
+  teamId?: number;
+  projectId?: number;
+  responsible?: string;
+  status?: TaskStatusType;
+  isUrgently?: boolean;
+  date?: Date;
 }
 
 export interface IModalCreate {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  teamId?: number;
+  projectId?: number;
 }
 
 export interface IModalChange {
@@ -32,10 +42,17 @@ export interface IModalChange {
   setIsOpen: (value: boolean) => void;
   id: number;
   text: string;
+  teamId?: number;
+  responsible?: string;
+  status?: TaskStatusType;
+  isUrgently?: boolean;
+  date?: Date;
 }
 
 export interface IModalDelete {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   id: number;
+  teamId?: number;
+  projectId?: number;
 }

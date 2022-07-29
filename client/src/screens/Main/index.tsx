@@ -4,8 +4,10 @@ import {AppIconButton} from 'components/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
+import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {ITeam} from 'models/ITasks';
+import {IProject, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, View} from 'react-native';
 import {Modals} from './Modals';
@@ -14,9 +16,13 @@ import {IMainScreen, TeamScreenNavigateType} from './types';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
+
   const routeName = useMemo(() => {
-    if (route.name === 'Team') {
+    if (route.name === teamRoute) {
       return 'Проекты';
+    }
+    if (route.name === projectRoute) {
+      return 'Задачи';
     }
     return 'Команды';
   }, [route.name]);
@@ -24,7 +30,9 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
 
-  const {teams, teamsIsLoading, fetchTeams} = useTeams();
+  const {teams, teamsIsLoading, team, teamIsLoading, fetchTeams, fetchTeam} =
+    useTeams();
+  const {project, fetchProject} = useProjects();
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -33,39 +41,56 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const [id, setId] = useState(0);
   const [text, setText] = useState('');
+  const [responsible, setResponsible] = useState('');
+  const [status, setStatus] = useState<TaskStatusType>();
+  const [isUrgently, setIsUrgently] = useState(false);
+  const [date, setDate] = useState<Date>();
 
   const data = useMemo(() => {
-    if (route.name === 'Team') {
-      return params.projects;
+    if (route.name === teamRoute) {
+      return team?.projects;
+    }
+    if (route.name === projectRoute) {
+      return project?.tasks;
     }
     return teams;
-  }, [teams, params, route.name]);
+  }, [teams, team, project, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
       title: routeName,
     });
 
-    route.name === 'Teams' && fetchTeams();
+    route.name === teamsRoute && fetchTeams();
   }, []);
 
-  const onOpen = useCallback((team: ITeam) => {
-    navigation.navigate('Team', {
-      teamId: team.id,
-      projects: team.projects,
-    });
+  const onOpen = useCallback(async (item: ITeam | IProject) => {
+    if (route.name === teamsRoute) {
+      await fetchTeam(item.id);
+      navigation.navigate(teamRoute, {
+        teamId: item.id,
+      });
+    }
+    if (route.name === teamRoute) {
+      await fetchProject(item.id);
+      navigation.navigate(projectRoute, {
+        projectId: item.id,
+      });
+    }
   }, []);
 
   const onRefresh = useCallback(() => {
     setIsRefreshing(true);
     try {
-      fetchTeams();
+      route.name === teamsRoute && fetchTeams();
+      route.name === teamRoute && fetchTeam(params.teamId);
+      route.name === projectRoute && fetchProject(params.projectId);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {
       setIsRefreshing(false);
     }
-  }, []);
+  }, [params]);
 
   const onAdd = useCallback(() => {
     setCreateIsOpen(true);
@@ -76,15 +101,29 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     setDeleteIsOpen(true);
   }, []);
 
-  const onChange = useCallback((itemId: number, itemText: string) => {
-    setId(itemId);
-    setChangeIsOpen(true);
-    setText(itemText);
-  }, []);
+  const onChange = useCallback(
+    (
+      itemId: number,
+      itemText: string,
+      itemResponsible: string | undefined,
+      itemStatus: TaskStatusType | undefined,
+      itemIsUrgently: boolean | undefined,
+      itemDate: Date | undefined,
+    ) => {
+      setId(itemId);
+      setChangeIsOpen(true);
+      setText(itemText);
+      itemResponsible && setResponsible(itemResponsible);
+      itemStatus && setStatus(itemStatus);
+      itemIsUrgently !== undefined && setIsUrgently(itemIsUrgently);
+      itemDate !== undefined && setDate(itemDate);
+    },
+    [],
+  );
 
   return (
     <View style={styles.main}>
-      {teamsIsLoading ? (
+      {teamsIsLoading || (route.name === teamRoute && teamIsLoading) ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
@@ -98,6 +137,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             onOpen={onOpen}
             onDelete={onDelete}
             onChange={onChange}
+            isColors={route.name === projectRoute}
           />
           <AppIconButton onPress={onAdd} />
           <Modals
@@ -109,6 +149,12 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             changeIsOpen={changeIsOpen}
             setChangeIsOpen={setChangeIsOpen}
             text={text}
+            teamId={route.name === teamRoute && params.teamId}
+            projectId={route.name === projectRoute && params.projectId}
+            responsible={responsible}
+            status={status}
+            isUrgently={isUrgently}
+            date={date}
           />
         </View>
       )}

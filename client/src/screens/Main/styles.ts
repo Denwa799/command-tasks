@@ -19,6 +19,18 @@ export const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginRight: 'auto',
   },
+  checkbox: {
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  date: {
+    fontSize: SIZES.body2,
+    marginTop: 5,
+    marginBottom: 10,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
   modalBtns: {
     flex: 1,
     flexDirection: 'row',
