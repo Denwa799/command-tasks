@@ -44,4 +44,5 @@ export interface IModalDelete {
   setIsOpen: (value: boolean) => void;
   id: number;
   teamId?: number;
+  projectId?: number;
 }

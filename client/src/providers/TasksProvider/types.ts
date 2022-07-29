@@ -2,6 +2,7 @@ import {ReactNode} from 'react';
 
 export interface ITasksContext {
   createIsLoading: boolean;
+  deleteIsLoading: boolean;
   createTask: (
     projectId: number,
     text: string,
@@ -10,6 +11,7 @@ export interface ITasksContext {
     isUrgently: boolean,
     date: Date,
   ) => Promise<void>;
+  deleteTask: (id: number) => Promise<void>;
 }
 
 export interface ITasksProvider {

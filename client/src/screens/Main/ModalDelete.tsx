@@ -7,13 +7,21 @@ import {styles} from './styles';
 import {useTeams} from 'hooks/useTeams';
 import {useRoute} from '@react-navigation/native';
 import {useProjects} from 'hooks/useProjects';
-import {teamRoute, teamsRoute} from 'constants/variables';
+import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useTasks} from 'hooks/useTasks';
 
-const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id, teamId}) => {
+const ModalDelete: FC<IModalDelete> = ({
+  isOpen,
+  setIsOpen,
+  id,
+  teamId,
+  projectId,
+}) => {
   const route = useRoute();
 
   const {fetchTeams, fetchTeam, deleteTeam, deleteIsLoading} = useTeams();
-  const {deleteProject} = useProjects();
+  const {deleteProject, fetchProject} = useProjects();
+  const {deleteTask} = useTasks();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -26,8 +34,11 @@ const ModalDelete: FC<IModalDelete> = ({isOpen, setIsOpen, id, teamId}) => {
     route.name === teamRoute && teamId && (await deleteProject(id));
     route.name === teamRoute && teamId && (await fetchTeam(teamId));
 
+    route.name === projectRoute && projectId && (await deleteTask(id));
+    route.name === projectRoute && projectId && (await fetchProject(projectId));
+
     setIsOpen(false);
-  }, [id, teamId]);
+  }, [id, teamId, projectId]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
