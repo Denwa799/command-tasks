@@ -132,6 +132,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             setChangeIsOpen={setChangeIsOpen}
             text={text}
             teamId={route.name === teamRoute && params.teamId}
+            projectId={route.name === projectRoute && params.projectId}
           />
         </View>
       )}

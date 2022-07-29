@@ -21,12 +21,14 @@ export interface IModals {
   id: number;
   text: string;
   teamId?: number;
+  projectId?: number;
 }
 
 export interface IModalCreate {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   teamId?: number;
+  projectId?: number;
 }
 
 export interface IModalChange {
