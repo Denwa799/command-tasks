@@ -11,6 +11,7 @@ import {
 import {styles} from './styles';
 import {IAppCard} from './types';
 import Anticon from 'react-native-vector-icons/AntDesign';
+import {doneStatus, inProgressStatus, overdueStatus} from 'constants/variables';
 
 const colorScheme = Appearance.getColorScheme();
 
@@ -25,18 +26,19 @@ export const AppCard: FC<IAppCard> = ({
   onChange,
   isColors = false,
   isUrgently = false,
+  date,
 }) => {
   const cardStyles = useMemo(() => {
     return [
       styles.card,
       BOX_SHADOW,
       isColors && styles.colorsCard,
-      status === 'overdue' && styles.redBorder,
-      status === 'inProgress' && styles.yellowBorder,
-      status === 'done' && styles.greenBorder,
-      status === 'overdue' && isUrgently && styles.redBack,
-      status === 'inProgress' && isUrgently && styles.yellowBack,
-      status === 'done' && isUrgently && styles.greenBack,
+      status === overdueStatus && styles.redBorder,
+      status === inProgressStatus && styles.yellowBorder,
+      status === doneStatus && styles.greenBorder,
+      status === overdueStatus && isUrgently && styles.redBack,
+      status === inProgressStatus && isUrgently && styles.yellowBack,
+      status === doneStatus && isUrgently && styles.greenBack,
     ];
   }, [isColors, status]);
 
@@ -45,7 +47,7 @@ export const AppCard: FC<IAppCard> = ({
       styles.text,
       isColors && styles.colorsText,
       isUrgently && styles.colorUrgently,
-      status === 'inProgress' && isUrgently && styles.blackText,
+      status === inProgressStatus && isUrgently && styles.blackText,
     ];
   }, [isColors, status]);
 
@@ -53,7 +55,7 @@ export const AppCard: FC<IAppCard> = ({
     return [
       styles.responsible,
       isUrgently && styles.colorUrgently,
-      status === 'inProgress' && isUrgently && styles.blackText,
+      status === inProgressStatus && isUrgently && styles.blackText,
     ];
   }, [isColors, status]);
 
@@ -62,7 +64,7 @@ export const AppCard: FC<IAppCard> = ({
       if (!isUrgently) {
         return THEME.TEXT_COLOR;
       }
-      if (status === 'inProgress') {
+      if (status === inProgressStatus) {
         return colorScheme === 'dark' ? THEME.BLACK_COLOR : THEME.BLACK_COLOR;
       }
       return colorScheme === 'dark' ? THEME.WHITE_COLOR : THEME.WHITE_COLOR;
@@ -93,7 +95,11 @@ export const AppCard: FC<IAppCard> = ({
           {responsible && <Text style={responsibleStyles}>{responsible}</Text>}
         </TouchableOpacity>
         <TouchableHighlight
-          onPress={onChange ? () => onChange(id, text) : changeHandler}
+          onPress={
+            onChange
+              ? () => onChange(id, text, responsible, status, isUrgently, date)
+              : changeHandler
+          }
           underlayColor="none">
           <Anticon name="edit" size={24} color={iconColor} />
         </TouchableHighlight>

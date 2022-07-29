@@ -1,4 +1,4 @@
-import {DeleteService, PostService} from 'api';
+import {DeleteService, PatchService, PostService} from 'api';
 import {variables} from 'constants/variables';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
@@ -10,6 +10,7 @@ export const TasksContext = createContext<ITasksContext>({} as ITasksContext);
 export const TasksProvider: FC<ITasksProvider> = ({children}) => {
   const [createIsLoading, setCreateIsLoading] = useState(false);
   const [deleteIsLoading, setDeleteIsLoading] = useState(false);
+  const [updateIsLoading, setUpdateIsLoading] = useState(false);
 
   const tasksPath = `${variables.API_URL}${variables.TASKS}`;
 
@@ -64,14 +65,49 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
     }
   }, []);
 
+  const updateTask = useCallback(
+    async (
+      id: number,
+      text: string,
+      responsible: string,
+      status: 'overdue' | 'inProgress' | 'done',
+      isUrgently: boolean,
+      date: Date,
+    ) => {
+      setUpdateIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          await PatchService(`${tasksPath}/${id}`, tokenBearer, {
+            text,
+            responsible,
+            status,
+            isUrgently,
+            date,
+          });
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка обновления задачи');
+      } finally {
+        setUpdateIsLoading(false);
+      }
+    },
+    [],
+  );
+
   const value = useMemo(
     () => ({
       createIsLoading,
       deleteIsLoading,
+      updateIsLoading,
       createTask,
       deleteTask,
+      updateTask,
     }),
-    [createIsLoading, deleteIsLoading],
+    [createIsLoading, deleteIsLoading, updateIsLoading],
   );
 
   return (

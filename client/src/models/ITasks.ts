@@ -13,6 +13,8 @@ export interface IProject {
 export interface ITask {
   id: number;
   text: string;
-  status: 'overdue' | 'inProgress' | 'done';
+  status: TaskStatusType;
   responsible: string;
 }
+
+export type TaskStatusType = 'overdue' | 'inProgress' | 'done';

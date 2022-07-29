@@ -34,6 +34,7 @@ export const AppList: FC<IAppList> = ({
             responsible={item?.responsible}
             status={item?.status}
             isUrgently={item?.isUrgently}
+            date={item?.date}
           />
         )}
       />

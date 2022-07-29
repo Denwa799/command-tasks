@@ -15,6 +15,10 @@ export const Modals: FC<IModals> = ({
   text,
   teamId,
   projectId,
+  responsible,
+  status,
+  isUrgently,
+  date,
 }) => {
   return (
     <>
@@ -37,6 +41,10 @@ export const Modals: FC<IModals> = ({
         id={id}
         text={text}
         teamId={teamId}
+        responsible={responsible}
+        status={status}
+        isUrgently={isUrgently}
+        date={date}
       />
     </>
   );

@@ -7,7 +7,7 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {IProject, ITeam} from 'models/ITasks';
+import {IProject, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, View} from 'react-native';
 import {Modals} from './Modals';
@@ -41,6 +41,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const [id, setId] = useState(0);
   const [text, setText] = useState('');
+  const [responsible, setResponsible] = useState('');
+  const [status, setStatus] = useState<TaskStatusType>();
+  const [isUrgently, setIsUrgently] = useState(false);
+  const [date, setDate] = useState<Date>();
 
   const data = useMemo(() => {
     if (route.name === teamRoute) {
@@ -97,11 +101,25 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     setDeleteIsOpen(true);
   }, []);
 
-  const onChange = useCallback((itemId: number, itemText: string) => {
-    setId(itemId);
-    setChangeIsOpen(true);
-    setText(itemText);
-  }, []);
+  const onChange = useCallback(
+    (
+      itemId: number,
+      itemText: string,
+      itemResponsible: string | undefined,
+      itemStatus: TaskStatusType | undefined,
+      itemIsUrgently: boolean | undefined,
+      itemDate: Date | undefined,
+    ) => {
+      setId(itemId);
+      setChangeIsOpen(true);
+      setText(itemText);
+      itemResponsible && setResponsible(itemResponsible);
+      itemStatus && setStatus(itemStatus);
+      itemIsUrgently !== undefined && setIsUrgently(itemIsUrgently);
+      itemDate !== undefined && setDate(itemDate);
+    },
+    [],
+  );
 
   return (
     <View style={styles.main}>
@@ -133,6 +151,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             text={text}
             teamId={route.name === teamRoute && params.teamId}
             projectId={route.name === projectRoute && params.projectId}
+            responsible={responsible}
+            status={status}
+            isUrgently={isUrgently}
+            date={date}
           />
         </View>
       )}

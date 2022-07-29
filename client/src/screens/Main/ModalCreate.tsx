@@ -77,9 +77,9 @@ export const ModalCreate: FC<IModalCreate> = ({
     setIsUrgently(value => !value);
   }, [isUrgently]);
 
-  const onDateConfirm = useCallback((date: Date) => {
+  const onDateConfirm = useCallback((newDate: Date) => {
     setIsPickerOpen(false);
-    setDate(date);
+    setDate(newDate);
   }, []);
 
   const onDateCancel = useCallback(() => {
@@ -155,7 +155,7 @@ export const ModalCreate: FC<IModalCreate> = ({
             dangerText={dangerResponsibleText}
           />
           <TouchableOpacity
-            style={styles.isUrgently}
+            style={styles.checkbox}
             activeOpacity={1}
             onPress={isUrgentlyHandler}>
             <AppCheckBox value={isUrgently} onValueChange={isUrgentlyHandler} />

@@ -19,7 +19,7 @@ export const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginRight: 'auto',
   },
-  isUrgently: {
+  checkbox: {
     marginTop: 10,
     flexDirection: 'row',
     alignItems: 'center',
