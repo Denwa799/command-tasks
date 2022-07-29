@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsBoolean,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -36,8 +38,9 @@ export class CreateTaskDto {
     description: 'Дата задачи в календаре',
   })
   @IsNotEmpty({ message: 'Пустое поле даты' })
-  @IsString({ message: 'Должно быть датой' })
-  readonly date: string;
+  @IsDate({ message: 'Должно быть датой' })
+  @Type(() => Date)
+  readonly date: Date;
 
   @ApiProperty({ example: '1', description: 'Id проекта' })
   @IsNotEmpty({ message: 'Нет id проекта' })

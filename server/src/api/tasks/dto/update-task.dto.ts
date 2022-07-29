@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString, Length } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsDate,
+  IsNotEmpty,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class UpdateTaskDto {
   @ApiProperty({ example: 'Найти персонал', description: 'Текст задачи' })
@@ -30,6 +37,7 @@ export class UpdateTaskDto {
     description: 'Дата задачи в календаре',
   })
   @IsNotEmpty({ message: 'Пустое поле даты' })
-  @IsString({ message: 'Должно быть датой' })
-  readonly date: string;
+  @IsDate({ message: 'Должно быть датой' })
+  @Type(() => Date)
+  readonly date: Date;
 }

@@ -58,8 +58,8 @@ export class Task {
     description: 'Дата создания',
   })
   @CreateDateColumn({ type: 'timestamptz' })
-  @IsString()
-  createdAt: string;
+  @IsDate()
+  createdAt: Date;
 
   @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',
