@@ -14,9 +14,9 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
   const [project, setProject] = useState<IProject | null>(null);
 
   const [projectIsLoading, setProjectIsLoading] = useState(false);
-  const [createIsLoading, setCreateIsLoading] = useState(false);
-  const [deleteIsLoading, setDeleteIsLoading] = useState(false);
-  const [updateIsLoading, setUpdateIsLoading] = useState(false);
+  const [createProjectIsLoading, setCreateProjectIsLoading] = useState(false);
+  const [deleteProjectIsLoading, setDeleteProjectIsLoading] = useState(false);
+  const [updateProjectIsLoading, setUpdateProjectIsLoading] = useState(false);
 
   const projectsPath = `${variables.API_URL}${variables.PROJECTS}`;
 
@@ -39,7 +39,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
   }, []);
 
   const createProject = useCallback(async (teamId: number, name: string) => {
-    setCreateIsLoading(true);
+    setCreateProjectIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -54,12 +54,12 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка создания проекта');
     } finally {
-      setCreateIsLoading(false);
+      setCreateProjectIsLoading(false);
     }
   }, []);
 
   const deleteProject = useCallback(async (id: number) => {
-    setDeleteIsLoading(true);
+    setDeleteProjectIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -71,12 +71,12 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка удаления проекта');
     } finally {
-      setDeleteIsLoading(false);
+      setDeleteProjectIsLoading(false);
     }
   }, []);
 
   const updateProject = useCallback(async (id: number, name: string) => {
-    setUpdateIsLoading(true);
+    setUpdateProjectIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -90,16 +90,16 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка обновления проекта');
     } finally {
-      setUpdateIsLoading(false);
+      setUpdateProjectIsLoading(false);
     }
   }, []);
 
   const value = useMemo(
     () => ({
       project,
-      createIsLoading,
-      deleteIsLoading,
-      updateIsLoading,
+      createProjectIsLoading,
+      deleteProjectIsLoading,
+      updateProjectIsLoading,
       projectIsLoading,
       createProject,
       deleteProject,
@@ -108,9 +108,9 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
     }),
     [
       project,
-      createIsLoading,
-      deleteIsLoading,
-      updateIsLoading,
+      createProjectIsLoading,
+      deleteProjectIsLoading,
+      updateProjectIsLoading,
       projectIsLoading,
     ],
   );

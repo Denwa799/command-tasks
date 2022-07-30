@@ -58,9 +58,9 @@ export const ModalChange: FC<IModalChange> = ({
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const {updateTeam, fetchTeams, fetchTeam, updateIsLoading} = useTeams();
-  const {updateProject, fetchProject} = useProjects();
-  const {updateTask} = useTasks();
+  const {updateTeam, fetchTeams, fetchTeam, updateTeamIsLoading} = useTeams();
+  const {updateProject, fetchProject, updateProjectIsLoading} = useProjects();
+  const {updateTask, updateTaskIsLoading} = useTasks();
 
   useEffect(() => {
     setTextValue(text);
@@ -241,7 +241,9 @@ export const ModalChange: FC<IModalChange> = ({
           title="Сохранить"
           styleContainer={styles.modalBtn}
           onPress={onSave}
-          disabled={updateIsLoading}
+          disabled={
+            updateTeamIsLoading || updateProjectIsLoading || updateTaskIsLoading
+          }
         />
       </View>
     </AppModal>

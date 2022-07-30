@@ -14,9 +14,9 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
 
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
   const [teamIsLoading, setTeamIsLoading] = useState(false);
-  const [createIsLoading, setCreateIsLoading] = useState(false);
-  const [deleteIsLoading, setDeleteIsLoading] = useState(false);
-  const [updateIsLoading, setUpdateIsLoading] = useState(false);
+  const [createTeamIsLoading, setCreateTeamIsLoading] = useState(false);
+  const [deleteTeamIsLoading, setDeleteTeamIsLoading] = useState(false);
+  const [updateTeamIsLoading, setUpdateTeamIsLoading] = useState(false);
 
   const teamsPath = `${variables.API_URL}${variables.TEAMS}`;
 
@@ -57,7 +57,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   }, []);
 
   const createTeam = useCallback(async (name: string) => {
-    setCreateIsLoading(true);
+    setCreateTeamIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -71,12 +71,12 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка создания команды');
     } finally {
-      setCreateIsLoading(false);
+      setCreateTeamIsLoading(false);
     }
   }, []);
 
   const deleteTeam = useCallback(async (id: number) => {
-    setDeleteIsLoading(true);
+    setDeleteTeamIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -88,12 +88,12 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка удаления команды');
     } finally {
-      setDeleteIsLoading(false);
+      setDeleteTeamIsLoading(false);
     }
   }, []);
 
   const updateTeam = useCallback(async (id: number, name: string) => {
-    setUpdateIsLoading(true);
+    setUpdateTeamIsLoading(true);
     try {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
@@ -107,7 +107,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       console.log(error);
       Alert.alert('Ошибка обновления команды');
     } finally {
-      setUpdateIsLoading(false);
+      setUpdateTeamIsLoading(false);
     }
   }, []);
 
@@ -117,9 +117,9 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       team,
       teamsIsLoading,
       teamIsLoading,
-      createIsLoading,
-      deleteIsLoading,
-      updateIsLoading,
+      createTeamIsLoading,
+      deleteTeamIsLoading,
+      updateTeamIsLoading,
       fetchTeams,
       fetchTeam,
       createTeam,
@@ -131,9 +131,9 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       teamsIsLoading,
       team,
       teamIsLoading,
-      createIsLoading,
-      deleteIsLoading,
-      updateIsLoading,
+      createTeamIsLoading,
+      deleteTeamIsLoading,
+      updateTeamIsLoading,
     ],
   );
 

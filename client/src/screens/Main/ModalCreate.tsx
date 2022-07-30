@@ -41,9 +41,9 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const {createTeam, fetchTeams, createIsLoading, fetchTeam} = useTeams();
-  const {createProject, fetchProject} = useProjects();
-  const {createTask} = useTasks();
+  const {createTeam, fetchTeams, createTeamIsLoading, fetchTeam} = useTeams();
+  const {createProject, fetchProject, createProjectIsLoading} = useProjects();
+  const {createTask, createTaskIsLoading} = useTasks();
 
   useEffect(() => {
     setText('');
@@ -186,7 +186,9 @@ export const ModalCreate: FC<IModalCreate> = ({
           title="Добавить"
           styleContainer={styles.modalBtn}
           onPress={onCreate}
-          disabled={createIsLoading}
+          disabled={
+            createTeamIsLoading || createProjectIsLoading || createTaskIsLoading
+          }
         />
       </View>
     </AppModal>
