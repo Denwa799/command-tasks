@@ -2,7 +2,7 @@ import {DeleteService, PatchService, PostService} from 'api';
 import {variables} from 'constants/variables';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
-import {getAccessToken} from 'utils/getAccessToken';
+import {getAccessToken} from 'utils/getSession';
 import {ITasksContext, ITasksProvider} from './types';
 
 export const TasksContext = createContext<ITasksContext>({} as ITasksContext);

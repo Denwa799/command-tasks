@@ -3,7 +3,7 @@ import {variables} from 'constants/variables';
 import {IProject} from 'models/ITasks';
 import {IProjectsContext, IProjectsProvider} from './types';
 import {Alert} from 'react-native';
-import {getAccessToken} from 'utils/getAccessToken';
+import {getAccessToken} from 'utils/getSession';
 import {DeleteService, GetService, PatchService, PostService} from 'api';
 
 export const ProjectsContext = createContext<IProjectsContext>(

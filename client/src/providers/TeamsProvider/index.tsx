@@ -3,7 +3,7 @@ import {variables} from 'constants/variables';
 import {ITeam} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
-import {getAccessToken} from 'utils/getAccessToken';
+import {getAccessToken} from 'utils/getSession';
 import {ITeamsContext, ITeamsProvider} from './types';
 
 export const TeamsContext = createContext<ITeamsContext>({} as ITeamsContext);

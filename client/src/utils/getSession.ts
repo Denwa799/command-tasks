@@ -9,3 +9,13 @@ export const getAccessToken = async () => {
   }
   return null;
 };
+
+export const getUserName = async () => {
+  const session = await EncryptedStorage.getItem('user_session');
+  if (session) {
+    const parseSession = JSON.parse(session);
+    const name = parseSession.name;
+    return name;
+  }
+  return null;
+};
