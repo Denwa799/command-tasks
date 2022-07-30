@@ -9,6 +9,7 @@ import {AppTextButton} from 'components/AppTextButton';
 import {
   doneStatus,
   inProgressStatus,
+  overdueStatus,
   projectRoute,
   teamRoute,
   teamsRoute,
@@ -63,13 +64,22 @@ export const ModalChange: FC<IModalChange> = ({
   const {updateTask, updateTaskIsLoading} = useTasks();
 
   useEffect(() => {
-    setTextValue(text);
-    setIsTextError(false);
-    responsible && setResponsibleValue(responsible);
-    setIsResponsibleError(false);
-    status && setStatusValue(status);
-    isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
-    date && setDateValue(new Date(date));
+    if (isOpen) {
+      setTextValue(text);
+      responsible && setResponsibleValue(responsible);
+      status && setStatusValue(status);
+      isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
+      date && setDateValue(new Date(date));
+    }
+    if (!isOpen) {
+      setTextValue('');
+      setIsTextError(false);
+      setResponsibleValue('');
+      setIsResponsibleError(false);
+      setStatusValue(inProgressStatus);
+      setIsUrgentlyValue(false);
+      setDateValue(new Date());
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -98,7 +108,7 @@ export const ModalChange: FC<IModalChange> = ({
   }, [isUrgentlyValue]);
 
   const statusHandler = useCallback(() => {
-    if (statusValue === inProgressStatus) {
+    if (statusValue === inProgressStatus || statusValue === overdueStatus) {
       return setStatusValue(doneStatus);
     }
     return setStatusValue(inProgressStatus);
