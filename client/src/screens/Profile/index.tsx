@@ -5,7 +5,7 @@ import {useAuth} from 'hooks/useAuth';
 import {AppContainer} from 'layouts/AppContainer';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
-import {getUserName} from 'utils/getSession';
+import {getUserName, getUserEmail} from 'utils/getSession';
 import {styles} from './styles';
 import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
@@ -15,6 +15,9 @@ export const ProfileScreen = () => {
   const [userName, setUserName] = useState('');
   const [userNameIsLoading, setUserNameIsLoading] = useState(false);
   const [editNameIsOpen, setEditNameIsOpen] = useState(false);
+
+  const [userEmail, setUserEmail] = useState('');
+  const [userEmailIsLoading, setUserEmailIsLoading] = useState(false);
 
   const {logout, updateUserIsLoading} = useAuth();
 
@@ -27,20 +30,32 @@ export const ProfileScreen = () => {
     getName();
   }, [updateUserIsLoading]);
 
+  useEffect(() => {
+    const getEmail = async () => {
+      setUserEmailIsLoading(true);
+      setUserEmail(await getUserEmail());
+      setUserEmailIsLoading(false);
+    };
+    getEmail();
+  }, []);
+
   const onEditName = useCallback(() => {
     setEditNameIsOpen(true);
   }, []);
 
   return (
     <View style={styles.profile}>
-      {userNameIsLoading ? (
+      {userNameIsLoading || userEmailIsLoading ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
       ) : (
         <>
           <View style={styles.header}>
-            <Text style={styles.userName}>{userName}</Text>
+            <View>
+              <Text style={styles.userName}>{userName}</Text>
+              <Text style={styles.userEmail}>{userEmail}</Text>
+            </View>
             <TouchableHighlight onPress={onEditName} underlayColor="none">
               <Anticon name="edit" size={26} color={THEME.TEXT_COLOR} />
             </TouchableHighlight>

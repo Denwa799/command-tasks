@@ -25,6 +25,10 @@ export const styles = StyleSheet.create({
     color: THEME.TEXT_COLOR,
     fontSize: SIZES.h1,
   },
+  userEmail: {
+    color: THEME.TEXT_COLOR,
+    fontSize: SIZES.h2,
+  },
   logout: {
     position: 'absolute',
     bottom: 110,
