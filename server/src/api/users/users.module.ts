@@ -1,4 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from 'src/api/auth/auth.module';
 import { RolesModule } from 'src/api/roles/roles.module';
@@ -13,6 +14,7 @@ import { UsersService } from './users.service';
     TypeOrmModule.forFeature([User]),
     forwardRef(() => AuthModule),
     RolesModule,
+    JwtModule,
   ],
   exports: [UsersService],
 })
