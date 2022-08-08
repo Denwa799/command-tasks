@@ -8,12 +8,13 @@ export const AppButton: FC<IAppButton> = ({
   onPress,
   title,
   colors = [THEME.MAIN_COLOR, THEME.THIRD_COLOR],
+  style,
 }) => {
   return (
     <TouchableHighlight
       onPress={onPress}
       underlayColor={colors[1]}
-      style={[{backgroundColor: colors[0]}, styles.button]}>
+      style={[{backgroundColor: colors[0]}, styles.button, style]}>
       <Text style={styles.text}>{title}</Text>
     </TouchableHighlight>
   );

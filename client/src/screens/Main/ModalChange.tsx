@@ -9,11 +9,13 @@ import {AppTextButton} from 'components/AppTextButton';
 import {
   doneStatus,
   inProgressStatus,
+  overdueStatus,
   projectRoute,
   teamRoute,
   teamsRoute,
 } from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
+import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
@@ -31,6 +33,7 @@ export const ModalChange: FC<IModalChange> = ({
   status,
   isUrgently,
   date,
+  projectId,
 }) => {
   const route = useRoute();
 
@@ -45,7 +48,8 @@ export const ModalChange: FC<IModalChange> = ({
 
   const [isUrgentlyValue, setIsUrgentlyValue] = useState(false);
 
-  const [statusValue, setStatusValue] = useState<TaskStatusType>();
+  const [statusValue, setStatusValue] =
+    useState<TaskStatusType>(inProgressStatus);
   const [isDone, setIsDone] = useState(false);
 
   const [dateValue, setDateValue] = useState<Date>(
@@ -55,16 +59,27 @@ export const ModalChange: FC<IModalChange> = ({
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const {updateTeam, fetchTeams, fetchTeam, updateIsLoading} = useTeams();
-  const {updateProject} = useProjects();
+  const {updateTeam, fetchTeams, fetchTeam, updateTeamIsLoading} = useTeams();
+  const {updateProject, fetchProject, updateProjectIsLoading} = useProjects();
+  const {updateTask, updateTaskIsLoading} = useTasks();
 
   useEffect(() => {
-    setTextValue(text);
-    setIsTextError(false);
-    responsible && setResponsibleValue(responsible);
-    status && setStatusValue(status);
-    isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
-    date !== undefined && setDateValue(date);
+    if (isOpen) {
+      setTextValue(text);
+      responsible && setResponsibleValue(responsible);
+      status && setStatusValue(status);
+      isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
+      date && setDateValue(new Date(date));
+    }
+    if (!isOpen) {
+      setTextValue('');
+      setIsTextError(false);
+      setResponsibleValue('');
+      setIsResponsibleError(false);
+      setStatusValue(inProgressStatus);
+      setIsUrgentlyValue(false);
+      setDateValue(new Date());
+    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -93,7 +108,7 @@ export const ModalChange: FC<IModalChange> = ({
   }, [isUrgentlyValue]);
 
   const statusHandler = useCallback(() => {
-    if (statusValue === inProgressStatus) {
+    if (statusValue === inProgressStatus || statusValue === overdueStatus) {
       return setStatusValue(doneStatus);
     }
     return setStatusValue(inProgressStatus);
@@ -126,14 +141,54 @@ export const ModalChange: FC<IModalChange> = ({
       return setIsTextError(true);
     }
 
+    if (route.name === projectRoute) {
+      if (
+        !responsibleValue ||
+        responsibleValue.length < 3 ||
+        responsibleValue.length > 50
+      ) {
+        if (responsibleValue.length < 3) {
+          setDangerResponsibleText('Меньше 3 символов');
+        }
+        if (responsibleValue.length > 50) {
+          setDangerResponsibleText('Больше 50 символов');
+        }
+        if (!responsibleValue) {
+          setDangerResponsibleText('Пустое поле');
+        }
+        return setIsResponsibleError(true);
+      }
+    }
+
     route.name === teamsRoute && (await updateTeam(id, textValue));
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await updateProject(id, textValue));
     route.name === teamRoute && teamId && (await fetchTeam(teamId));
 
+    route.name === projectRoute &&
+      projectId &&
+      (await updateTask(
+        id,
+        textValue,
+        responsibleValue,
+        statusValue,
+        isUrgentlyValue,
+        dateValue,
+      ));
+    route.name === projectRoute && projectId && (await fetchProject(projectId));
+
     setIsOpen(false);
-  }, [id, textValue, teamId]);
+  }, [
+    id,
+    textValue,
+    teamId,
+    responsibleValue,
+    projectId,
+    statusValue,
+    isUrgentlyValue,
+    dateValue,
+  ]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -170,6 +225,19 @@ export const ModalChange: FC<IModalChange> = ({
             <AppCheckBox value={isDone} onValueChange={statusHandler} />
             <AppText>Выполнено</AppText>
           </TouchableOpacity>
+          <AppText style={styles.date}>{`${dateValue.getDate()}/${
+            dateValue.getMonth() + 1
+          }/${dateValue.getFullYear()}`}</AppText>
+          <AppTextButton
+            text="Выбрать дату"
+            onPress={() => setIsPickerOpen(true)}
+          />
+          <AppDatePicker
+            date={dateValue}
+            isOpen={isPickerOpen}
+            onConfirm={onDateConfirm}
+            onCancel={onDateCancel}
+          />
         </>
       )}
 
@@ -183,7 +251,9 @@ export const ModalChange: FC<IModalChange> = ({
           title="Сохранить"
           styleContainer={styles.modalBtn}
           onPress={onSave}
-          disabled={updateIsLoading}
+          disabled={
+            updateTeamIsLoading || updateProjectIsLoading || updateTaskIsLoading
+          }
         />
       </View>
     </AppModal>

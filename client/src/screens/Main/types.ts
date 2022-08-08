@@ -47,6 +47,7 @@ export interface IModalChange {
   status?: TaskStatusType;
   isUrgently?: boolean;
   date?: Date;
+  projectId?: number;
 }
 
 export interface IModalDelete {

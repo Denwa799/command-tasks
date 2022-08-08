@@ -3,9 +3,9 @@ import {ReactNode} from 'react';
 
 export interface IProjectsContext {
   project: IProject | null;
-  createIsLoading: boolean;
-  deleteIsLoading: boolean;
-  updateIsLoading: boolean;
+  createProjectIsLoading: boolean;
+  deleteProjectIsLoading: boolean;
+  updateProjectIsLoading: boolean;
   projectIsLoading: boolean;
   fetchProject: (id: number) => Promise<void>;
   createProject: (teamId: number, name: string) => Promise<void>;

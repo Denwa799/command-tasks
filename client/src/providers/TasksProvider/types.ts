@@ -1,9 +1,9 @@
 import {ReactNode} from 'react';
 
 export interface ITasksContext {
-  createIsLoading: boolean;
-  deleteIsLoading: boolean;
-  updateIsLoading: boolean;
+  createTaskIsLoading: boolean;
+  deleteTaskIsLoading: boolean;
+  updateTaskIsLoading: boolean;
   createTask: (
     projectId: number,
     text: string,

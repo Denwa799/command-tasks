@@ -6,9 +6,9 @@ export interface ITeamsContext {
   team: ITeam | null;
   teamsIsLoading: boolean;
   teamIsLoading: boolean;
-  createIsLoading: boolean;
-  deleteIsLoading: boolean;
-  updateIsLoading: boolean;
+  createTeamIsLoading: boolean;
+  deleteTeamIsLoading: boolean;
+  updateTeamIsLoading: boolean;
   fetchTeams: () => Promise<void>;
   fetchTeam: (id: number) => Promise<void>;
   createTeam: (name: string) => Promise<void>;

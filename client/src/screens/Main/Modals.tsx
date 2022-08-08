@@ -45,6 +45,7 @@ export const Modals: FC<IModals> = ({
         status={status}
         isUrgently={isUrgently}
         date={date}
+        projectId={projectId}
       />
     </>
   );

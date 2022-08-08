@@ -19,9 +19,9 @@ const ModalDelete: FC<IModalDelete> = ({
 }) => {
   const route = useRoute();
 
-  const {fetchTeams, fetchTeam, deleteTeam, deleteIsLoading} = useTeams();
-  const {deleteProject, fetchProject} = useProjects();
-  const {deleteTask} = useTasks();
+  const {fetchTeams, fetchTeam, deleteTeam, deleteTeamIsLoading} = useTeams();
+  const {deleteProject, fetchProject, deleteProjectIsLoading} = useProjects();
+  const {deleteTask, deleteTaskIsLoading} = useTasks();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -53,7 +53,9 @@ const ModalDelete: FC<IModalDelete> = ({
           title="Удалить"
           styleContainer={styles.modalBtn}
           onPress={onDelete}
-          disabled={deleteIsLoading}
+          disabled={
+            deleteTeamIsLoading || deleteProjectIsLoading || deleteTaskIsLoading
+          }
         />
       </View>
     </AppModal>
