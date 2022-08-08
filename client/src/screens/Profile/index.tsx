@@ -16,7 +16,7 @@ export const ProfileScreen = () => {
   const [userNameIsLoading, setUserNameIsLoading] = useState(false);
   const [editNameIsOpen, setEditNameIsOpen] = useState(false);
 
-  const {logout} = useAuth();
+  const {logout, updateUserIsLoading} = useAuth();
 
   useEffect(() => {
     const getName = async () => {
@@ -25,7 +25,7 @@ export const ProfileScreen = () => {
       setUserNameIsLoading(false);
     };
     getName();
-  }, []);
+  }, [updateUserIsLoading]);
 
   const onEditName = useCallback(() => {
     setEditNameIsOpen(true);

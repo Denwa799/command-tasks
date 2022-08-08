@@ -24,6 +24,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
     const response = {
+      id: user.id,
       email: user.email,
       name: user.name,
       tokens,
@@ -47,6 +48,7 @@ export class AuthService {
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
     const response = {
+      id: user.id,
       email: user.email,
       name: user.name,
       tokens,
@@ -71,6 +73,7 @@ export class AuthService {
         const tokens = await this.generateTokens(user);
         await this.updateRtHash(user.id, tokens.refresh_token);
         return {
+          id: user.id,
           email: user.email,
           name: user.name,
           tokens,
