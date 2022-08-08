@@ -1,4 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/api/roles/roles.service';
 import { Repository } from 'typeorm';
@@ -14,6 +15,7 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private roleService: RolesService,
+    private jwtService: JwtService,
   ) {}
 
   async createUser(dto: CreateUserDto) {
@@ -68,13 +70,19 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async update(id: number, dto: UpdateUserDto): Promise<User> {
+  async update(id: number, dto: UpdateUserDto, token: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (user) {
-      const newUser = await this.userRepository.merge(user, {
-        name: dto.name,
-      });
-      return this.userRepository.save(newUser);
+      const decoded = JSON.parse(JSON.stringify(this.jwtService.decode(token)));
+
+      if (decoded && decoded.id === user.id) {
+        const newUser = await this.userRepository.merge(user, {
+          name: dto.name,
+        });
+        return this.userRepository.save(newUser);
+      }
+
+      throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
     }
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }

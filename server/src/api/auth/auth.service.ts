@@ -76,6 +76,7 @@ export class AuthService {
           tokens,
         };
       }
+
       throw new HttpException('Доступ запрещен', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);

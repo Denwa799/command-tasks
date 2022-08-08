@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../auth/decorators';
+import { GetCurrentUser, Roles } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
@@ -53,8 +53,12 @@ export class UsersController {
   @ApiOperation({ summary: 'Обновление пользователя по id' })
   @ApiResponse({ status: 200, type: User })
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateDto: UpdateUserDto) {
-    return this.usersService.update(id, updateDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateDto: UpdateUserDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.usersService.update(id, updateDto, token);
   }
 
   @ApiOperation({ summary: 'Выдать роль' })
