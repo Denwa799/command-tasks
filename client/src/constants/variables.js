@@ -1,4 +1,4 @@
-import {API_URL, AUTH, TEAMS, PROJECTS, TASKS} from '@env';
+import {API_URL, AUTH, TEAMS, PROJECTS, TASKS, USERS} from '@env';
 
 export const variables = {
   API_URL,
@@ -6,6 +6,7 @@ export const variables = {
   TEAMS,
   PROJECTS,
   TASKS,
+  USERS,
 };
 
 export const teamsRoute = 'Teams';
