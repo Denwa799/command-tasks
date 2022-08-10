@@ -41,6 +41,13 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
+  @ApiOperation({ summary: 'Получение пользователей по email' })
+  @ApiResponse({ status: 200, type: [User] })
+  @Get(':email')
+  getUsersByEmail(@Param('email') email: string) {
+    return this.usersService.findUsersByEmail(email);
+  }
+
   @ApiOperation({ summary: 'Удаление пользователя по id' })
   @ApiResponse({ status: 200, type: User })
   @Roles('admin')
