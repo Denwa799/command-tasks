@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetCurrentUser } from '../auth/decorators';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Team } from './teams.entity';
 import { TeamsService } from './teams.service';
@@ -28,28 +29,38 @@ export class TeamsController {
   @ApiOperation({ summary: 'Получение всех команд' })
   @ApiResponse({ status: 200, type: [Team] })
   @Get()
-  getAll() {
-    return this.teamsService.getAllTeams();
+  getAll(@GetCurrentUser('accessToken') token: string) {
+    return this.teamsService.getAllTeams(token);
   }
 
   @ApiOperation({ summary: 'Получение команды по id' })
   @ApiResponse({ status: 200, type: Team })
   @Get(':id')
-  findTeamById(@Param('id') id: number) {
-    return this.teamsService.getTeamById(id);
+  findTeamById(
+    @Param('id') id: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.getTeamById(id, token);
   }
 
   @ApiOperation({ summary: 'Удаление команды по id' })
   @ApiResponse({ status: 200, type: Team })
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.teamsService.delete(id);
+  delete(
+    @Param('id') id: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.delete(id, token);
   }
 
   @ApiOperation({ summary: 'Обновление команды по id' })
   @ApiResponse({ status: 200, type: Team })
   @Patch(':id')
-  update(@Param('id') id: number, @Body() teamDto: CreateTeamDto) {
-    return this.teamsService.update(id, teamDto);
+  update(
+    @Param('id') id: number,
+    @Body() teamDto: CreateTeamDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.update(id, teamDto, token);
   }
 }

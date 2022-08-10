@@ -18,6 +18,10 @@ export class UsersService {
     private jwtService: JwtService,
   ) {}
 
+  private async decodeToken(token: string) {
+    return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
+  }
+
   async createUser(dto: CreateUserDto) {
     const role = await this.roleService.getRoleByValue('user');
     const user = await this.userRepository.create({ ...dto, roles: [role] });
@@ -73,7 +77,7 @@ export class UsersService {
   async update(id: number, dto: UpdateUserDto, token: string) {
     const user = await this.userRepository.findOneBy({ id });
     if (user) {
-      const decoded = JSON.parse(JSON.stringify(this.jwtService.decode(token)));
+      const decoded = await this.decodeToken(token);
 
       if (decoded && decoded.id === user.id) {
         const newUser = await this.userRepository.merge(user, {
