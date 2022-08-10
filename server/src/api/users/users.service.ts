@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/api/roles/roles.service';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -46,7 +46,7 @@ export class UsersService {
 
   async findUsersByEmail(email: string): Promise<User[]> {
     const users = await this.userRepository.find({
-      where: { email },
+      where: { email: Like(`%${email}%`) },
     });
     if (users) return users;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);

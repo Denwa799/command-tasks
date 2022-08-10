@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { RolesGuard } from '../auth/guards';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { EmailQueryParamDto } from './dto/query-param.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -43,9 +45,9 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Получение пользователей по email' })
   @ApiResponse({ status: 200, type: [User] })
-  @Get(':email')
-  getUsersByEmail(@Param('email') email: string) {
-    return this.usersService.findUsersByEmail(email);
+  @Get('/email')
+  getUsersByEmail(@Query() reqParam: EmailQueryParamDto) {
+    return this.usersService.findUsersByEmail(reqParam.email);
   }
 
   @ApiOperation({ summary: 'Удаление пользователя по id' })
