@@ -15,7 +15,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  OneToMany,
+  JoinTable,
 } from 'typeorm';
+import { Team } from '../teams/teams.entity';
 
 @Entity('users')
 export class User {
@@ -64,6 +67,18 @@ export class User {
   @ApiProperty({ description: 'Роли пользователя' })
   @ManyToMany(() => Role, (role) => role.users)
   roles: Role[];
+
+  @ApiProperty({
+    type: () => Team,
+    description: 'Созданные пользователем команды',
+  })
+  @OneToMany(() => Team, (team) => team.creator)
+  createdTeams: Team[];
+
+  @ApiProperty({ description: 'Команды пользователя' })
+  @ManyToMany(() => Team, (team) => team.users)
+  @JoinTable()
+  teams: Team[];
 
   @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',

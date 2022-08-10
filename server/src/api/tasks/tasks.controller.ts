@@ -6,8 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { GetCurrentUser, Roles } from '../auth/decorators';
+import { RolesGuard } from '../auth/guards';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
@@ -21,12 +24,17 @@ export class TasksController {
   @ApiOperation({ summary: 'Создание задачи' })
   @ApiResponse({ status: 200, type: Task })
   @Post()
-  create(@Body() taskDto: CreateTaskDto) {
-    return this.tasksService.create(taskDto);
+  create(
+    @Body() taskDto: CreateTaskDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.tasksService.create(taskDto, token);
   }
 
   @ApiOperation({ summary: 'Получение всех задач' })
   @ApiResponse({ status: 200, type: [Task] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
   @Get()
   getAll() {
     return this.tasksService.getAllTasks();
@@ -35,14 +43,21 @@ export class TasksController {
   @ApiOperation({ summary: 'Удаление задачи по id' })
   @ApiResponse({ status: 200, type: Task })
   @Delete(':id')
-  delete(@Param('id') id: number) {
-    return this.tasksService.delete(id);
+  delete(
+    @Param('id') id: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.tasksService.delete(id, token);
   }
 
   @ApiOperation({ summary: 'Обновление задачи по id' })
   @ApiResponse({ status: 200, type: Task })
   @Patch(':id')
-  update(@Param('id') id: number, @Body() updateDto: UpdateTaskDto) {
-    return this.tasksService.update(id, updateDto);
+  update(
+    @Param('id') id: number,
+    @Body() updateDto: UpdateTaskDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.tasksService.update(id, updateDto, token);
   }
 }
