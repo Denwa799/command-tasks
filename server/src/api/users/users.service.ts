@@ -44,9 +44,11 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async findUsersByEmail(email: string): Promise<User[]> {
+  async findUsersByEmail(email: string, take = 10, skip = 0): Promise<User[]> {
     const users = await this.userRepository.find({
       where: { email: Like(`%${email}%`) },
+      take: take,
+      skip: skip,
     });
     if (users) return users;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
