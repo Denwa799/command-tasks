@@ -46,7 +46,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Получение пользователей по email' })
   @ApiResponse({ status: 200, type: [User] })
   @Get('/email')
-  getUsersByEmail(@Query('filter') reqParam: EmailQueryParamDto) {
+  getUsersByEmail(@Query() reqParam: EmailQueryParamDto) {
     return this.usersService.findUsersByEmail(
       reqParam.email,
       reqParam.take,
