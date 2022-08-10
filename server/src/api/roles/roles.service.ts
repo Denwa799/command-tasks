@@ -10,8 +10,8 @@ export class RolesService {
     @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
-  async getAllRoles() {
-    const roles = await this.roleRepository.find();
+  async getAllRoles(take = 50, skip = 0) {
+    const roles = await this.roleRepository.find({ take, skip });
     if (roles) return roles;
     throw new HttpException('Роли не найдены', HttpStatus.NOT_FOUND);
   }

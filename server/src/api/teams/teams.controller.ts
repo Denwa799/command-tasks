@@ -6,11 +6,12 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators';
 import { CreateTeamDto } from './dto/create-team.dto';
+import { PaginationQueryParamDto } from './dto/query-param.dto';
 import { Team } from './teams.entity';
 import { TeamsService } from './teams.service';
 
@@ -29,8 +30,11 @@ export class TeamsController {
   @ApiOperation({ summary: 'Получение всех команд' })
   @ApiResponse({ status: 200, type: [Team] })
   @Get()
-  getAll(@GetCurrentUser('accessToken') token: string) {
-    return this.teamsService.getAllTeams(token);
+  getAll(
+    @Query() reqParam: PaginationQueryParamDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.getAllTeams(token, reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Получение команды по id' })

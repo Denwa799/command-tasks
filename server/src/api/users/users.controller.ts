@@ -15,7 +15,10 @@ import { RolesGuard } from '../auth/guards';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { EmailQueryParamDto } from './dto/query-param.dto';
+import {
+  EmailQueryParamDto,
+  PaginationQueryParamDto,
+} from './dto/query-param.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 import { UsersService } from './users.service';
@@ -39,8 +42,8 @@ export class UsersController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  getAll() {
-    return this.usersService.getAllUsers();
+  getAll(@Query() reqParam: PaginationQueryParamDto) {
+    return this.usersService.getAllUsers(reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Получение пользователей по email' })

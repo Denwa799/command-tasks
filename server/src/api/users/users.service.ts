@@ -29,8 +29,12 @@ export class UsersService {
     throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
 
-  async getAllUsers() {
-    const users = await this.userRepository.find({ relations: ['roles'] });
+  async getAllUsers(take = 50, skip = 0) {
+    const users = await this.userRepository.find({
+      relations: ['roles'],
+      take,
+      skip,
+    });
     if (users) return users;
     throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
@@ -47,8 +51,8 @@ export class UsersService {
   async findUsersByEmail(email: string, take = 10, skip = 0): Promise<User[]> {
     const users = await this.userRepository.find({
       where: { email: Like(`%${email}%`) },
-      take: take,
-      skip: skip,
+      take,
+      skip,
     });
     if (users) return users;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);

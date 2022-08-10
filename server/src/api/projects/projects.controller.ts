@@ -6,11 +6,13 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser, Roles } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
+import { PaginationQueryParamDto } from '../roles/dto/query-param.dto';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './projects.entity';
@@ -36,8 +38,8 @@ export class ProjectsController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  getAll() {
-    return this.projectsService.getAllProjects();
+  getAll(@Query() reqParam: PaginationQueryParamDto) {
+    return this.projectsService.getAllProjects(reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Получение проекта по id' })

@@ -5,6 +5,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -13,6 +14,7 @@ import { Role } from './roles.entity';
 import { RolesService } from './roles.service';
 import { RolesGuard } from '../auth/guards';
 import { Roles } from '../auth/decorators';
+import { PaginationQueryParamDto } from './dto/query-param.dto';
 
 @ApiTags('Роли пользователей')
 @Controller('roles')
@@ -33,8 +35,8 @@ export class RolesController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  getAll() {
-    return this.roleService.getAllRoles();
+  getAll(@Query() reqParam: PaginationQueryParamDto) {
+    return this.roleService.getAllRoles(reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Получение роли по value' })

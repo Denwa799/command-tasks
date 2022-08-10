@@ -33,9 +33,11 @@ export class ProjectsService {
     throw new HttpException('Ошибка создания проекта', HttpStatus.NOT_FOUND);
   }
 
-  async getAllProjects() {
+  async getAllProjects(take = 50, skip = 0) {
     const projects = await this.projectRepository.find({
       relations: ['team', 'tasks'],
+      take,
+      skip,
     });
     if (projects) return projects;
     throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);

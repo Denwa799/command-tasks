@@ -43,12 +43,14 @@ export class TeamsService {
     throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
   }
 
-  async getAllTeams(token: string) {
+  async getAllTeams(token: string, take = 50, skip = 0) {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const teams = await this.teamRepository.find({
         where: { users: { id: decoded.id } },
         relations: ['projects'],
+        take,
+        skip,
       });
       if (teams) return teams;
       throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);

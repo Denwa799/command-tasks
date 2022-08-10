@@ -40,8 +40,12 @@ export class TasksService {
     throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
   }
 
-  async getAllTasks() {
-    const tasks = await this.taskRepository.find({ relations: ['project'] });
+  async getAllTasks(take = 50, skip = 0) {
+    const tasks = await this.taskRepository.find({
+      relations: ['project'],
+      take,
+      skip,
+    });
     if (tasks) return tasks;
     throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
   }

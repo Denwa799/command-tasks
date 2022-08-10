@@ -11,3 +11,11 @@ export class EmailQueryParamDto {
   @IsOptional()
   skip: number;
 }
+
+export class PaginationQueryParamDto {
+  @IsOptional()
+  take: number;
+
+  @IsOptional()
+  skip: number;
+}
