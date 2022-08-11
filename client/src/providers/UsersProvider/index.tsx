@@ -43,6 +43,7 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
       if (tokenBearer) {
         const response = await GetService(`${usersPath}/email`, tokenBearer, {
           email,
+          take: 5,
         });
         setFoundUsers(response.data);
       } else {
