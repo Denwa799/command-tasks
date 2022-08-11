@@ -1,3 +1,4 @@
+import {IUser} from 'models/IUser';
 import {ReactNode} from 'react';
 
 export interface IAuthContext {
@@ -10,12 +11,4 @@ export interface IAuthContext {
 
 export interface IAuthProvider {
   children: ReactNode;
-}
-
-export interface IUser {
-  id: number;
-  email: string;
-  name: string;
-  access_token: string;
-  refresh_token: string;
 }

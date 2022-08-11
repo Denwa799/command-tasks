@@ -9,10 +9,11 @@ import React, {
   useState,
 } from 'react';
 import {Alert} from 'react-native';
-import {IAuthContext, IAuthProvider, IUser} from './types';
+import {IAuthContext, IAuthProvider} from './types';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppLoader} from 'components/AppLoader';
+import {IUser} from 'models/IUser';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
