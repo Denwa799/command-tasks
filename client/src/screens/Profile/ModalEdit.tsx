@@ -1,7 +1,7 @@
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
 import {AppNativeButton} from 'components/AppNativeButton';
-import {useAuth} from 'hooks/useAuth';
+import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {getUserId} from 'utils/getSession';
@@ -13,7 +13,7 @@ export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
   const [isNameError, setIsNameError] = useState(false);
   const [dangerNameText, setDangerNameText] = useState('Пустое поле');
 
-  const {updateUser, updateUserIsLoading} = useAuth();
+  const {updateUser, updateUserIsLoading} = useUsers();
 
   useEffect(() => {
     setNameValue(name);

@@ -10,6 +10,7 @@ import {styles} from './styles';
 import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
 import {ModalEdit} from './ModalEdit';
+import {useUsers} from 'hooks/useUsers';
 
 export const ProfileScreen = () => {
   const [userName, setUserName] = useState('');
@@ -19,7 +20,8 @@ export const ProfileScreen = () => {
   const [userEmail, setUserEmail] = useState('');
   const [userEmailIsLoading, setUserEmailIsLoading] = useState(false);
 
-  const {logout, updateUserIsLoading} = useAuth();
+  const {logout} = useAuth();
+  const {updateUserIsLoading} = useUsers();
 
   useEffect(() => {
     const getName = async () => {

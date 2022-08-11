@@ -1,9 +1,4 @@
-import {
-  LoginService,
-  PatchService,
-  RefreshService,
-  RegistrationService,
-} from 'api';
+import {LoginService, RefreshService, RegistrationService} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -18,8 +13,6 @@ import {IAuthContext, IAuthProvider, IUser} from './types';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppLoader} from 'components/AppLoader';
-import {getAccessToken} from 'utils/getSession';
-import {setUserNameSession} from 'utils/setSession';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
@@ -29,10 +22,8 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstRefresh, setIsFirstRefresh] = useState(true);
-  const [updateUserIsLoading, setUpdateUserIsLoading] = useState(false);
 
   const authPath = `${variables.API_URL}${variables.AUTH}`;
-  const usersPath = `${variables.API_URL}${variables.USERS}`;
 
   useEffect(() => {
     const checkSession = async () => {
@@ -150,26 +141,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     }
   }, []);
 
-  const updateUser = useCallback(async (id: number, name: string) => {
-    setUpdateUserIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        const response = await PatchService(`${usersPath}/${id}`, tokenBearer, {
-          name,
-        });
-        await setUserNameSession(response.data?.name);
-      } else {
-        throw new Error('Ошибка сессии');
-      }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления пользователя');
-    } finally {
-      setUpdateUserIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
     const fourteenMinutes = 840000;
     refreshHandler();
@@ -180,13 +151,12 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     () => ({
       user,
       isLoading,
-      updateUserIsLoading,
+
       login: loginHandler,
       register: registerHandler,
       logout: logoutHandler,
-      updateUser: updateUser,
     }),
-    [user, isLoading, updateUserIsLoading],
+    [user, isLoading],
   );
 
   return (
