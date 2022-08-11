@@ -6,12 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser, Roles } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { PaginationQueryParamDto } from './dto/query-param.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
@@ -36,8 +38,8 @@ export class TasksController {
   @Roles('admin')
   @UseGuards(RolesGuard)
   @Get()
-  getAll() {
-    return this.tasksService.getAllTasks();
+  getAll(@Query() reqParam: PaginationQueryParamDto) {
+    return this.tasksService.getAllTasks(reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Удаление задачи по id' })

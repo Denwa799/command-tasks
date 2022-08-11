@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/api/roles/roles.service';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -29,8 +29,12 @@ export class UsersService {
     throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
 
-  async getAllUsers() {
-    const users = await this.userRepository.find({ relations: ['roles'] });
+  async getAllUsers(take = 50, skip = 0) {
+    const users = await this.userRepository.find({
+      relations: ['roles'],
+      take,
+      skip,
+    });
     if (users) return users;
     throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
@@ -44,9 +48,11 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async findUsersByEmail(email: string): Promise<User[]> {
+  async findUsersByEmail(email: string, take = 10, skip = 0): Promise<User[]> {
     const users = await this.userRepository.find({
-      where: { email },
+      where: { email: Like(`%${email}%`) },
+      take,
+      skip,
     });
     if (users) return users;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
