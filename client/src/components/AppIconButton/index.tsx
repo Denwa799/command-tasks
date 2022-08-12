@@ -11,13 +11,14 @@ export const AppIconButton: FC<IAppIconButton> = ({
   style,
   children,
   size = 34,
+  textStyle,
 }) => {
   return (
     <TouchableHighlight
       onPress={onPress}
       underlayColor={colors[1]}
       style={[{backgroundColor: colors[0]}, styles.button, style]}>
-      <Text style={styles.text}>
+      <Text style={[styles.text, textStyle]}>
         {children ? children : <Ionicon name="add" size={size} />}
       </Text>
     </TouchableHighlight>

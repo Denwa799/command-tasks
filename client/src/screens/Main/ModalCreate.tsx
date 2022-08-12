@@ -125,6 +125,10 @@ export const ModalCreate: FC<IModalCreate> = ({
     [responsible],
   );
 
+  const onAdd = useCallback(() => {
+    setIsOpen(false);
+  }, []);
+
   const onClose = useCallback(() => {
     setIsOpen(false);
   }, []);
@@ -205,11 +209,12 @@ export const ModalCreate: FC<IModalCreate> = ({
         <AppAutocomplete
           placeholder="Введите email пользователя"
           value={autocompleteValue}
-          onChange={autocompleteHandler}
           data={autocompleteData}
-          onPress={onAutocompletePress}
           isDisplay={isAutocomplete}
           isLoading={findUsersIsLoading}
+          onChange={autocompleteHandler}
+          onPress={onAutocompletePress}
+          onAdd={onAdd}
         />
       )}
       {route.name === projectRoute && (

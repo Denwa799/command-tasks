@@ -1,26 +1,29 @@
-import {SIZES, THEME} from 'constants/theme';
+import {THEME} from 'constants/theme';
 import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
-  input: {
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+  autocompleteContainer: {
+    flexDirection: 'row',
+    width: '100%',
   },
-  list: {
-    borderColor: THEME.BACK_COLOR,
-    borderWidth: 1,
-    backgroundColor: THEME.BACK_SECOND,
-    borderBottomLeftRadius: SIZES.radius,
-    borderBottomRightRadius: SIZES.radius,
+  autocomplete: {
+    flex: 1,
   },
-  item: {
-    borderRadius: SIZES.radius,
-    backgroundColor: THEME.BACK_SECOND,
-    paddingTop: 10,
-    paddingBottom: 10,
+  addBtnContainer: {
+    height: '100%',
+    width: 48,
   },
-  text: {
-    paddingLeft: 10,
-    fontSize: SIZES.body3,
+  addBtn: {
+    borderRadius: 10,
+    width: 38,
+    height: 38,
+    position: 'relative',
+    top: 10,
+    bottom: 'auto',
+    left: 'auto',
+    right: 0,
+  },
+  addBtnText: {
+    color: THEME.TEXT_COLOR,
   },
 });
