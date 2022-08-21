@@ -47,7 +47,7 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const teams = await this.teamRepository.find({
-        where: { users: { id: decoded.id } },
+        where: [{ users: { id: decoded.id } }, { creator: { id: decoded.id } }],
         relations: ['projects'],
         take,
         skip,
@@ -62,7 +62,10 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamRepository.findOne({
-        where: { id, users: { id: decoded.id } },
+        where: [
+          { id, users: { id: decoded.id } },
+          { id, creator: { id: decoded.id } },
+        ],
         relations: ['projects'],
       });
       if (team) return team;

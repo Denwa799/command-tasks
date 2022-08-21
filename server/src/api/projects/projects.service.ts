@@ -47,14 +47,24 @@ export class ProjectsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const project = await this.projectRepository.findOne({
-        where: {
-          id,
-          team: {
-            users: {
-              id: decoded.id,
+        where: [
+          {
+            id,
+            team: {
+              users: {
+                id: decoded.id,
+              },
             },
           },
-        },
+          {
+            id,
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        ],
         relations: ['tasks'],
       });
       if (project) return project;
