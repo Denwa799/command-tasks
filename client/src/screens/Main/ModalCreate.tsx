@@ -1,17 +1,22 @@
 import {useRoute} from '@react-navigation/native';
+import {AppAutocomplete} from 'components/AppAutocomplete';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
+import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
 import {AppNativeButton} from 'components/AppNativeButton';
 import {AppText} from 'components/AppText';
 import {AppTextButton} from 'components/AppTextButton';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useDebounce} from 'hooks/useDebounce';
 import {useProjects} from 'hooks/useProjects';
 import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
+import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
+import {getUserEmail} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -27,12 +32,22 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
 
+  const [autocompleteValue, setAutocompleteValue] = useState('');
+  const debouncedAutocompleteValue = useDebounce<string>(
+    autocompleteValue,
+    500,
+  );
+  const [autocompletePress, setAutocompletePress] = useState('');
+  const [isAutocomplete, setIsAutocomplete] = useState(false);
+
   const [responsible, setResponsible] = useState('');
   const [isResponsibleError, setIsResponsibleError] = useState(false);
   const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
 
   const [isUrgently, setIsUrgently] = useState(false);
+
+  const [emails, setEmails] = useState<string[]>([]);
 
   const [date, setDate] = useState(
     useMemo(() => {
@@ -44,14 +59,49 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {createTeam, fetchTeams, createTeamIsLoading, fetchTeam} = useTeams();
   const {createProject, fetchProject, createProjectIsLoading} = useProjects();
   const {createTask, createTaskIsLoading} = useTasks();
+  const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
+
+  const autocompleteData = useMemo(() => {
+    return foundUsers.map(user => user.email);
+  }, [foundUsers]);
 
   useEffect(() => {
+    const getEmail = async () => {
+      setEmails([await getUserEmail()]);
+    };
+    getEmail();
+
     setText('');
     setIsTextError(false);
+    setAutocompleteValue('');
+    setAutocompletePress('');
     setResponsible('');
     setIsResponsibleError(false);
     setIsUrgently(false);
   }, [isOpen]);
+
+  useEffect(() => {
+    if (debouncedAutocompleteValue.length > 0) {
+      searchUsersByEmail(debouncedAutocompleteValue.toLowerCase());
+    }
+  }, [debouncedAutocompleteValue]);
+
+  useEffect(() => {
+    if (autocompleteData.length > 0 && debouncedAutocompleteValue.length > 0) {
+      setIsAutocomplete(true);
+    } else {
+      setIsAutocomplete(false);
+    }
+
+    if (autocompleteValue === autocompletePress) {
+      setIsAutocomplete(false);
+    }
+  }, [
+    autocompleteData,
+    autocompleteValue,
+    autocompletePress,
+    debouncedAutocompleteValue,
+  ]);
 
   const textHandler = useCallback(
     (value: string) => {
@@ -61,12 +111,40 @@ export const ModalCreate: FC<IModalCreate> = ({
     [text],
   );
 
+  const autocompleteHandler = useCallback(
+    (value: string) => {
+      setAutocompleteValue(value);
+    },
+    [autocompleteValue],
+  );
+
+  const onAutocompletePress = useCallback(
+    (email: string) => {
+      setAutocompletePress(email);
+      setAutocompleteValue(email);
+    },
+    [autocompletePress],
+  );
+
   const responsibleHandler = useCallback(
     (value: string) => {
       setResponsible(value);
       setIsResponsibleError(false);
     },
     [responsible],
+  );
+
+  const onAdd = useCallback(() => {
+    setEmails(items => [...items, autocompletePress]);
+  }, [autocompletePress]);
+
+  const deleteEmailHandler = useCallback(
+    (index: number) => {
+      const newEmails = [...emails];
+      newEmails.splice(index, 1);
+      setEmails(newEmails);
+    },
+    [emails],
   );
 
   const onClose = useCallback(() => {
@@ -145,6 +223,21 @@ export const ModalCreate: FC<IModalCreate> = ({
         isDanger={isTextError}
         dangerText={dangerText}
       />
+      {route.name === teamsRoute && (
+        <>
+          <AppAutocomplete
+            placeholder="Введите email пользователя"
+            value={autocompleteValue}
+            data={autocompleteData}
+            isDisplay={isAutocomplete}
+            isLoading={findUsersIsLoading}
+            onChange={autocompleteHandler}
+            onPress={onAutocompletePress}
+            onAdd={onAdd}
+          />
+          <AppItemsGrid items={emails} onDelete={deleteEmailHandler} />
+        </>
+      )}
       {route.name === projectRoute && (
         <>
           <AppField

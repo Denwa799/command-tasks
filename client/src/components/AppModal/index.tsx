@@ -1,6 +1,6 @@
 import {useOrientation} from 'hooks/useOrientation';
 import React, {FC, useCallback} from 'react';
-import {ScrollView, TouchableOpacity} from 'react-native';
+import {ScrollView, TouchableOpacity, View} from 'react-native';
 import {styles} from './styles';
 import {IAppModal} from './types';
 
@@ -32,7 +32,7 @@ export const AppModal: FC<IAppModal> = ({
               style,
             ]}
             keyboardShouldPersistTaps="handled">
-            {children}
+            <View style={styles.content}>{children}</View>
           </ScrollView>
         </>
       )}

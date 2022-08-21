@@ -53,6 +53,11 @@ export class UsersService {
       where: { email: Like(`%${email}%`) },
       take,
       skip,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
     });
     if (users) return users;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
