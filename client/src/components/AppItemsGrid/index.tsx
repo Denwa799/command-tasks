@@ -1,11 +1,11 @@
 import React, {FC} from 'react';
-import {Text, View} from 'react-native';
+import {Text, TouchableOpacity, View} from 'react-native';
 import {styles} from './styles';
 import {IAppItemsGrid} from './types';
 import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
 
-export const AppItemsGrid: FC<IAppItemsGrid> = ({items, style}) => {
+export const AppItemsGrid: FC<IAppItemsGrid> = ({items, style, onDelete}) => {
   return (
     <View style={[styles.grid, style]}>
       {items.map((item, index) => {
@@ -14,7 +14,11 @@ export const AppItemsGrid: FC<IAppItemsGrid> = ({items, style}) => {
             <Text style={styles.text} numberOfLines={1}>
               {item}
             </Text>
-            <Anticon name="delete" size={18} color={THEME.RED_COLOR} />
+            <TouchableOpacity
+              onPress={() => onDelete(index)}
+              activeOpacity={0.3}>
+              <Anticon name="delete" size={18} color={THEME.RED_COLOR} />
+            </TouchableOpacity>
           </View>
         );
       })}

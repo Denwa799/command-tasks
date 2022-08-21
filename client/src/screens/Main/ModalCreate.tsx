@@ -138,6 +138,15 @@ export const ModalCreate: FC<IModalCreate> = ({
     setEmails(items => [...items, autocompletePress]);
   }, [autocompletePress]);
 
+  const deleteEmailHandler = useCallback(
+    (index: number) => {
+      const newEmails = [...emails];
+      newEmails.splice(index, 1);
+      setEmails(newEmails);
+    },
+    [emails],
+  );
+
   const onClose = useCallback(() => {
     setIsOpen(false);
   }, []);
@@ -226,7 +235,7 @@ export const ModalCreate: FC<IModalCreate> = ({
             onPress={onAutocompletePress}
             onAdd={onAdd}
           />
-          <AppItemsGrid items={emails} />
+          <AppItemsGrid items={emails} onDelete={deleteEmailHandler} />
         </>
       )}
       {route.name === projectRoute && (
