@@ -51,6 +51,9 @@ export class TeamsService {
         relations: ['projects'],
         take,
         skip,
+        order: {
+          id: 'ASC',
+        },
       });
       if (teams) return teams;
       throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
@@ -67,6 +70,11 @@ export class TeamsService {
           { id, creator: { id: decoded.id } },
         ],
         relations: ['projects'],
+        order: {
+          projects: {
+            id: 'ASC',
+          },
+        },
       });
       if (team) return team;
       throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);

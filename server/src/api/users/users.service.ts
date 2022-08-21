@@ -34,6 +34,9 @@ export class UsersService {
       relations: ['roles'],
       take,
       skip,
+      order: {
+        id: 'DESC',
+      },
     });
     if (users) return users;
     throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
@@ -57,6 +60,9 @@ export class UsersService {
         id: true,
         name: true,
         email: true,
+      },
+      order: {
+        name: 'ASC',
       },
     });
     if (users) return users;
