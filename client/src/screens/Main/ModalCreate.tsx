@@ -3,6 +3,7 @@ import {AppAutocomplete} from 'components/AppAutocomplete';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
+import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
 import {AppNativeButton} from 'components/AppNativeButton';
 import {AppText} from 'components/AppText';
@@ -15,6 +16,7 @@ import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
+import {getUserEmail} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -45,6 +47,8 @@ export const ModalCreate: FC<IModalCreate> = ({
 
   const [isUrgently, setIsUrgently] = useState(false);
 
+  const [emails, setEmails] = useState<string[]>([]);
+
   const [date, setDate] = useState(
     useMemo(() => {
       return new Date();
@@ -62,6 +66,11 @@ export const ModalCreate: FC<IModalCreate> = ({
   }, [foundUsers]);
 
   useEffect(() => {
+    const getEmail = async () => {
+      setEmails([await getUserEmail()]);
+    };
+    getEmail();
+
     setText('');
     setIsTextError(false);
     setAutocompleteValue('');
@@ -126,8 +135,8 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
 
   const onAdd = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    setEmails(items => [...items, autocompletePress]);
+  }, [autocompletePress]);
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -206,16 +215,19 @@ export const ModalCreate: FC<IModalCreate> = ({
         dangerText={dangerText}
       />
       {route.name === teamsRoute && (
-        <AppAutocomplete
-          placeholder="Введите email пользователя"
-          value={autocompleteValue}
-          data={autocompleteData}
-          isDisplay={isAutocomplete}
-          isLoading={findUsersIsLoading}
-          onChange={autocompleteHandler}
-          onPress={onAutocompletePress}
-          onAdd={onAdd}
-        />
+        <>
+          <AppAutocomplete
+            placeholder="Введите email пользователя"
+            value={autocompleteValue}
+            data={autocompleteData}
+            isDisplay={isAutocomplete}
+            isLoading={findUsersIsLoading}
+            onChange={autocompleteHandler}
+            onPress={onAutocompletePress}
+            onAdd={onAdd}
+          />
+          <AppItemsGrid items={emails} />
+        </>
       )}
       {route.name === projectRoute && (
         <>

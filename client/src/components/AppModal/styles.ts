@@ -21,8 +21,11 @@ export const styles = StyleSheet.create({
     backgroundColor:
       colorScheme === 'dark' ? THEME.BLACK_COLOR : THEME.WHITE_COLOR,
     width: '80%',
-    padding: 20,
     borderRadius: SIZES.radius,
+    maxHeight: 400,
+  },
+  content: {
+    padding: 20,
   },
   scroll: {
     top: '15%',
