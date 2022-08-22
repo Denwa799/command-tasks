@@ -16,7 +16,7 @@ import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
-import {getUserEmail} from 'utils/getSession';
+import {getUserEmail, getUserId} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -51,6 +51,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isUrgently, setIsUrgently] = useState(false);
 
   const [userEmail, setUserEmail] = useState('');
+  const [userId, setUserId] = useState(0);
   const [emails, setEmails] = useState<string[]>([]);
 
   const [date, setDate] = useState(
@@ -70,10 +71,11 @@ export const ModalCreate: FC<IModalCreate> = ({
   }, [foundUsers]);
 
   useEffect(() => {
-    const getEmail = async () => {
+    const getUser = async () => {
       setUserEmail(await getUserEmail());
+      setUserId(await getUserId());
     };
-    getEmail();
+    getUser();
   }, []);
 
   useEffect(() => {
@@ -216,6 +218,13 @@ export const ModalCreate: FC<IModalCreate> = ({
       return setIsTextError(true);
     }
 
+    if (route.name === teamsRoute) {
+      if (emails.length === 0) {
+        setDangerAutocompleteText('Добавьте пользователя');
+        return setIsAutocompleteError(true);
+      }
+    }
+
     if (route.name === projectRoute) {
       if (!responsible || responsible.length < 3 || responsible.length > 50) {
         if (responsible.length < 3) {
@@ -231,7 +240,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       }
     }
 
-    route.name === teamsRoute && (await createTeam(text));
+    route.name === teamsRoute && (await createTeam(text, userId, emails));
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await createProject(teamId, text));
@@ -250,7 +259,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === projectRoute && projectId && (await fetchProject(projectId));
 
     setIsOpen(false);
-  }, [teamId, projectId, text, responsible, isUrgently, date]);
+  }, [teamId, projectId, text, responsible, isUrgently, date, emails]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
