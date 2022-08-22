@@ -47,10 +47,13 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const teams = await this.teamRepository.find({
-        where: { users: { id: decoded.id } },
+        where: [{ users: { id: decoded.id } }, { creator: { id: decoded.id } }],
         relations: ['projects'],
         take,
         skip,
+        order: {
+          id: 'ASC',
+        },
       });
       if (teams) return teams;
       throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
@@ -62,8 +65,16 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamRepository.findOne({
-        where: { id, users: { id: decoded.id } },
+        where: [
+          { id, users: { id: decoded.id } },
+          { id, creator: { id: decoded.id } },
+        ],
         relations: ['projects'],
+        order: {
+          projects: {
+            id: 'ASC',
+          },
+        },
       });
       if (team) return team;
       throw new HttpException('Команда не найдена', HttpStatus.NOT_FOUND);

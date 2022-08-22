@@ -45,6 +45,9 @@ export class TasksService {
       relations: ['project'],
       take,
       skip,
+      order: {
+        id: 'DESC',
+      },
     });
     if (tasks) return tasks;
     throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);

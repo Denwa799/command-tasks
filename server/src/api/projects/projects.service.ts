@@ -38,6 +38,9 @@ export class ProjectsService {
       relations: ['team', 'tasks'],
       take,
       skip,
+      order: {
+        id: 'ASC',
+      },
     });
     if (projects) return projects;
     throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
@@ -47,15 +50,30 @@ export class ProjectsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const project = await this.projectRepository.findOne({
-        where: {
-          id,
-          team: {
-            users: {
-              id: decoded.id,
+        where: [
+          {
+            id,
+            team: {
+              users: {
+                id: decoded.id,
+              },
             },
           },
-        },
+          {
+            id,
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        ],
         relations: ['tasks'],
+        order: {
+          tasks: {
+            id: 'ASC',
+          },
+        },
       });
       if (project) return project;
       throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
