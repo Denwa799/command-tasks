@@ -15,6 +15,8 @@ export const AppAutocomplete: FC<IAppAutocomplete> = ({
   isLoading,
   onAdd,
   placeholder,
+  isDanger,
+  dangerText,
 }) => {
   return (
     <View style={styles.autocompleteContainer}>
@@ -27,6 +29,8 @@ export const AppAutocomplete: FC<IAppAutocomplete> = ({
         isDisplay={isDisplay}
         isLoading={isLoading}
         style={styles.autocomplete}
+        isDanger={isDanger}
+        dangerText={dangerText}
       />
       <View style={styles.addBtnContainer}>
         <AppIconButton

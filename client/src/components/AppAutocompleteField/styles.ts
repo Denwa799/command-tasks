@@ -24,4 +24,16 @@ export const styles = StyleSheet.create({
     fontSize: SIZES.body3,
     color: THEME.TEXT_COLOR,
   },
+  dangerInput: {
+    borderColor: THEME.DANGER_COLOR,
+    borderWidth: 1,
+  },
+  dangerList: {
+    borderRadius: SIZES.radius,
+  },
+  dangerText: {
+    color: THEME.DANGER_COLOR,
+    fontSize: 12,
+    paddingTop: 2,
+  },
 });

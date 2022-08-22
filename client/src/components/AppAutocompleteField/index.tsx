@@ -15,6 +15,8 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
   isDisplay,
   isLoading,
   style,
+  isDanger,
+  dangerText = 'Пустое поле',
 }) => {
   return (
     <View style={style}>
@@ -22,11 +24,15 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        style={isDisplay && styles.input}
+        style={[
+          isDisplay && !isDanger && styles.input,
+          isDanger && styles.dangerInput,
+        ]}
       />
+      {isDanger && <Text style={styles.dangerText}>{dangerText}</Text>}
 
       {isDisplay && (
-        <View style={styles.list}>
+        <View style={[styles.list, isDanger && styles.dangerList]}>
           {isLoading ? (
             <AppLoader />
           ) : (

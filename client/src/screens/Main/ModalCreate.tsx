@@ -39,6 +39,9 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
   const [autocompletePress, setAutocompletePress] = useState('');
   const [isAutocomplete, setIsAutocomplete] = useState(false);
+  const [isAutocompleteError, setIsAutocompleteError] = useState(false);
+  const [dangerAutocompleteText, setDangerAutocompleteText] =
+    useState('Пустое поле');
 
   const [responsible, setResponsible] = useState('');
   const [isResponsibleError, setIsResponsibleError] = useState(false);
@@ -47,6 +50,7 @@ export const ModalCreate: FC<IModalCreate> = ({
 
   const [isUrgently, setIsUrgently] = useState(false);
 
+  const [userEmail, setUserEmail] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
 
   const [date, setDate] = useState(
@@ -67,10 +71,12 @@ export const ModalCreate: FC<IModalCreate> = ({
 
   useEffect(() => {
     const getEmail = async () => {
-      setEmails([await getUserEmail()]);
+      setUserEmail(await getUserEmail());
     };
     getEmail();
+  }, []);
 
+  useEffect(() => {
     setText('');
     setIsTextError(false);
     setAutocompleteValue('');
@@ -78,6 +84,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     setResponsible('');
     setIsResponsibleError(false);
     setIsUrgently(false);
+    setIsAutocompleteError(false);
   }, [isOpen]);
 
   useEffect(() => {
@@ -114,12 +121,14 @@ export const ModalCreate: FC<IModalCreate> = ({
   const autocompleteHandler = useCallback(
     (value: string) => {
       setAutocompleteValue(value);
+      setIsAutocompleteError(false);
     },
     [autocompleteValue],
   );
 
   const onAutocompletePress = useCallback(
     (email: string) => {
+      setIsAutocompleteError(false);
       setAutocompletePress(email);
       setAutocompleteValue(email);
     },
@@ -135,8 +144,36 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
 
   const onAdd = useCallback(() => {
+    if (!autocompleteValue) {
+      setDangerAutocompleteText('Пустое поле');
+      return setIsAutocompleteError(true);
+    }
+
+    if (!autocompletePress) {
+      setDangerAutocompleteText('Email не выбран');
+      return setIsAutocompleteError(true);
+    }
+
+    if (autocompleteValue !== autocompletePress) {
+      setDangerAutocompleteText('Выберите email');
+      return setIsAutocompleteError(true);
+    }
+
+    if (autocompletePress === userEmail) {
+      setDangerAutocompleteText(
+        'Email не должен быть таким же, как почта владельца аккаунта',
+      );
+      return setIsAutocompleteError(true);
+    }
+
+    const email = emails.find(element => element === autocompletePress);
+    if (email) {
+      setDangerAutocompleteText('Email уже добавлен');
+      return setIsAutocompleteError(true);
+    }
+
     setEmails(items => [...items, autocompletePress]);
-  }, [autocompletePress]);
+  }, [autocompleteValue, autocompletePress, emails]);
 
   const deleteEmailHandler = useCallback(
     (index: number) => {
@@ -234,6 +271,8 @@ export const ModalCreate: FC<IModalCreate> = ({
             onChange={autocompleteHandler}
             onPress={onAutocompletePress}
             onAdd={onAdd}
+            isDanger={isAutocompleteError}
+            dangerText={dangerAutocompleteText}
           />
           <AppItemsGrid items={emails} onDelete={deleteEmailHandler} />
         </>

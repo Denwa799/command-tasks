@@ -7,4 +7,6 @@ export interface IAppAutocomplete {
   placeholder?: string;
   isDisplay?: boolean;
   isLoading?: boolean;
+  isDanger?: boolean;
+  dangerText?: string;
 }
