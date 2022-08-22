@@ -172,6 +172,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       return setIsAutocompleteError(true);
     }
 
+    setIsAutocompleteError(false);
     setEmails(items => [...items, autocompletePress]);
   }, [autocompleteValue, autocompletePress, emails]);
 
