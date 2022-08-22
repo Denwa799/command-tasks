@@ -56,24 +56,29 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     }
   }, []);
 
-  const createTeam = useCallback(async (name: string) => {
-    setCreateTeamIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        await PostService(`${teamsPath}`, tokenBearer, {
-          name,
-        });
-      } else {
-        throw new Error('Ошибка сессии');
+  const createTeam = useCallback(
+    async (name: string, creator: number, users: string[]) => {
+      setCreateTeamIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          await PostService(`${teamsPath}`, tokenBearer, {
+            name,
+            creator,
+            users,
+          });
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка создания команды');
+      } finally {
+        setCreateTeamIsLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка создания команды');
-    } finally {
-      setCreateTeamIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const deleteTeam = useCallback(async (id: number) => {
     setDeleteTeamIsLoading(true);

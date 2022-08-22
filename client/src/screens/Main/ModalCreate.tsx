@@ -16,7 +16,7 @@ import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
-import {getUserEmail} from 'utils/getSession';
+import {getUserEmail, getUserId} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -39,6 +39,9 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
   const [autocompletePress, setAutocompletePress] = useState('');
   const [isAutocomplete, setIsAutocomplete] = useState(false);
+  const [isAutocompleteError, setIsAutocompleteError] = useState(false);
+  const [dangerAutocompleteText, setDangerAutocompleteText] =
+    useState('Пустое поле');
 
   const [responsible, setResponsible] = useState('');
   const [isResponsibleError, setIsResponsibleError] = useState(false);
@@ -47,6 +50,8 @@ export const ModalCreate: FC<IModalCreate> = ({
 
   const [isUrgently, setIsUrgently] = useState(false);
 
+  const [userEmail, setUserEmail] = useState('');
+  const [userId, setUserId] = useState(0);
   const [emails, setEmails] = useState<string[]>([]);
 
   const [date, setDate] = useState(
@@ -66,11 +71,14 @@ export const ModalCreate: FC<IModalCreate> = ({
   }, [foundUsers]);
 
   useEffect(() => {
-    const getEmail = async () => {
-      setEmails([await getUserEmail()]);
+    const getUser = async () => {
+      setUserEmail(await getUserEmail());
+      setUserId(await getUserId());
     };
-    getEmail();
+    getUser();
+  }, []);
 
+  useEffect(() => {
     setText('');
     setIsTextError(false);
     setAutocompleteValue('');
@@ -78,6 +86,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     setResponsible('');
     setIsResponsibleError(false);
     setIsUrgently(false);
+    setIsAutocompleteError(false);
   }, [isOpen]);
 
   useEffect(() => {
@@ -114,12 +123,14 @@ export const ModalCreate: FC<IModalCreate> = ({
   const autocompleteHandler = useCallback(
     (value: string) => {
       setAutocompleteValue(value);
+      setIsAutocompleteError(false);
     },
     [autocompleteValue],
   );
 
   const onAutocompletePress = useCallback(
     (email: string) => {
+      setIsAutocompleteError(false);
       setAutocompletePress(email);
       setAutocompleteValue(email);
     },
@@ -135,8 +146,37 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
 
   const onAdd = useCallback(() => {
+    if (!autocompleteValue) {
+      setDangerAutocompleteText('Пустое поле');
+      return setIsAutocompleteError(true);
+    }
+
+    if (!autocompletePress) {
+      setDangerAutocompleteText('Email не выбран');
+      return setIsAutocompleteError(true);
+    }
+
+    if (autocompleteValue !== autocompletePress) {
+      setDangerAutocompleteText('Выберите email');
+      return setIsAutocompleteError(true);
+    }
+
+    if (autocompletePress === userEmail) {
+      setDangerAutocompleteText(
+        'Email не должен быть таким же, как почта владельца аккаунта',
+      );
+      return setIsAutocompleteError(true);
+    }
+
+    const email = emails.find(element => element === autocompletePress);
+    if (email) {
+      setDangerAutocompleteText('Email уже добавлен');
+      return setIsAutocompleteError(true);
+    }
+
+    setIsAutocompleteError(false);
     setEmails(items => [...items, autocompletePress]);
-  }, [autocompletePress]);
+  }, [autocompleteValue, autocompletePress, emails]);
 
   const deleteEmailHandler = useCallback(
     (index: number) => {
@@ -178,6 +218,13 @@ export const ModalCreate: FC<IModalCreate> = ({
       return setIsTextError(true);
     }
 
+    if (route.name === teamsRoute) {
+      if (emails.length === 0) {
+        setDangerAutocompleteText('Добавьте пользователя');
+        return setIsAutocompleteError(true);
+      }
+    }
+
     if (route.name === projectRoute) {
       if (!responsible || responsible.length < 3 || responsible.length > 50) {
         if (responsible.length < 3) {
@@ -193,7 +240,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       }
     }
 
-    route.name === teamsRoute && (await createTeam(text));
+    route.name === teamsRoute && (await createTeam(text, userId, emails));
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await createProject(teamId, text));
@@ -212,7 +259,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === projectRoute && projectId && (await fetchProject(projectId));
 
     setIsOpen(false);
-  }, [teamId, projectId, text, responsible, isUrgently, date]);
+  }, [teamId, projectId, text, responsible, isUrgently, date, emails]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -234,6 +281,8 @@ export const ModalCreate: FC<IModalCreate> = ({
             onChange={autocompleteHandler}
             onPress={onAutocompletePress}
             onAdd={onAdd}
+            isDanger={isAutocompleteError}
+            dangerText={dangerAutocompleteText}
           />
           <AppItemsGrid items={emails} onDelete={deleteEmailHandler} />
         </>

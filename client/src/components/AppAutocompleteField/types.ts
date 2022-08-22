@@ -7,4 +7,6 @@ export interface IAppAutocompleteField {
   isDisplay?: boolean;
   isLoading?: boolean;
   style?: Object;
+  isDanger?: boolean;
+  dangerText?: string;
 }
