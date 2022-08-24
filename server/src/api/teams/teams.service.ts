@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Team } from './teams.entity';
@@ -22,6 +22,7 @@ export class TeamsService {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
       const users = [];
+      const activatedUsers = [];
       for (const email of dto.users) {
         const user = await this.userService.findUserByEmail(email);
         if (!user) {
@@ -31,11 +32,13 @@ export class TeamsService {
           );
         }
         users.push(user);
+        activatedUsers.push(user.id);
       }
       const team = await this.teamRepository.create({
         name: dto.name,
         creator,
         users,
+        activatedUsers,
       });
       if (team) return this.teamRepository.save(team);
       throw new HttpException('Команда не создана', HttpStatus.BAD_REQUEST);
@@ -47,7 +50,13 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const teams = await this.teamRepository.find({
-        where: [{ users: { id: decoded.id } }, { creator: { id: decoded.id } }],
+        where: [
+          {
+            users: { id: decoded.id },
+            activatedUsers: ArrayContains([decoded.id]),
+          },
+          { creator: { id: decoded.id } },
+        ],
         relations: ['projects'],
         take,
         skip,
@@ -71,7 +80,11 @@ export class TeamsService {
           },
         },
         where: [
-          { id, users: { id: decoded.id } },
+          {
+            id,
+            users: { id: decoded.id },
+            activatedUsers: ArrayContains([decoded.id]),
+          },
           { id, creator: { id: decoded.id } },
         ],
         relations: ['projects', 'creator'],

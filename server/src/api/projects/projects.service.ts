@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeamsService } from 'src/api/teams/teams.service';
-import { Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './projects.entity';
@@ -72,6 +72,7 @@ export class ProjectsService {
               users: {
                 id: decoded.id,
               },
+              activatedUsers: ArrayContains([decoded.id]),
             },
           },
           {
