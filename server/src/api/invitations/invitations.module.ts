@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeamsModule } from '../teams/teams.module';
@@ -13,8 +13,8 @@ import { InvitationsService } from './invitations.service';
   imports: [
     TypeOrmModule.forFeature([Invitation]),
     UsersModule,
-    TeamsModule,
     JwtModule,
+    forwardRef(() => TeamsModule),
   ],
   exports: [InvitationsService],
 })

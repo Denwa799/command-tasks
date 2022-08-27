@@ -28,7 +28,9 @@ export class Invitation {
   message: string;
 
   @ApiProperty({ type: () => Team, description: 'Команда приглашения' })
-  @ManyToOne(() => Team, (team) => team.invitations)
+  @ManyToOne(() => Team, (team) => team.invitations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   team: Team;
 

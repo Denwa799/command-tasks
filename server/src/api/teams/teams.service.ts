@@ -1,8 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayContains, Repository } from 'typeorm';
-import { User } from '../users/users.entity';
+import { InvitationsService } from '../invitations/invitations.service';
 import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Team } from './teams.entity';
@@ -13,13 +19,15 @@ export class TeamsService {
     @InjectRepository(Team) private teamRepository: Repository<Team>,
     private userService: UsersService,
     private jwtService: JwtService,
+    @Inject(forwardRef(() => InvitationsService))
+    private invitationsService: InvitationsService,
   ) {}
 
   private async decodeToken(token: string) {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async create(dto: CreateTeamDto) {
+  async create(dto: CreateTeamDto, token: string) {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
       const users = [];
@@ -39,7 +47,18 @@ export class TeamsService {
         users,
         activatedUsers: [],
       });
-      if (team) return this.teamRepository.save(team);
+      if (team) {
+        const savedTeam = await this.teamRepository.save(team);
+        for (const user of users) {
+          const invitationBody = {
+            message: `Приглашение в команду ${dto.name} от ${creator.email}`,
+            teamId: savedTeam.id,
+            userEmail: user.email,
+          };
+          await this.invitationsService.create(invitationBody, token);
+        }
+        return 'Команда создана';
+      }
       throw new HttpException('Команда не создана', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);

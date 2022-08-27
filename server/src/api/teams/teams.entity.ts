@@ -50,9 +50,7 @@ export class Team {
   activatedUsers: number[];
 
   @ApiProperty({ type: () => Invitation, description: 'Приглашения команды' })
-  @OneToMany(() => Invitation, (invitation) => invitation.team, {
-    onDelete: 'CASCADE',
-  })
+  @OneToMany(() => Invitation, (invitation) => invitation.team)
   invitations: Invitation[];
 
   @ApiProperty({

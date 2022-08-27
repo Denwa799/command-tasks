@@ -23,8 +23,11 @@ export class TeamsController {
   @ApiOperation({ summary: 'Создание команды' })
   @ApiResponse({ status: 200, type: Team })
   @Post()
-  create(@Body() teamDto: CreateTeamDto) {
-    return this.teamsService.create(teamDto);
+  create(
+    @Body() teamDto: CreateTeamDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.create(teamDto, token);
   }
 
   @ApiOperation({ summary: 'Получение всех команд' })
