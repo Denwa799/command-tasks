@@ -13,6 +13,7 @@ import {
 import { IsArray, IsDate, IsNumber, IsString } from 'class-validator';
 import { Project } from 'src/api/projects/projects.entity';
 import { User } from '../users/users.entity';
+import { Invitation } from '../invitations/invitations.entity';
 
 @Entity('teams')
 export class Team {
@@ -47,6 +48,12 @@ export class Team {
   @IsArray()
   @IsNumber()
   activatedUsers: number[];
+
+  @ApiProperty({ type: () => Invitation, description: 'Приглашения команды' })
+  @OneToMany(() => Invitation, (invitation) => invitation.team, {
+    onDelete: 'CASCADE',
+  })
+  invitations: Invitation[];
 
   @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',

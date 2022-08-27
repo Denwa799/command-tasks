@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayContains, Repository } from 'typeorm';
+import { User } from '../users/users.entity';
 import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { Team } from './teams.entity';
@@ -22,7 +23,6 @@ export class TeamsService {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
       const users = [];
-      const activatedUsers = [];
       for (const email of dto.users) {
         const user = await this.userService.findUserByEmail(email);
         if (!user) {
@@ -32,13 +32,12 @@ export class TeamsService {
           );
         }
         users.push(user);
-        activatedUsers.push(user.id);
       }
       const team = await this.teamRepository.create({
         name: dto.name,
         creator,
         users,
-        activatedUsers,
+        activatedUsers: [],
       });
       if (team) return this.teamRepository.save(team);
       throw new HttpException('Команда не создана', HttpStatus.BAD_REQUEST);
@@ -136,5 +135,33 @@ export class TeamsService {
       );
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async addActivatedUser(id: number, userId: number) {
+    const team = await this.teamRepository.findOneBy({
+      id,
+    });
+    if (team) {
+      const activatedUsers = [...team.activatedUsers, userId];
+      const newTeam = await this.teamRepository.merge(team, {
+        activatedUsers,
+      });
+      return this.teamRepository.save(newTeam);
+    }
+    throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
+  }
+
+  async removeActivatedUser(id: number, userId: number) {
+    const team = await this.teamRepository.findOneBy({
+      id,
+    });
+    if (team) {
+      const activatedUsers = team.activatedUsers.filter((id) => id != userId);
+      const newTeam = await this.teamRepository.merge(team, {
+        activatedUsers,
+      });
+      return this.teamRepository.save(newTeam);
+    }
+    throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
   }
 }

@@ -18,6 +18,7 @@ import {
   OneToMany,
   JoinTable,
 } from 'typeorm';
+import { Invitation } from '../invitations/invitations.entity';
 import { Team } from '../teams/teams.entity';
 
 @Entity('users')
@@ -79,6 +80,15 @@ export class User {
   @ManyToMany(() => Team, (team) => team.users)
   @JoinTable()
   teams: Team[];
+
+  @ApiProperty({
+    type: () => Invitation,
+    description: 'Приглашения пользователя',
+  })
+  @OneToMany(() => Invitation, (invitation) => invitation.team, {
+    onDelete: 'CASCADE',
+  })
+  invitations: Invitation[];
 
   @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',

@@ -9,6 +9,7 @@ import { ProjectsModule } from './api/projects/projects.module';
 import { TasksModule } from './api/tasks/tasks.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './api/auth/guards';
+import { InvitationsModule } from './api/invitations/invitations.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AccessTokenGuard } from './api/auth/guards';
     TeamsModule,
     ProjectsModule,
     TasksModule,
+    InvitationsModule,
   ],
   providers: [
     {
