@@ -12,4 +12,7 @@ export const styles = StyleSheet.create({
     fontSize: 11,
     paddingBottom: 2,
   },
+  notifications: {
+    marginRight: 5,
+  },
 });
