@@ -21,23 +21,26 @@ export class TasksService {
   }
 
   async create(dto: CreateTaskDto, token) {
-    const project = await this.projectService.getProjectById(
-      dto.projectId,
-      token,
-    );
-
-    if (project) {
-      const task = await this.taskRepository.create({
-        text: dto.text,
-        responsible: dto.responsible,
-        status: dto.status,
-        isUrgently: dto.isUrgently,
-        date: dto.date,
-        project,
-      });
-      return this.taskRepository.save(task);
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const project = await this.projectService.getProjectById(
+        dto.projectId,
+        token,
+      );
+      if (project && project.team.creator.id === decoded.id) {
+        const task = await this.taskRepository.create({
+          text: dto.text,
+          responsible: dto.responsible,
+          status: dto.status,
+          isUrgently: dto.isUrgently,
+          date: dto.date,
+          project,
+        });
+        return this.taskRepository.save(task);
+      }
+      throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
   async getAllTasks(take = 50, skip = 0) {

@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeamsService } from 'src/api/teams/teams.service';
-import { Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './projects.entity';
@@ -21,16 +21,19 @@ export class ProjectsService {
   }
 
   async create(dto: CreateProjectDto, token: string) {
-    const team = await this.teamService.getTeamById(dto.teamId, token);
-
-    if (team) {
-      const project = await this.projectRepository.create({
-        name: dto.name,
-        team,
-      });
-      return this.projectRepository.save(project);
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const team = await this.teamService.getTeamById(dto.teamId, token);
+      if (team && team.creator.id === decoded.id) {
+        const project = await this.projectRepository.create({
+          name: dto.name,
+          team,
+        });
+        return this.projectRepository.save(project);
+      }
+      throw new HttpException('Ошибка создания проекта', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Ошибка создания проекта', HttpStatus.NOT_FOUND);
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
   async getAllProjects(take = 50, skip = 0) {
@@ -50,6 +53,18 @@ export class ProjectsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const project = await this.projectRepository.findOne({
+        select: {
+          id: true,
+          name: true,
+          tasks: true,
+          team: {
+            id: true,
+            name: true,
+            creator: {
+              id: true,
+            },
+          },
+        },
         where: [
           {
             id,
@@ -57,6 +72,7 @@ export class ProjectsService {
               users: {
                 id: decoded.id,
               },
+              activatedUsers: ArrayContains([decoded.id]),
             },
           },
           {
@@ -68,7 +84,12 @@ export class ProjectsService {
             },
           },
         ],
-        relations: ['tasks'],
+        relations: {
+          tasks: true,
+          team: {
+            creator: true,
+          },
+        },
         order: {
           tasks: {
             id: 'ASC',
