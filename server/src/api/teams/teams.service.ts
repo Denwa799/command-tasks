@@ -68,6 +68,17 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const teams = await this.teamRepository.find({
+        select: {
+          id: true,
+          name: true,
+          projects: {
+            id: true,
+            name: true,
+          },
+          creator: {
+            id: true,
+          },
+        },
         where: [
           {
             users: { id: decoded.id },
@@ -75,7 +86,7 @@ export class TeamsService {
           },
           { creator: { id: decoded.id } },
         ],
-        relations: ['projects'],
+        relations: ['projects', 'creator'],
         take,
         skip,
         order: {
@@ -93,6 +104,17 @@ export class TeamsService {
     if (decoded) {
       const team = await this.teamRepository.findOne({
         select: {
+          id: true,
+          name: true,
+          activatedUsers: true,
+          projects: {
+            id: true,
+            name: true,
+          },
+          users: {
+            id: true,
+            email: true,
+          },
           creator: {
             id: true,
           },
@@ -105,7 +127,7 @@ export class TeamsService {
           },
           { id, creator: { id: decoded.id } },
         ],
-        relations: ['projects', 'creator'],
+        relations: ['projects', 'creator', 'users'],
         order: {
           projects: {
             id: 'ASC',

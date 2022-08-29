@@ -56,7 +56,14 @@ export class ProjectsService {
         select: {
           id: true,
           name: true,
-          tasks: true,
+          tasks: {
+            id: true,
+            text: true,
+            responsible: true,
+            status: true,
+            isUrgently: true,
+            date: true,
+          },
           team: {
             id: true,
             name: true,
