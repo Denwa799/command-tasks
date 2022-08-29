@@ -1,5 +1,5 @@
 import React, {FC} from 'react';
-import {Text, TouchableOpacity} from 'react-native';
+import {Text, TouchableWithoutFeedback} from 'react-native';
 import {styles} from './styles';
 import {IAppTextButton} from './types';
 
@@ -10,11 +10,8 @@ export const AppTextButton: FC<IAppTextButton> = ({
   containerStyle,
 }) => {
   return (
-    <TouchableOpacity
-      activeOpacity={1}
-      onPress={onPress}
-      style={containerStyle}>
+    <TouchableWithoutFeedback onPress={onPress} style={containerStyle}>
       <Text style={[styles.text, style]}>{text}</Text>
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   );
 };

@@ -5,7 +5,7 @@ import {useAuth} from 'hooks/useAuth';
 import {Pressable, Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAuthData} from './types';
-import {AppButton} from 'components/AppButton';
+import {AppButton} from 'components/Btns/AppButton';
 
 export const AuthScreen: FC = () => {
   const {isLoading, login, register} = useAuth();

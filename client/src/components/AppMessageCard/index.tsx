@@ -1,4 +1,4 @@
-import {AppTextButton} from 'components/AppTextButton';
+import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
 import {AppContainer} from 'layouts/AppContainer';
 import React, {FC, useCallback} from 'react';
 import {Text, View} from 'react-native';
@@ -23,15 +23,19 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
         <Text style={styles.text}>{message}</Text>
         {!isAccepted && (
           <View style={styles.btnsContainer}>
-            <AppTextButton
+            <AppNativeFeedbackBtn
               text={btnText}
               onPress={onPress ? onPress : btnHandler}
-              containerStyle={styles.btn}
+              style={styles.btn}
+              isCenter
+              isMainColor
             />
-            <AppTextButton
+            <AppNativeFeedbackBtn
               text={secondBtnText}
               onPress={onPress ? onPress : btnHandler}
-              containerStyle={styles.btn}
+              style={styles.btn}
+              isCenter
+              isMainColor
             />
           </View>
         )}

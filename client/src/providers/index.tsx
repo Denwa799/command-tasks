@@ -7,7 +7,7 @@ import {TeamsProvider} from './TeamsProvider';
 import {IProviderComposer, IProviders} from './types';
 import {UsersProvider} from './UsersProvider';
 
-const provider = (provider: T, props = {}) => [provider, props];
+const provider = (item: any, props = {}) => [item, props];
 
 const ProviderComposer: FC<IProviderComposer> = ({providers, children}) => {
   for (let i = providers.length - 1; i >= 0; --i) {

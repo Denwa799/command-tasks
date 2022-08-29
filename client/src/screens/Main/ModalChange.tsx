@@ -3,9 +3,9 @@ import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/AppNativeButton';
+import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import {AppText} from 'components/AppText';
-import {AppTextButton} from 'components/AppTextButton';
+import {AppTextButton} from 'components/Btns/AppTextButton';
 import {
   doneStatus,
   inProgressStatus,

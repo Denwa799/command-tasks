@@ -1,6 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AppIconButton} from 'components/AppIconButton';
+import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';

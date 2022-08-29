@@ -1,5 +1,5 @@
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/AppNativeButton';
+import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import React, {FC, useCallback} from 'react';
 import {Text, View} from 'react-native';
 import {IModalDelete} from './types';
