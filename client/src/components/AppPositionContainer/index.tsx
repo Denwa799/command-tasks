@@ -7,12 +7,14 @@ export const AppPositionContainer: FC<IAppHorizontalContainer> = ({
   children,
   style,
   isHorizontal,
+  isHorizontalCenter,
   isCenter,
 }) => {
   return (
     <View
       style={[
         isHorizontal && styles.horizontal,
+        isHorizontalCenter && styles.horizontalCenter,
         isCenter && styles.center,
         style,
       ]}>

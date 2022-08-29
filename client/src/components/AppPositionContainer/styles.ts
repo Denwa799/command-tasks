@@ -8,4 +8,7 @@ export const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
   },
+  horizontalCenter: {
+    alignItems: 'center',
+  },
 });
