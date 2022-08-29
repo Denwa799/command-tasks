@@ -13,6 +13,15 @@ export const styles = StyleSheet.create({
   list: {
     height: '95%',
   },
+  messageCenter: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 350,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
   modalText: {
     fontSize: SIZES.body2,
     color: THEME.TEXT_COLOR,

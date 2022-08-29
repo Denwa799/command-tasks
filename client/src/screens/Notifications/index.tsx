@@ -52,6 +52,7 @@ export const NotificationsScreen = () => {
         <>
           <AppList
             data={invitations}
+            style={styles.list}
             refreshing={isRefreshing}
             onRefresh={onRefresh}
             type="appMessageCard"
@@ -59,9 +60,9 @@ export const NotificationsScreen = () => {
             disabledMessagePressBtn={updateInvitationIsLoading}
           />
           {(!invitations || invitations.length === 0) && (
-            <AppPositionContainer isCenter isHorizontalCenter>
-              <AppTitle level="2">Уведомлений нет</AppTitle>
-            </AppPositionContainer>
+            <AppTitle level="2" style={styles.messageCenter}>
+              Уведомлений нет
+            </AppTitle>
           )}
         </>
       )}
