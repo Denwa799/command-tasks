@@ -14,15 +14,7 @@ export const styles = StyleSheet.create({
     borderBottomRightRadius: SIZES.radius,
   },
   item: {
-    borderRadius: SIZES.radius,
     backgroundColor: THEME.BACK_SECOND,
-    paddingTop: 10,
-    paddingBottom: 10,
-  },
-  text: {
-    paddingLeft: 10,
-    fontSize: SIZES.body3,
-    color: THEME.TEXT_COLOR,
   },
   dangerInput: {
     borderColor: THEME.DANGER_COLOR,

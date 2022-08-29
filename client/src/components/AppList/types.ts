@@ -16,4 +16,9 @@ export interface IAppList {
   refreshing?: boolean;
   onRefresh?: () => void;
   isColors?: boolean;
+  type?: 'appCard' | 'appMessageCard';
+  messageCardTextBtn?: string;
+  messageCardSecTextBtn?: string;
+  onPressMessageBtn?: (id: number) => void;
+  disabledMessagePressBtn?: boolean;
 }

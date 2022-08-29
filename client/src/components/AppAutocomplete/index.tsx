@@ -1,5 +1,5 @@
 import {AppAutocompleteField} from 'components/AppAutocompleteField';
-import {AppIconButton} from 'components/AppIconButton';
+import {AppIconButton} from 'components/Btns/AppIconButton';
 import {THEME} from 'constants/theme';
 import React, {FC} from 'react';
 import {View} from 'react-native';

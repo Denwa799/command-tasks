@@ -13,6 +13,7 @@ const LIGHT_THEME = {
   RED_COLOR: '#e20d0d',
   YELLOW_COLOR: '#ffdc10',
   GREEN_COLOR: '#3ead13',
+  GREEN_COLOR_LIGHT: '#338513',
   WHITE_COLOR: '#fff',
   BLACK_COLOR: '#000',
   BLACK_60_COLOR: 'rgba(17,17,19,0.6)',

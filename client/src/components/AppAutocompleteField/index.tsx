@@ -1,8 +1,8 @@
 import {AppField} from 'components/AppField';
 import {AppLoader} from 'components/AppLoader';
-import {THEME} from 'constants/theme';
+import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
 import React, {FC} from 'react';
-import {Text, TouchableNativeFeedback, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAppAutocompleteField} from './types';
 
@@ -38,18 +38,13 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
           ) : (
             <View>
               {data.map(item => (
-                <View key={`${Math.random()}${item}`} style={styles.item}>
-                  <TouchableNativeFeedback
-                    onPress={() => onPress(item)}
-                    background={TouchableNativeFeedback.Ripple(
-                      THEME.MAIN_COLOR,
-                      true,
-                    )}>
-                    <View>
-                      <Text style={styles.text}>{item}</Text>
-                    </View>
-                  </TouchableNativeFeedback>
-                </View>
+                <AppNativeFeedbackBtn
+                  key={`${Math.random()}${item}`}
+                  onPress={() => onPress(item)}
+                  text={item}
+                  isBorderRadius
+                  style={styles.item}
+                />
               ))}
             </View>
           )}

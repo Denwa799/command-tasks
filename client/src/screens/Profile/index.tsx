@@ -1,4 +1,4 @@
-import {AppButton} from 'components/AppButton';
+import {AppButton} from 'components/Btns/AppButton';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {useAuth} from 'hooks/useAuth';

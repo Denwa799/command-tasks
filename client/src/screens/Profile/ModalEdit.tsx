@@ -1,6 +1,6 @@
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/AppNativeButton';
+import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useState} from 'react';
 import {View} from 'react-native';

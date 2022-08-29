@@ -1,6 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {AppIconButton} from 'components/AppIconButton';
+import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
@@ -13,6 +13,7 @@ import {Alert, View} from 'react-native';
 import {Modals} from './Modals';
 import {styles} from './styles';
 import {IMainScreen, TeamScreenNavigateType} from './types';
+import {AppTitle} from 'components/AppTitle';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
@@ -128,35 +129,42 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
           <AppLoader />
         </AppPositionContainer>
       ) : (
-        <View style={styles.content}>
-          <AppList
-            data={data}
-            refreshing={isRefreshing}
-            onRefresh={onRefresh}
-            style={styles.list}
-            onOpen={onOpen}
-            onDelete={onDelete}
-            onChange={onChange}
-            isColors={route.name === projectRoute}
-          />
-          <AppIconButton onPress={onAdd} />
-          <Modals
-            createIsOpen={createIsOpen}
-            setCreateIsOpen={setCreateIsOpen}
-            id={id}
-            deleteIsOpen={deleteIsOpen}
-            setDeleteIsOpen={setDeleteIsOpen}
-            changeIsOpen={changeIsOpen}
-            setChangeIsOpen={setChangeIsOpen}
-            text={text}
-            teamId={route.name === teamRoute && params.teamId}
-            projectId={route.name === projectRoute && params.projectId}
-            responsible={responsible}
-            status={status}
-            isUrgently={isUrgently}
-            date={date}
-          />
-        </View>
+        <>
+          <View style={styles.content}>
+            <AppList
+              data={data}
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              style={styles.list}
+              onOpen={onOpen}
+              onDelete={onDelete}
+              onChange={onChange}
+              isColors={route.name === projectRoute}
+            />
+            {(!data || data.length === 0) && (
+              <AppTitle level="2" style={styles.messageCenter}>
+                Список пуст
+              </AppTitle>
+            )}
+            <AppIconButton onPress={onAdd} />
+            <Modals
+              createIsOpen={createIsOpen}
+              setCreateIsOpen={setCreateIsOpen}
+              id={id}
+              deleteIsOpen={deleteIsOpen}
+              setDeleteIsOpen={setDeleteIsOpen}
+              changeIsOpen={changeIsOpen}
+              setChangeIsOpen={setChangeIsOpen}
+              text={text}
+              teamId={route.name === teamRoute && params.teamId}
+              projectId={route.name === projectRoute && params.projectId}
+              responsible={responsible}
+              status={status}
+              isUrgently={isUrgently}
+              date={date}
+            />
+          </View>
+        </>
       )}
     </View>
   );

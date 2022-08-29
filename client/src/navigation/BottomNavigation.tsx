@@ -1,6 +1,6 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {THEME} from 'constants/theme';
-import React from 'react';
+import React, {useCallback} from 'react';
 import {ProfileScreen} from 'screens/Profile';
 import {styles} from './styles';
 import {ITabBarIcon} from './types';
@@ -11,6 +11,14 @@ import {TaskNavigation} from './TaskNavigation';
 const Tab = createBottomTabNavigator();
 
 export const BottomNavigation = () => {
+  const mainScreenButton = useCallback((color: string) => {
+    return <Ionicon name="ios-list" size={24} color={color} />;
+  }, []);
+
+  const profileScreenButton = useCallback((color: string) => {
+    return <Anticon name="user" size={24} color={color} />;
+  }, []);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -26,9 +34,7 @@ export const BottomNavigation = () => {
         component={TaskNavigation}
         options={{
           tabBarLabel: 'Задачи',
-          tabBarIcon: (options: ITabBarIcon) => (
-            <Ionicon name="ios-list" size={24} color={options.color} />
-          ),
+          tabBarIcon: (options: ITabBarIcon) => mainScreenButton(options.color),
         }}
       />
       <Tab.Screen
@@ -36,9 +42,8 @@ export const BottomNavigation = () => {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Профиль',
-          tabBarIcon: (options: ITabBarIcon) => (
-            <Anticon name="user" size={24} color={options.color} />
-          ),
+          tabBarIcon: (options: ITabBarIcon) =>
+            profileScreenButton(options.color),
         }}
       />
     </Tab.Navigator>
