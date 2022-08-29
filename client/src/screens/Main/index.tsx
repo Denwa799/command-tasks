@@ -14,9 +14,11 @@ import {Modals} from './Modals';
 import {styles} from './styles';
 import {IMainScreen, TeamScreenNavigateType} from './types';
 import {AppTitle} from 'components/AppTitle';
+import {useAuth} from 'hooks/useAuth';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
+  const {user} = useAuth();
 
   const routeName = useMemo(() => {
     if (route.name === teamRoute) {
@@ -34,6 +36,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const {teams, teamsIsLoading, team, teamIsLoading, fetchTeams, fetchTeam} =
     useTeams();
   const {project, fetchProject} = useProjects();
+
+  const [creatorId, setCreatorId] = useState<number | undefined>(
+    team?.creator.id,
+  );
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -64,6 +70,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
     route.name === teamsRoute && fetchTeams();
   }, []);
+
+  useEffect(() => {
+    team && setCreatorId(team.creator.id);
+  }, [team]);
 
   const onOpen = useCallback(async (item: ITeam | IProject) => {
     if (route.name === teamsRoute) {
@@ -140,13 +150,16 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               onDelete={onDelete}
               onChange={onChange}
               isColors={route.name === projectRoute}
+              creatorId={creatorId}
             />
             {(!data || data.length === 0) && (
               <AppTitle level="2" style={styles.messageCenter}>
                 Список пуст
               </AppTitle>
             )}
-            <AppIconButton onPress={onAdd} />
+            {(creatorId === user?.id || route.name === teamsRoute) && (
+              <AppIconButton onPress={onAdd} />
+            )}
             <Modals
               createIsOpen={createIsOpen}
               setCreateIsOpen={setCreateIsOpen}

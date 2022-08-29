@@ -1,6 +1,6 @@
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {IUsersContext, IUsersProvider} from './types';
-import {getAccessToken} from 'utils/getSession';
+import {getAccessToken, getSession} from 'utils/getSession';
 import {setUserNameSession} from 'utils/setSession';
 import {Alert} from 'react-native';
 import {GetService, PatchService} from 'api';

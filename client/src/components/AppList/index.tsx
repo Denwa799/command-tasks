@@ -18,6 +18,7 @@ export const AppList: FC<IAppList> = ({
   messageCardSecTextBtn,
   onPressMessageBtn,
   disabledMessagePressBtn,
+  creatorId,
 }) => {
   const renderItem = ({item}) => {
     return (
@@ -35,6 +36,7 @@ export const AppList: FC<IAppList> = ({
             status={item?.status}
             isUrgently={item?.isUrgently}
             date={item?.date}
+            creatorId={creatorId}
           />
         )}
         {type === 'appMessageCard' && (
