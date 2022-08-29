@@ -5,7 +5,7 @@ import {MainScreen} from 'screens/Main';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import {Notifications} from 'screens/Notifications';
+import {NotificationsScreen} from 'screens/Notifications';
 import {styles} from './styles';
 
 const Stack = createNativeStackNavigator();
@@ -52,7 +52,7 @@ export const TaskNavigation = () => {
       <Stack.Screen name="Project" component={MainScreen} />
       <Stack.Screen
         name="Notifications"
-        component={Notifications}
+        component={NotificationsScreen}
         options={{
           title: 'Уведомления',
         }}
