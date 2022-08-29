@@ -4,5 +4,6 @@ export interface IAppMessageCard {
   isAccepted: boolean;
   btnText?: string;
   secondBtnText?: string;
-  onPress?: () => void;
+  onPress?: (id: number) => void;
+  disabled?: boolean;
 }

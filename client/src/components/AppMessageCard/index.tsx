@@ -12,9 +12,12 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
   btnText = 'Принять',
   secondBtnText = 'Скрыть',
   onPress,
+  disabled,
 }) => {
   const btnHandler = useCallback(() => {
-    console.log('Нажатие на кнопку');
+    if (onPress) {
+      onPress(id);
+    }
   }, []);
 
   return (
@@ -25,17 +28,19 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
           <View style={styles.btnsContainer}>
             <AppNativeFeedbackBtn
               text={btnText}
-              onPress={onPress ? onPress : btnHandler}
+              onPress={btnHandler}
               style={styles.btn}
               isCenter
               isMainColor
+              disabled={disabled}
             />
             <AppNativeFeedbackBtn
               text={secondBtnText}
-              onPress={onPress ? onPress : btnHandler}
+              onPress={btnHandler}
               style={styles.btn}
               isCenter
               isMainColor
+              disabled={disabled}
             />
           </View>
         )}

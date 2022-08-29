@@ -16,7 +16,8 @@ export const AppList: FC<IAppList> = ({
   type = 'appCard',
   messageCardTextBtn,
   messageCardSecTextBtn,
-  onPress,
+  onPressMessageBtn,
+  disabledMessagePressBtn,
 }) => {
   const renderItem = ({item}) => {
     return (
@@ -43,7 +44,8 @@ export const AppList: FC<IAppList> = ({
             isAccepted={item?.isAccepted}
             btnText={messageCardTextBtn}
             secondBtnText={messageCardSecTextBtn}
-            onPress={onPress}
+            onPress={onPressMessageBtn}
+            disabled={disabledMessagePressBtn}
           />
         )}
       </>

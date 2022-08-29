@@ -7,4 +7,5 @@ export interface IAppNativeFeedbackBtn {
   isBorderRadius?: boolean;
   isCenter?: boolean;
   isMainColor?: boolean;
+  disabled?: boolean;
 }

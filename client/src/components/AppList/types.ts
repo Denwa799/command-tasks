@@ -19,5 +19,6 @@ export interface IAppList {
   type?: 'appCard' | 'appMessageCard';
   messageCardTextBtn?: string;
   messageCardSecTextBtn?: string;
-  onPress?: () => void;
+  onPressMessageBtn?: (id: number) => void;
+  disabledMessagePressBtn?: boolean;
 }
