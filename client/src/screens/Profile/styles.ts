@@ -34,13 +34,4 @@ export const styles = StyleSheet.create({
     bottom: 110,
     left: 15,
   },
-  modalBtns: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalBtn: {
-    width: '45%',
-    marginTop: 20,
-  },
 });

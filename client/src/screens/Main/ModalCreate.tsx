@@ -5,7 +5,6 @@ import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
 import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import {AppText} from 'components/AppText';
 import {AppTextButton} from 'components/Btns/AppTextButton';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
