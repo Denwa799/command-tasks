@@ -8,6 +8,7 @@ import {AppModal} from 'components/AppModal';
 import {AppText} from 'components/AppText';
 import {AppTextButton} from 'components/Btns/AppTextButton';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useAuth} from 'hooks/useAuth';
 import {useDebounce} from 'hooks/useDebounce';
 import {useProjects} from 'hooks/useProjects';
 import {useTasks} from 'hooks/useTasks';
@@ -15,7 +16,6 @@ import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {TouchableOpacity} from 'react-native';
-import {getUserEmail, getUserId} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -26,6 +26,8 @@ export const ModalCreate: FC<IModalCreate> = ({
   projectId,
 }) => {
   const route = useRoute();
+
+  const {user} = useAuth();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -66,16 +68,15 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
   const autocompleteData = useMemo(() => {
-    return foundUsers.map(user => user.email);
+    return foundUsers.map(item => item.email);
   }, [foundUsers]);
 
   useEffect(() => {
-    const getUser = async () => {
-      setUserEmail(await getUserEmail());
-      setUserId(await getUserId());
-    };
-    getUser();
-  }, []);
+    if (user) {
+      setUserEmail(user.email);
+      setUserId(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     setText('');
@@ -86,6 +87,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     setIsResponsibleError(false);
     setIsUrgently(false);
     setIsAutocompleteError(false);
+    setEmails([]);
   }, [isOpen]);
 
   useEffect(() => {
@@ -175,6 +177,8 @@ export const ModalCreate: FC<IModalCreate> = ({
 
     setIsAutocompleteError(false);
     setEmails(items => [...items, autocompletePress]);
+    setAutocompleteValue('');
+    setAutocompletePress('');
   }, [autocompleteValue, autocompletePress, emails]);
 
   const deleteEmailHandler = useCallback(
@@ -320,7 +324,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       <AppModal.Actions>
         <AppModal.Button title="Закрыть" onPress={onClose} />
         <AppModal.Button
-          title="Добавить"
+          title="Создать"
           onPress={onCreate}
           disabled={
             createTeamIsLoading || createProjectIsLoading || createTaskIsLoading
