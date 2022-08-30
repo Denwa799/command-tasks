@@ -6,10 +6,13 @@ import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Alert, View} from 'react-native';
+import {Dialog} from './Dialog';
 import {styles} from './styles';
 
 export const NotificationsScreen = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [notificationId, setNotificationId] = useState(0);
 
   const {
     fetchInvitations,
@@ -36,11 +39,17 @@ export const NotificationsScreen = () => {
     fetchInvitations();
   }, []);
 
-  const onAccept = useCallback(async (id: number) => {
-    await updateInvitation(id, true);
+  const dialogOpen = useCallback((id: number) => {
+    setNotificationId(id);
+    setDialogIsOpen(true);
+  }, []);
+
+  const onAccept = useCallback(async () => {
+    await updateInvitation(notificationId, true);
+    setDialogIsOpen(false);
     fetchInvitations();
     fetchTeams();
-  }, []);
+  }, [notificationId]);
 
   return (
     <View style={styles.notifications}>
@@ -56,14 +65,19 @@ export const NotificationsScreen = () => {
             refreshing={isRefreshing}
             onRefresh={onRefresh}
             type="appMessageCard"
-            onPressMessageBtn={onAccept}
-            disabledMessagePressBtn={updateInvitationIsLoading}
+            onPressMessageBtn={dialogOpen}
           />
           {(!invitations || invitations.length === 0) && (
             <AppTitle level="2" style={styles.messageCenter}>
               Уведомлений нет
             </AppTitle>
           )}
+          <Dialog
+            isOpen={dialogIsOpen}
+            setIsOpen={setDialogIsOpen}
+            onAccept={onAccept}
+            disabled={updateInvitationIsLoading}
+          />
         </>
       )}
     </View>
