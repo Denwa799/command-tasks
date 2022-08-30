@@ -15,7 +15,7 @@ import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {getUserEmail, getUserId} from 'utils/getSession';
 import {styles} from './styles';
 import {IModalCreate} from './types';
@@ -318,21 +318,16 @@ export const ModalCreate: FC<IModalCreate> = ({
           />
         </>
       )}
-      <View style={styles.modalBtns}>
-        <AppNativeButton
-          title="Закрыть"
-          styleContainer={styles.modalBtn}
-          onPress={onClose}
-        />
-        <AppNativeButton
+      <AppModal.Actions>
+        <AppModal.Button title="Закрыть" onPress={onClose} />
+        <AppModal.Button
           title="Добавить"
-          styleContainer={styles.modalBtn}
           onPress={onCreate}
           disabled={
             createTeamIsLoading || createProjectIsLoading || createTaskIsLoading
           }
         />
-      </View>
+      </AppModal.Actions>
     </AppModal>
   );
 };

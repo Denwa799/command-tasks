@@ -22,12 +22,6 @@ export const styles = StyleSheet.create({
     right: 0,
     textAlign: 'center',
   },
-  modalText: {
-    fontSize: SIZES.body2,
-    color: THEME.TEXT_COLOR,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
   checkbox: {
     marginTop: 10,
     flexDirection: 'row',
@@ -39,14 +33,5 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     marginLeft: 'auto',
     marginRight: 'auto',
-  },
-  modalBtns: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalBtn: {
-    width: '45%',
-    marginTop: 20,
   },
 });

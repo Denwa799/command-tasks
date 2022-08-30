@@ -19,7 +19,7 @@ import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity} from 'react-native';
 import {styles} from './styles';
 import {IModalChange} from './types';
 
@@ -241,21 +241,16 @@ export const ModalChange: FC<IModalChange> = ({
         </>
       )}
 
-      <View style={styles.modalBtns}>
-        <AppNativeButton
-          title="Закрыть"
-          styleContainer={styles.modalBtn}
-          onPress={onClose}
-        />
-        <AppNativeButton
+      <AppModal.Actions>
+        <AppModal.Button title="Закрыть" onPress={onClose} />
+        <AppModal.Button
           title="Сохранить"
-          styleContainer={styles.modalBtn}
           onPress={onSave}
           disabled={
             updateTeamIsLoading || updateProjectIsLoading || updateTaskIsLoading
           }
         />
-      </View>
+      </AppModal.Actions>
     </AppModal>
   );
 };

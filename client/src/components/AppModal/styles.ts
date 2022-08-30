@@ -33,4 +33,13 @@ export const styles = StyleSheet.create({
     paddingTop: 0,
     paddingBottom: 0,
   },
+  actions: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 15,
+  },
+  button: {
+    width: '45%',
+  },
 });
