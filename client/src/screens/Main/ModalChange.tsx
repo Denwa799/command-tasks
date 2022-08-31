@@ -1,4 +1,5 @@
 import {useRoute} from '@react-navigation/native';
+import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
@@ -200,6 +201,15 @@ export const ModalChange: FC<IModalChange> = ({
       />
       {route.name === projectRoute && (
         <>
+          <AppAutocompleteField
+            data={[]}
+            value={responsibleValue}
+            onChange={() => console.log('value change')}
+            onPress={() => console.log('value press')}
+            placeholder={'Введите ответственного'}
+            isDanger={isResponsibleError}
+            dangerText={dangerResponsibleText}
+          />
           <AppField
             value={responsibleValue}
             placeholder={'Введите ответственного'}
@@ -227,10 +237,9 @@ export const ModalChange: FC<IModalChange> = ({
           <AppText style={styles.date}>{`${dateValue.getDate()}/${
             dateValue.getMonth() + 1
           }/${dateValue.getFullYear()}`}</AppText>
-          <AppTextButton
-            text="Выбрать дату"
-            onPress={() => setIsPickerOpen(true)}
-          />
+          <AppTextButton onPress={() => setIsPickerOpen(true)}>
+            Выбрать дату
+          </AppTextButton>
           <AppDatePicker
             date={dateValue}
             isOpen={isPickerOpen}

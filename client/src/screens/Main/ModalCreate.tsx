@@ -309,10 +309,9 @@ export const ModalCreate: FC<IModalCreate> = ({
           <AppText style={styles.date}>{`${date.getDate()}/${
             date.getMonth() + 1
           }/${date.getFullYear()}`}</AppText>
-          <AppTextButton
-            text="Выбрать дату"
-            onPress={() => setIsPickerOpen(true)}
-          />
+          <AppTextButton onPress={() => setIsPickerOpen(true)}>
+            Выбрать дату
+          </AppTextButton>
           <AppDatePicker
             date={date}
             isOpen={isPickerOpen}

@@ -4,14 +4,20 @@ import {styles} from './styles';
 import {IAppTextButton} from './types';
 
 export const AppTextButton: FC<IAppTextButton> = ({
-  text,
+  children,
   style,
   onPress,
   containerStyle,
+  isTextCenter = false,
+  numberOfLines,
 }) => {
   return (
     <TouchableWithoutFeedback onPress={onPress} style={containerStyle}>
-      <Text style={[styles.text, style]}>{text}</Text>
+      <Text
+        style={[styles.text, isTextCenter && styles.center, style]}
+        numberOfLines={numberOfLines}>
+        {children}
+      </Text>
     </TouchableWithoutFeedback>
   );
 };

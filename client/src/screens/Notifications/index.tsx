@@ -1,11 +1,11 @@
-import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
+import {AppMessageCard} from 'components/Cards/AppMessageCard';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, View} from 'react-native';
+import {Alert, FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {styles} from './styles';
 
@@ -59,13 +59,19 @@ export const NotificationsScreen = () => {
         </AppPositionContainer>
       ) : (
         <>
-          <AppList
+          <FlatList
             data={invitations}
             style={styles.list}
             refreshing={isRefreshing}
             onRefresh={onRefresh}
-            type="appMessageCard"
-            onPressMessageBtn={dialogOpen}
+            renderItem={({item}) => (
+              <AppMessageCard
+                id={item.id}
+                message={item.message}
+                isAccepted={item.isAccepted}
+                onPress={dialogOpen}
+              />
+            )}
           />
           {(!invitations || invitations.length === 0) && (
             <AppTitle level="2" style={styles.messageCenter}>

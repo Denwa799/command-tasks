@@ -1,7 +1,6 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppIconButton} from 'components/Btns/AppIconButton';
-import {AppList} from 'components/AppList';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
@@ -9,12 +8,13 @@ import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
 import {IProject, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {Alert, View} from 'react-native';
+import {Alert, FlatList, View} from 'react-native';
 import {Modals} from './Modals';
 import {styles} from './styles';
 import {IMainScreen, TeamScreenNavigateType} from './types';
 import {AppTitle} from 'components/AppTitle';
 import {useAuth} from 'hooks/useAuth';
+import {AppCard} from 'components/Cards/AppCard';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
@@ -141,16 +141,27 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       ) : (
         <>
           <View style={styles.content}>
-            <AppList
+            <FlatList
               data={data}
+              style={styles.list}
               refreshing={isRefreshing}
               onRefresh={onRefresh}
-              style={styles.list}
-              onOpen={onOpen}
-              onDelete={onDelete}
-              onChange={onChange}
-              isColors={route.name === projectRoute}
-              creatorId={creatorId}
+              renderItem={({item}) => (
+                <AppCard
+                  id={item?.id}
+                  text={item.name ? item.name : item.text}
+                  item={item}
+                  onOpen={onOpen}
+                  onDelete={onDelete}
+                  onChange={onChange}
+                  isColors={route.name === projectRoute}
+                  responsible={item?.responsible}
+                  status={item?.status}
+                  isUrgently={item?.isUrgently}
+                  date={item?.date}
+                  creatorId={creatorId}
+                />
+              )}
             />
             {(!data || data.length === 0) && (
               <AppTitle level="2" style={styles.messageCenter}>

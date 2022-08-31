@@ -8,4 +8,7 @@ export const styles = StyleSheet.create({
     marginRight: 'auto',
     fontSize: SIZES.body3,
   },
+  center: {
+    textAlign: 'center',
+  },
 });
