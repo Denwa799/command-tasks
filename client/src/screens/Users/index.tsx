@@ -37,8 +37,6 @@ export const UsersScreen = () => {
     }
   }, [team]);
 
-  console.log(activatedUsers);
-
   const onRefresh = useCallback(() => {
     teamId && fetchTeam(teamId);
   }, []);
