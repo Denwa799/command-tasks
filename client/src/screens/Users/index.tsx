@@ -1,5 +1,8 @@
+import {AppLoader} from 'components/AppLoader';
+import {AppPositionContainer} from 'components/AppPositionContainer';
+import {AppTitle} from 'components/AppTitle';
 import {AppUserCard} from 'components/Cards/AppUserCard';
-import { useAuth } from 'hooks/useAuth';
+import {useAuth} from 'hooks/useAuth';
 import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
@@ -14,7 +17,6 @@ export const UsersScreen = () => {
   const [creatorId, setCreatorId] = useState(0);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [userId, setUserId] = useState(0);
 
   const data = useMemo(() => {
@@ -32,13 +34,18 @@ export const UsersScreen = () => {
 
   useEffect(() => {
     if (team) {
+      setTeamId(team?.id);
       setActivatedUsers(team.activatedUsers);
       setCreatorId(team.creator.id);
     }
   }, [team]);
 
-  const onRefresh = useCallback(() => {
-    teamId && fetchTeam(teamId);
+  const onRefresh = useCallback(async () => {
+    if (teamId) {
+      setIsRefreshing(true);
+      await fetchTeam(teamId);
+      setIsRefreshing(false);
+    }
   }, []);
 
   const dialogOpen = useCallback((id: number) => {
@@ -47,26 +54,40 @@ export const UsersScreen = () => {
 
   return (
     <View style={styles.users}>
-      <FlatList
-        data={data}
-        style={styles.list}
-        refreshing={isRefreshing}
-        onRefresh={onRefresh}
-        renderItem={({item}) => (
-          <AppUserCard
-            id={item.id}
-            name={item.name}
-            email={item.email}
-            onPress={dialogOpen}
-            btnText={'Удалить'}
-            isActive={
-              activatedUsers?.includes(item.id) || item.id === creatorId
-            }
-            isBtnVisible={user?.id === creatorId}
-            isCreator={user?.id === creatorId && user?.id === item.id}
+      {teamIsLoading || isRefreshing ? (
+        <AppPositionContainer isCenter>
+          <AppLoader />
+        </AppPositionContainer>
+      ) : (
+        <>
+          <FlatList
+            data={data}
+            style={styles.list}
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            renderItem={({item}) => (
+              <AppUserCard
+                id={item.id}
+                name={item.name}
+                email={item.email}
+                onPress={dialogOpen}
+                btnText={'Удалить'}
+                isActive={
+                  activatedUsers?.includes(item.id) || item.id === creatorId
+                }
+                isBtnVisible={user?.id === creatorId}
+                isCreator={user?.id === creatorId && user?.id === item.id}
+              />
+            )}
           />
-        )}
-      />
+          {!team ||
+            (Object.keys(team).length === 0 && (
+              <AppTitle level="2" style={styles.messageCenter}>
+                Список пользователей пуст
+              </AppTitle>
+            ))}
+        </>
+      )}
     </View>
   );
 };

@@ -10,4 +10,13 @@ export const styles = StyleSheet.create({
   list: {
     height: '100%',
   },
+  messageCenter: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 350,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
 });
