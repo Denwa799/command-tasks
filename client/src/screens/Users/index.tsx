@@ -1,38 +1,50 @@
 import {AppUserCard} from 'components/Cards/AppUserCard';
-import React, {useCallback, useState} from 'react';
+import { useAuth } from 'hooks/useAuth';
+import {useTeams} from 'hooks/useTeams';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {styles} from './styles';
 
 export const UsersScreen = () => {
+  const {team, teamIsLoading, fetchTeam} = useTeams();
+  const {user} = useAuth();
+
+  const [teamId, setTeamId] = useState(team?.id);
+  const [activatedUsers, setActivatedUsers] = useState<Number[]>([]);
+  const [creatorId, setCreatorId] = useState(0);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [userId, setUserId] = useState(0);
 
-  const data = [
-    {
-      id: 1,
-      email: 'test@test.ru',
-      name: 'Ваня',
-    },
-    {
-      id: 2,
-      email: 'test2@test.ru',
-      name: 'Женя',
-    },
-    {
-      id: 3,
-      email: 'test3@test.ru',
-      name: 'Никита',
-    },
-  ];
+  const data = useMemo(() => {
+    let users;
+    if (team?.users) {
+      users = [...team?.users];
+      users.push({
+        id: team.creator?.id,
+        email: team.creator?.email,
+        name: team.creator?.name,
+      });
+    }
+    return users;
+  }, [team]);
+
+  useEffect(() => {
+    if (team) {
+      setActivatedUsers(team.activatedUsers);
+      setCreatorId(team.creator.id);
+    }
+  }, [team]);
+
+  console.log(activatedUsers);
 
   const onRefresh = useCallback(() => {
-    console.log('refresh');
+    teamId && fetchTeam(teamId);
   }, []);
 
   const dialogOpen = useCallback((id: number) => {
     setUserId(id);
-    console.log(id);
   }, []);
 
   return (
@@ -49,6 +61,11 @@ export const UsersScreen = () => {
             email={item.email}
             onPress={dialogOpen}
             btnText={'Удалить'}
+            isActive={
+              activatedUsers?.includes(item.id) || item.id === creatorId
+            }
+            isBtnVisible={user?.id === creatorId}
+            isCreator={user?.id === creatorId && user?.id === item.id}
           />
         )}
       />

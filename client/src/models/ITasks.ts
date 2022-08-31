@@ -4,10 +4,13 @@ export interface ITeam {
   projects: IProject[];
   creator: {
     id: number;
+    email: string;
+    name: string;
   };
   users: {
     id: number;
     email: string;
+    name: string;
   }[];
   activatedUsers: number[];
 }

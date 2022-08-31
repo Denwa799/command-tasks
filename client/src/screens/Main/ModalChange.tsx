@@ -210,13 +210,6 @@ export const ModalChange: FC<IModalChange> = ({
             isDanger={isResponsibleError}
             dangerText={dangerResponsibleText}
           />
-          <AppField
-            value={responsibleValue}
-            placeholder={'Введите ответственного'}
-            onChange={responsibleHandler}
-            isDanger={isResponsibleError}
-            dangerText={dangerResponsibleText}
-          />
           <TouchableOpacity
             style={styles.checkbox}
             activeOpacity={1}

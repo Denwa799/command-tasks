@@ -118,6 +118,8 @@ export class TeamsService {
           },
           creator: {
             id: true,
+            email: true,
+            name: true,
           },
         },
         where: [
