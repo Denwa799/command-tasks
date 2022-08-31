@@ -1,5 +1,6 @@
 import {useRoute} from '@react-navigation/native';
 import {AppAutocomplete} from 'components/AppAutocomplete';
+import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
@@ -28,6 +29,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   const route = useRoute();
 
   const {user} = useAuth();
+  const {project} = useProjects();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -42,11 +44,6 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isAutocomplete, setIsAutocomplete] = useState(false);
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
   const [dangerAutocompleteText, setDangerAutocompleteText] =
-    useState('Пустое поле');
-
-  const [responsible, setResponsible] = useState('');
-  const [isResponsibleError, setIsResponsibleError] = useState(false);
-  const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
 
   const [isUrgently, setIsUrgently] = useState(false);
@@ -67,9 +64,28 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {createTask, createTaskIsLoading} = useTasks();
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
+  const activeUsersEmail = useMemo(() => {
+    if (route.name === projectRoute && project) {
+      const activeUsers = project?.team.users.filter(item =>
+        project.team.activatedUsers.includes(item.id),
+      );
+      return activeUsers.map(item => {
+        return item.email;
+      });
+    }
+  }, [route, project]);
+
   const autocompleteData = useMemo(() => {
-    return foundUsers.map(item => item.email);
-  }, [foundUsers]);
+    if (route.name === projectRoute && activeUsersEmail) {
+      return activeUsersEmail.filter(item => {
+        return item.toLowerCase().includes(debouncedAutocompleteValue);
+      });
+    } else if (route.name === teamsRoute) {
+      return foundUsers.map(item => item.email);
+    } else {
+      return [];
+    }
+  }, [foundUsers, route, debouncedAutocompleteValue, activeUsersEmail]);
 
   useEffect(() => {
     if (user) {
@@ -83,15 +99,13 @@ export const ModalCreate: FC<IModalCreate> = ({
     setIsTextError(false);
     setAutocompleteValue('');
     setAutocompletePress('');
-    setResponsible('');
-    setIsResponsibleError(false);
     setIsUrgently(false);
     setIsAutocompleteError(false);
     setEmails([]);
   }, [isOpen]);
 
   useEffect(() => {
-    if (debouncedAutocompleteValue.length > 0) {
+    if (debouncedAutocompleteValue.length > 0 && route.name === teamsRoute) {
       searchUsersByEmail(debouncedAutocompleteValue.toLowerCase());
     }
   }, [debouncedAutocompleteValue]);
@@ -136,14 +150,6 @@ export const ModalCreate: FC<IModalCreate> = ({
       setAutocompleteValue(email);
     },
     [autocompletePress],
-  );
-
-  const responsibleHandler = useCallback(
-    (value: string) => {
-      setResponsible(value);
-      setIsResponsibleError(false);
-    },
-    [responsible],
   );
 
   const onAdd = useCallback(() => {
@@ -229,17 +235,9 @@ export const ModalCreate: FC<IModalCreate> = ({
     }
 
     if (route.name === projectRoute) {
-      if (!responsible || responsible.length < 3 || responsible.length > 50) {
-        if (responsible.length < 3) {
-          setDangerResponsibleText('Меньше 3 символов');
-        }
-        if (responsible.length > 50) {
-          setDangerResponsibleText('Больше 50 символов');
-        }
-        if (!responsible) {
-          setDangerResponsibleText('Пустое поле');
-        }
-        return setIsResponsibleError(true);
+      if (!autocompletePress) {
+        setDangerAutocompleteText('Ответственный не выбран');
+        return setIsAutocompleteError(true);
       }
     }
 
@@ -254,7 +252,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       (await createTask(
         projectId,
         text,
-        responsible,
+        autocompletePress,
         'inProgress',
         isUrgently,
         date,
@@ -262,7 +260,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === projectRoute && projectId && (await fetchProject(projectId));
 
     setIsOpen(false);
-  }, [teamId, projectId, text, responsible, isUrgently, date, emails]);
+  }, [teamId, projectId, text, autocompletePress, isUrgently, date, emails]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -292,12 +290,16 @@ export const ModalCreate: FC<IModalCreate> = ({
       )}
       {route.name === projectRoute && (
         <>
-          <AppField
-            value={responsible}
-            placeholder={'Введите ответственного'}
-            onChange={responsibleHandler}
-            isDanger={isResponsibleError}
-            dangerText={dangerResponsibleText}
+          <AppAutocompleteField
+            placeholder="Выберите email ответственного"
+            value={autocompleteValue}
+            data={autocompleteData}
+            isDisplay={isAutocomplete}
+            isLoading={findUsersIsLoading}
+            onChange={autocompleteHandler}
+            onPress={onAutocompletePress}
+            isDanger={isAutocompleteError}
+            dangerText={dangerAutocompleteText}
           />
           <TouchableOpacity
             style={styles.checkbox}

@@ -70,6 +70,7 @@ export class ProjectsService {
             creator: {
               id: true,
             },
+            activatedUsers: true,
             users: {
               id: true,
               email: true,
