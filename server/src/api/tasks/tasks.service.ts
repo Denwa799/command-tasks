@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectsService } from 'src/api/projects/projects.service';
-import { Repository } from 'typeorm';
+import { ArrayContains, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -20,6 +20,85 @@ export class TasksService {
 
   private async decodeToken(token: string) {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
+  }
+
+  async getAllProjectTasks(token: string, id: number, take = 50, skip = 0) {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const tasks = await this.taskRepository.find({
+        select: {
+          id: true,
+          text: true,
+          responsible: {
+            id: true,
+            email: true,
+            name: true,
+          },
+          status: true,
+          isUrgently: true,
+          date: true,
+          project: {
+            id: true,
+            name: true,
+            team: {
+              id: true,
+              name: true,
+              users: {
+                id: true,
+                email: true,
+                name: true,
+              },
+              activatedUsers: true,
+              creator: {
+                id: true,
+                email: true,
+                name: true,
+              },
+            },
+          },
+        },
+        where: [
+          {
+            project: {
+              id: id,
+              team: {
+                creator: {
+                  id: decoded.id,
+                },
+              },
+            },
+          },
+          {
+            project: {
+              id: id,
+              team: {
+                users: {
+                  id: decoded.id,
+                },
+                activatedUsers: ArrayContains([decoded.id]),
+              },
+            },
+          },
+        ],
+        relations: {
+          responsible: true,
+          project: {
+            team: {
+              creator: true,
+              users: true,
+            },
+          },
+        },
+        take,
+        skip,
+        order: {
+          id: 'DESC',
+        },
+      });
+      if (tasks) return tasks;
+      throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
   async create(dto: CreateTaskDto, token) {
@@ -53,19 +132,6 @@ export class TasksService {
       throw new HttpException('Ошибка создания задачи', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
-  }
-
-  async getAllTasks(take = 50, skip = 0) {
-    const tasks = await this.taskRepository.find({
-      relations: ['project'],
-      take,
-      skip,
-      order: {
-        id: 'DESC',
-      },
-    });
-    if (tasks) return tasks;
-    throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
   }
 
   async delete(id: number, token): Promise<Task> {
@@ -142,5 +208,18 @@ export class TasksService {
       throw new HttpException('Ошибка обновления задачи', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async getAllTasks(take = 50, skip = 0) {
+    const tasks = await this.taskRepository.find({
+      relations: ['project'],
+      take,
+      skip,
+      order: {
+        id: 'DESC',
+      },
+    });
+    if (tasks) return tasks;
+    throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
   }
 }

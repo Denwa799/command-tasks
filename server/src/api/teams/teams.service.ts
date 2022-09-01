@@ -27,6 +27,37 @@ export class TeamsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
+  async getAllUserTeams(token: string, take = 50, skip = 0) {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const teams = await this.teamRepository.find({
+        select: {
+          id: true,
+          name: true,
+          creator: {
+            id: true,
+          },
+        },
+        where: [
+          {
+            users: { id: decoded.id },
+            activatedUsers: ArrayContains([decoded.id]),
+          },
+          { creator: { id: decoded.id } },
+        ],
+        relations: ['creator'],
+        take,
+        skip,
+        order: {
+          id: 'ASC',
+        },
+      });
+      if (teams) return teams;
+      throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async create(dto: CreateTeamDto, token: string) {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
@@ -62,41 +93,6 @@ export class TeamsService {
       throw new HttpException('Команда не создана', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
-  }
-
-  async getAllTeams(token: string, take = 50, skip = 0) {
-    const decoded = await this.decodeToken(token);
-    if (decoded) {
-      const teams = await this.teamRepository.find({
-        select: {
-          id: true,
-          name: true,
-          projects: {
-            id: true,
-            name: true,
-          },
-          creator: {
-            id: true,
-          },
-        },
-        where: [
-          {
-            users: { id: decoded.id },
-            activatedUsers: ArrayContains([decoded.id]),
-          },
-          { creator: { id: decoded.id } },
-        ],
-        relations: ['projects', 'creator'],
-        take,
-        skip,
-        order: {
-          id: 'ASC',
-        },
-      });
-      if (teams) return teams;
-      throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
-    }
-    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
   async getTeamById(id: number, token: string) {
@@ -207,5 +203,25 @@ export class TeamsService {
       return this.teamRepository.save(newTeam);
     }
     throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
+  }
+
+  async getAllTeams(take = 50, skip = 0) {
+    const teams = await this.teamRepository.find({
+      select: {
+        id: true,
+        name: true,
+        creator: {
+          id: true,
+        },
+      },
+      relations: ['creator'],
+      take,
+      skip,
+      order: {
+        id: 'ASC',
+      },
+    });
+    if (teams) return teams;
+    throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
   }
 }

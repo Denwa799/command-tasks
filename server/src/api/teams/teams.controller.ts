@@ -7,9 +7,11 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { GetCurrentUser } from '../auth/decorators';
+import { GetCurrentUser, Roles } from '../auth/decorators';
+import { RolesGuard } from '../auth/guards';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
 import { Team } from './teams.entity';
@@ -20,6 +22,29 @@ import { TeamsService } from './teams.service';
 export class TeamsController {
   constructor(private teamsService: TeamsService) {}
 
+  @ApiOperation({ summary: 'Получение всех команд пользователя' })
+  @ApiResponse({ status: 200, type: [Team] })
+  @Get()
+  getAllUserTeams(
+    @Query() reqParam: PaginationQueryParamDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.getAllUserTeams(
+      token,
+      reqParam.take,
+      reqParam.skip,
+    );
+  }
+
+  @ApiOperation({ summary: 'Получение всех команд. Только для администратора' })
+  @ApiResponse({ status: 200, type: [Team] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get('admin')
+  getAllTeams(@Query() reqParam: PaginationQueryParamDto) {
+    return this.teamsService.getAllTeams(reqParam.take, reqParam.skip);
+  }
+
   @ApiOperation({ summary: 'Создание команды' })
   @ApiResponse({ status: 200, type: 'Команда создана' })
   @Post()
@@ -28,16 +53,6 @@ export class TeamsController {
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.teamsService.create(teamDto, token);
-  }
-
-  @ApiOperation({ summary: 'Получение всех команд' })
-  @ApiResponse({ status: 200, type: [Team] })
-  @Get()
-  getAll(
-    @Query() reqParam: PaginationQueryParamDto,
-    @GetCurrentUser('accessToken') token: string,
-  ) {
-    return this.teamsService.getAllTeams(token, reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Получение команды по id' })
