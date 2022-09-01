@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
+import { User } from '../users/users.entity';
 
 @Entity('tasks')
 export class Task {
@@ -23,12 +24,12 @@ export class Task {
   @IsString()
   text: string;
 
-  @ApiProperty({ example: 'Иванов Иван', description: 'ФИО ответственного' })
-  @Column()
-  @IsString()
-  responsible: string;
+  @ApiProperty({ type: () => User, description: 'Ответственный пользователь' })
+  @ManyToOne(() => User, (user) => user.tasks)
+  @JoinColumn()
+  responsible: User;
 
-  @ApiProperty({ example: 'overdue', description: 'Статус' })
+  @ApiProperty({ example: 'inProgress', description: 'Статус' })
   @Column()
   @IsString()
   status: string;

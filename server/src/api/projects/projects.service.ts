@@ -59,7 +59,6 @@ export class ProjectsService {
           tasks: {
             id: true,
             text: true,
-            responsible: true,
             status: true,
             isUrgently: true,
             date: true,

@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProjectsService } from 'src/api/projects/projects.service';
 import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
@@ -14,6 +15,7 @@ export class TasksService {
     private taskRepository: Repository<Task>,
     private projectService: ProjectsService,
     private jwtService: JwtService,
+    private userService: UsersService,
   ) {}
 
   private async decodeToken(token: string) {
@@ -27,18 +29,28 @@ export class TasksService {
         dto.projectId,
         token,
       );
-      if (project && project.team.creator.id === decoded.id) {
+      const user = await this.userService.findUserByEmail(dto.responsible);
+      const userInTeam = project.team.users.find((item) => item.id === user.id);
+      if (
+        project &&
+        project.team.creator.id === decoded.id &&
+        ((userInTeam && project.team.activatedUsers.includes(userInTeam?.id)) ||
+          project.team.creator.id === user.id)
+      ) {
         const task = await this.taskRepository.create({
           text: dto.text,
-          responsible: dto.responsible,
+          responsible: user,
           status: dto.status,
           isUrgently: dto.isUrgently,
           date: dto.date,
           project,
         });
-        return this.taskRepository.save(task);
+        const createdTask = await this.taskRepository.save(task);
+        return {
+          id: createdTask.id,
+        };
       }
-      throw new HttpException('Проект не найден', HttpStatus.NOT_FOUND);
+      throw new HttpException('Ошибка создания задачи', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
@@ -75,28 +87,57 @@ export class TasksService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async update(id: number, dto: UpdateTaskDto, token): Promise<Task> {
+  async update(id: number, dto: UpdateTaskDto, token) {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const task = await this.taskRepository.findOneBy({
-        id,
-        project: {
-          team: {
-            creator: {
-              id: decoded.id,
+      const task = await this.taskRepository.findOne({
+        where: {
+          id,
+          project: {
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        },
+        relations: {
+          project: {
+            team: {
+              creator: true,
+              users: true,
             },
           },
         },
       });
-      if (task) {
+      const user = await this.userService.findUserByEmail(dto.responsible);
+      const userInTeam = task.project.team.users.find(
+        (item) => item.id === user.id,
+      );
+
+      if (
+        task &&
+        task.project.team.creator.id === decoded.id &&
+        ((userInTeam &&
+          task.project.team.activatedUsers.includes(userInTeam?.id)) ||
+          task.project.team.creator.id === user.id)
+      ) {
         const newTask = await this.taskRepository.merge(task, {
           text: dto.text,
-          responsible: dto.responsible,
+          responsible: user,
           status: dto.status,
           isUrgently: dto.isUrgently,
           date: dto.date,
         });
-        return this.taskRepository.save(newTask);
+        const savedTask = await this.taskRepository.save(newTask);
+        return {
+          id: savedTask.id,
+          text: savedTask.text,
+          status: savedTask.status,
+          isUrgently: savedTask.isUrgently,
+          date: savedTask.date,
+          responsible: savedTask.responsible.email,
+        };
       }
       throw new HttpException('Ошибка обновления задачи', HttpStatus.NOT_FOUND);
     }

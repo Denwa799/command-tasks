@@ -53,7 +53,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: 'Обновление задачи по id' })
-  @ApiResponse({ status: 200, type: Task })
+  @ApiResponse({ status: 200 })
   @Patch(':id')
   update(
     @Param('id') id: number,
