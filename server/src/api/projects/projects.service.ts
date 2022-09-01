@@ -70,6 +70,12 @@ export class ProjectsService {
             creator: {
               id: true,
             },
+            activatedUsers: true,
+            users: {
+              id: true,
+              email: true,
+              name: true,
+            },
           },
         },
         where: [
@@ -95,6 +101,7 @@ export class ProjectsService {
           tasks: true,
           team: {
             creator: true,
+            users: true,
           },
         },
         order: {

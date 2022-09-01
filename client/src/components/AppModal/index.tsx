@@ -1,15 +1,17 @@
 import {useOrientation} from 'hooks/useOrientation';
-import React, {FC, useCallback} from 'react';
+import React, {useCallback} from 'react';
 import {ScrollView, TouchableOpacity, View} from 'react-native';
+import {ModalActions} from './ModalActions';
+import {ModalButton} from './ModalButton';
 import {styles} from './styles';
-import {IAppModal} from './types';
+import {AppModalType} from './types';
 
-export const AppModal: FC<IAppModal> = ({
+export const AppModal = ({
   children,
   style,
   isOpen,
   setIsOpen,
-}) => {
+}: AppModalType) => {
   const orientation = useOrientation();
 
   const wrapperHandler = useCallback(() => {
@@ -39,3 +41,6 @@ export const AppModal: FC<IAppModal> = ({
     </>
   );
 };
+
+AppModal.Actions = ModalActions;
+AppModal.Button = ModalButton;

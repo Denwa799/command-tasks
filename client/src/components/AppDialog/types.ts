@@ -1,17 +1,17 @@
 import {ReactNode} from 'react';
 
-export type AppModalType = {
+export type AppDialogType = {
   children: ReactNode;
   style?: Object;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
 };
 
-export type ModalChildrenType = {
+export type DialogChildrenType = {
   children: ReactNode;
 };
 
-export type ModalButtonType = {
+export type DialogButtonType = {
   title: string;
   styleContainer?: Object;
   onPress: () => void;

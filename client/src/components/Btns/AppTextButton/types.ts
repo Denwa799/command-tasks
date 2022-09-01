@@ -1,6 +1,8 @@
 export interface IAppTextButton {
-  text: string;
+  children: string | string[];
   onPress: () => void;
   style?: Object;
   containerStyle?: Object;
+  isTextCenter?: boolean;
+  numberOfLines?: number;
 }

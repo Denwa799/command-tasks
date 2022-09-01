@@ -19,4 +19,5 @@ export interface IAppCard {
   isColors?: boolean;
   isUrgently?: boolean;
   date?: Date;
+  creatorId?: number;
 }

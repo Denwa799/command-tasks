@@ -1,11 +1,8 @@
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useState} from 'react';
-import {View} from 'react-native';
 import {getUserId} from 'utils/getSession';
-import {styles} from './styles';
 import {IModalEdit} from './types';
 
 export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
@@ -60,19 +57,14 @@ export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
         isDanger={isNameError}
         dangerText={dangerNameText}
       />
-      <View style={styles.modalBtns}>
-        <AppNativeButton
-          title="Закрыть"
-          styleContainer={styles.modalBtn}
-          onPress={onClose}
-        />
-        <AppNativeButton
+      <AppModal.Actions>
+        <AppModal.Button title="Закрыть" onPress={onClose} />
+        <AppModal.Button
           title="Сохранить"
-          styleContainer={styles.modalBtn}
           onPress={onEdit}
           disabled={updateUserIsLoading}
         />
-      </View>
+      </AppModal.Actions>
     </AppModal>
   );
 };

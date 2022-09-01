@@ -1,14 +1,11 @@
-import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import React, {FC, useCallback} from 'react';
-import {Text, View} from 'react-native';
 import {IModalDelete} from './types';
-import {styles} from './styles';
 import {useTeams} from 'hooks/useTeams';
 import {useRoute} from '@react-navigation/native';
 import {useProjects} from 'hooks/useProjects';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
 import {useTasks} from 'hooks/useTasks';
+import {AppDialog} from 'components/AppDialog';
 
 const ModalDelete: FC<IModalDelete> = ({
   isOpen,
@@ -41,24 +38,19 @@ const ModalDelete: FC<IModalDelete> = ({
   }, [id, teamId, projectId]);
 
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <Text style={styles.modalText}>Удалить?</Text>
-      <View style={styles.modalBtns}>
-        <AppNativeButton
-          title="Закрыть"
-          styleContainer={styles.modalBtn}
-          onPress={onClose}
-        />
-        <AppNativeButton
+    <AppDialog isOpen={isOpen} setIsOpen={setIsOpen}>
+      <AppDialog.Title>Удалить?</AppDialog.Title>
+      <AppDialog.Actions>
+        <AppDialog.Button title="Закрыть" onPress={onClose} />
+        <AppDialog.Button
           title="Удалить"
-          styleContainer={styles.modalBtn}
           onPress={onDelete}
           disabled={
             deleteTeamIsLoading || deleteProjectIsLoading || deleteTaskIsLoading
           }
         />
-      </View>
-    </AppModal>
+      </AppDialog.Actions>
+    </AppDialog>
   );
 };
 

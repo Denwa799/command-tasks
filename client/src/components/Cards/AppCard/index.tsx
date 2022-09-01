@@ -13,6 +13,7 @@ import {IAppCard} from './types';
 import Anticon from 'react-native-vector-icons/AntDesign';
 import {doneStatus, inProgressStatus, overdueStatus} from 'constants/variables';
 import {TaskStatusType} from 'models/ITasks';
+import {useAuth} from 'hooks/useAuth';
 
 const colorScheme = Appearance.getColorScheme();
 
@@ -28,8 +29,13 @@ export const AppCard: FC<IAppCard> = ({
   isColors = false,
   isUrgently = false,
   date,
+  creatorId,
 }) => {
+  const {user} = useAuth();
+
+  const [itemCreatorId, setItemCreatorId] = useState();
   const [currentStatus, setCurrentStatus] = useState<TaskStatusType>();
+  const [isAccess, setIsAccess] = useState(false);
 
   const cardStyles = useMemo(() => {
     return [
@@ -86,6 +92,20 @@ export const AppCard: FC<IAppCard> = ({
     return setCurrentStatus(status);
   }, [date, status]);
 
+  useEffect(() => {
+    item.creator && setItemCreatorId(item.creator.id);
+  }, [item]);
+
+  useEffect(() => {
+    if (itemCreatorId === user?.id) {
+      return setIsAccess(true);
+    }
+    if (creatorId === user?.id && !itemCreatorId) {
+      return setIsAccess(true);
+    }
+    return setIsAccess(false);
+  }, [itemCreatorId, creatorId, user]);
+
   const openHandler = useCallback(() => {
     console.log('Открыть');
   }, []);
@@ -102,34 +122,40 @@ export const AppCard: FC<IAppCard> = ({
     <AppContainer>
       <View style={cardStyles}>
         <TouchableOpacity
-          style={styles.cardHandler}
+          style={[styles.cardHandler, !isAccess && styles.noAccess]}
           activeOpacity={0.9}
           onPress={onOpen ? () => onOpen(item) : openHandler}>
           <Text style={textStyles}>{text}</Text>
           {responsible && <Text style={responsibleStyles}>{responsible}</Text>}
         </TouchableOpacity>
-        <TouchableHighlight
-          onPress={
-            onChange
-              ? () =>
-                  onChange(
-                    id,
-                    text,
-                    responsible,
-                    currentStatus,
-                    isUrgently,
-                    date,
-                  )
-              : changeHandler
-          }
-          underlayColor="none">
-          <Anticon name="edit" size={24} color={iconColor} />
-        </TouchableHighlight>
-        <TouchableHighlight
-          onPress={onDelete ? () => onDelete(id) : deleteHandler}
-          underlayColor="none">
-          <Anticon name="delete" size={24} color={iconColor} />
-        </TouchableHighlight>
+        {isAccess && (
+          <View style={[styles.btns, isColors && styles.paddingRight0]}>
+            <TouchableHighlight
+              onPress={
+                onChange
+                  ? () =>
+                      onChange(
+                        id,
+                        text,
+                        responsible,
+                        currentStatus,
+                        isUrgently,
+                        date,
+                      )
+                  : changeHandler
+              }
+              underlayColor="none"
+              style={[styles.btn, styles.btnEdit]}>
+              <Anticon name="edit" size={24} color={iconColor} />
+            </TouchableHighlight>
+            <TouchableHighlight
+              onPress={onDelete ? () => onDelete(id) : deleteHandler}
+              underlayColor="none"
+              style={styles.btn}>
+              <Anticon name="delete" size={24} color={iconColor} />
+            </TouchableHighlight>
+          </View>
+        )}
       </View>
     </AppContainer>
   );

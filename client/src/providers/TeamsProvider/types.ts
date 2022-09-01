@@ -11,7 +11,7 @@ export interface ITeamsContext {
   updateTeamIsLoading: boolean;
   fetchTeams: () => Promise<void>;
   fetchTeam: (id: number) => Promise<void>;
-  createTeam: (name: string) => Promise<void>;
+  createTeam: (name: string, creator: number, users: string[]) => Promise<void>;
   deleteTeam: (id: number) => Promise<void>;
   updateTeam: (id: number, name: string) => Promise<void>;
 }

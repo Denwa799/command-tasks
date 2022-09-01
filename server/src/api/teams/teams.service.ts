@@ -114,9 +114,12 @@ export class TeamsService {
           users: {
             id: true,
             email: true,
+            name: true,
           },
           creator: {
             id: true,
+            email: true,
+            name: true,
           },
         },
         where: [

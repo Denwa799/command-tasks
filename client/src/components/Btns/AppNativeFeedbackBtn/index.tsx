@@ -16,7 +16,6 @@ export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
   disabled = false,
 }) => {
   const handler = useCallback(() => {
-    console.log(disabled);
     !disabled && onPress();
   }, [disabled]);
 

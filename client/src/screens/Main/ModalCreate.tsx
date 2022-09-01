@@ -1,22 +1,22 @@
 import {useRoute} from '@react-navigation/native';
 import {AppAutocomplete} from 'components/AppAutocomplete';
+import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
 import {AppField} from 'components/AppField';
 import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
-import {AppNativeButton} from 'components/Btns/AppNativeButton';
 import {AppText} from 'components/AppText';
 import {AppTextButton} from 'components/Btns/AppTextButton';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {useAuth} from 'hooks/useAuth';
 import {useDebounce} from 'hooks/useDebounce';
 import {useProjects} from 'hooks/useProjects';
 import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {getUserEmail, getUserId} from 'utils/getSession';
+import {TouchableOpacity} from 'react-native';
 import {styles} from './styles';
 import {IModalCreate} from './types';
 
@@ -27,6 +27,9 @@ export const ModalCreate: FC<IModalCreate> = ({
   projectId,
 }) => {
   const route = useRoute();
+
+  const {user} = useAuth();
+  const {project} = useProjects();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -41,11 +44,6 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isAutocomplete, setIsAutocomplete] = useState(false);
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
   const [dangerAutocompleteText, setDangerAutocompleteText] =
-    useState('Пустое поле');
-
-  const [responsible, setResponsible] = useState('');
-  const [isResponsibleError, setIsResponsibleError] = useState(false);
-  const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
 
   const [isUrgently, setIsUrgently] = useState(false);
@@ -66,31 +64,48 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {createTask, createTaskIsLoading} = useTasks();
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
+  const activeUsersEmail = useMemo(() => {
+    if (route.name === projectRoute && project) {
+      const activeUsers = project?.team.users.filter(item =>
+        project.team.activatedUsers.includes(item.id),
+      );
+      return activeUsers.map(item => {
+        return item.email;
+      });
+    }
+  }, [route, project]);
+
   const autocompleteData = useMemo(() => {
-    return foundUsers.map(user => user.email);
-  }, [foundUsers]);
+    if (route.name === projectRoute && activeUsersEmail) {
+      return activeUsersEmail.filter(item => {
+        return item.toLowerCase().includes(debouncedAutocompleteValue);
+      });
+    } else if (route.name === teamsRoute) {
+      return foundUsers.map(item => item.email);
+    } else {
+      return [];
+    }
+  }, [foundUsers, route, debouncedAutocompleteValue, activeUsersEmail]);
 
   useEffect(() => {
-    const getUser = async () => {
-      setUserEmail(await getUserEmail());
-      setUserId(await getUserId());
-    };
-    getUser();
-  }, []);
+    if (user) {
+      setUserEmail(user.email);
+      setUserId(user.id);
+    }
+  }, [user]);
 
   useEffect(() => {
     setText('');
     setIsTextError(false);
     setAutocompleteValue('');
     setAutocompletePress('');
-    setResponsible('');
-    setIsResponsibleError(false);
     setIsUrgently(false);
     setIsAutocompleteError(false);
+    setEmails([]);
   }, [isOpen]);
 
   useEffect(() => {
-    if (debouncedAutocompleteValue.length > 0) {
+    if (debouncedAutocompleteValue.length > 0 && route.name === teamsRoute) {
       searchUsersByEmail(debouncedAutocompleteValue.toLowerCase());
     }
   }, [debouncedAutocompleteValue]);
@@ -137,14 +152,6 @@ export const ModalCreate: FC<IModalCreate> = ({
     [autocompletePress],
   );
 
-  const responsibleHandler = useCallback(
-    (value: string) => {
-      setResponsible(value);
-      setIsResponsibleError(false);
-    },
-    [responsible],
-  );
-
   const onAdd = useCallback(() => {
     if (!autocompleteValue) {
       setDangerAutocompleteText('Пустое поле');
@@ -176,6 +183,8 @@ export const ModalCreate: FC<IModalCreate> = ({
 
     setIsAutocompleteError(false);
     setEmails(items => [...items, autocompletePress]);
+    setAutocompleteValue('');
+    setAutocompletePress('');
   }, [autocompleteValue, autocompletePress, emails]);
 
   const deleteEmailHandler = useCallback(
@@ -226,17 +235,9 @@ export const ModalCreate: FC<IModalCreate> = ({
     }
 
     if (route.name === projectRoute) {
-      if (!responsible || responsible.length < 3 || responsible.length > 50) {
-        if (responsible.length < 3) {
-          setDangerResponsibleText('Меньше 3 символов');
-        }
-        if (responsible.length > 50) {
-          setDangerResponsibleText('Больше 50 символов');
-        }
-        if (!responsible) {
-          setDangerResponsibleText('Пустое поле');
-        }
-        return setIsResponsibleError(true);
+      if (!autocompletePress) {
+        setDangerAutocompleteText('Ответственный не выбран');
+        return setIsAutocompleteError(true);
       }
     }
 
@@ -251,7 +252,7 @@ export const ModalCreate: FC<IModalCreate> = ({
       (await createTask(
         projectId,
         text,
-        responsible,
+        autocompletePress,
         'inProgress',
         isUrgently,
         date,
@@ -259,7 +260,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === projectRoute && projectId && (await fetchProject(projectId));
 
     setIsOpen(false);
-  }, [teamId, projectId, text, responsible, isUrgently, date, emails]);
+  }, [teamId, projectId, text, autocompletePress, isUrgently, date, emails]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -289,12 +290,16 @@ export const ModalCreate: FC<IModalCreate> = ({
       )}
       {route.name === projectRoute && (
         <>
-          <AppField
-            value={responsible}
-            placeholder={'Введите ответственного'}
-            onChange={responsibleHandler}
-            isDanger={isResponsibleError}
-            dangerText={dangerResponsibleText}
+          <AppAutocompleteField
+            placeholder="Выберите email ответственного"
+            value={autocompleteValue}
+            data={autocompleteData}
+            isDisplay={isAutocomplete}
+            isLoading={findUsersIsLoading}
+            onChange={autocompleteHandler}
+            onPress={onAutocompletePress}
+            isDanger={isAutocompleteError}
+            dangerText={dangerAutocompleteText}
           />
           <TouchableOpacity
             style={styles.checkbox}
@@ -306,10 +311,9 @@ export const ModalCreate: FC<IModalCreate> = ({
           <AppText style={styles.date}>{`${date.getDate()}/${
             date.getMonth() + 1
           }/${date.getFullYear()}`}</AppText>
-          <AppTextButton
-            text="Выбрать дату"
-            onPress={() => setIsPickerOpen(true)}
-          />
+          <AppTextButton onPress={() => setIsPickerOpen(true)}>
+            Выбрать дату
+          </AppTextButton>
           <AppDatePicker
             date={date}
             isOpen={isPickerOpen}
@@ -318,21 +322,16 @@ export const ModalCreate: FC<IModalCreate> = ({
           />
         </>
       )}
-      <View style={styles.modalBtns}>
-        <AppNativeButton
-          title="Закрыть"
-          styleContainer={styles.modalBtn}
-          onPress={onClose}
-        />
-        <AppNativeButton
-          title="Добавить"
-          styleContainer={styles.modalBtn}
+      <AppModal.Actions>
+        <AppModal.Button title="Закрыть" onPress={onClose} />
+        <AppModal.Button
+          title="Создать"
           onPress={onCreate}
           disabled={
             createTeamIsLoading || createProjectIsLoading || createTaskIsLoading
           }
         />
-      </View>
+      </AppModal.Actions>
     </AppModal>
   );
 };
