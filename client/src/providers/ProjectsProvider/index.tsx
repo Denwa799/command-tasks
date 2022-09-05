@@ -11,14 +11,37 @@ export const ProjectsContext = createContext<IProjectsContext>(
 );
 
 export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
+  const [projects, setProjects] = useState<IProject[] | null>(null);
   const [project, setProject] = useState<IProject | null>(null);
 
+  const [projectsIsLoading, setProjectsIsLoading] = useState(false);
   const [projectIsLoading, setProjectIsLoading] = useState(false);
   const [createProjectIsLoading, setCreateProjectIsLoading] = useState(false);
   const [deleteProjectIsLoading, setDeleteProjectIsLoading] = useState(false);
   const [updateProjectIsLoading, setUpdateProjectIsLoading] = useState(false);
 
   const projectsPath = `${variables.API_URL}${variables.PROJECTS}`;
+
+  const fetchProjects = useCallback(async (teamId: number) => {
+    setProjectsIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        const response = await GetService(
+          `${projectsPath}/team/${teamId}`,
+          tokenBearer,
+        );
+        setProjects(response.data);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка загрузки списка проектов');
+    } finally {
+      setProjectsIsLoading(false);
+    }
+  }, []);
 
   const fetchProject = useCallback(async (id: number) => {
     setProjectIsLoading(true);
@@ -96,18 +119,23 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
 
   const value = useMemo(
     () => ({
+      projects,
       project,
+      projectsIsLoading,
       createProjectIsLoading,
       deleteProjectIsLoading,
       updateProjectIsLoading,
       projectIsLoading,
+      fetchProjects,
       createProject,
       deleteProject,
       updateProject,
       fetchProject,
     }),
     [
+      projects,
       project,
+      projectsIsLoading,
       createProjectIsLoading,
       deleteProjectIsLoading,
       updateProjectIsLoading,

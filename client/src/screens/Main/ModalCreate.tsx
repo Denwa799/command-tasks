@@ -59,9 +59,9 @@ export const ModalCreate: FC<IModalCreate> = ({
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const {createTeam, fetchTeams, createTeamIsLoading, fetchTeam} = useTeams();
-  const {createProject, fetchProject, createProjectIsLoading} = useProjects();
-  const {createTask, createTaskIsLoading} = useTasks();
+  const {createTeam, fetchTeams, createTeamIsLoading} = useTeams();
+  const {createProject, fetchProjects, createProjectIsLoading} = useProjects();
+  const {fetchTasks, createTask, createTaskIsLoading} = useTasks();
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
   const activeUsersEmail = useMemo(() => {
@@ -245,7 +245,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await createProject(teamId, text));
-    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+    route.name === teamRoute && teamId && (await fetchProjects(teamId));
 
     route.name === projectRoute &&
       projectId &&
@@ -257,7 +257,7 @@ export const ModalCreate: FC<IModalCreate> = ({
         isUrgently,
         date,
       ));
-    route.name === projectRoute && projectId && (await fetchProject(projectId));
+    route.name === projectRoute && projectId && (await fetchTasks(projectId));
 
     setIsOpen(false);
   }, [teamId, projectId, text, autocompletePress, isUrgently, date, emails]);

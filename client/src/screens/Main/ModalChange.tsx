@@ -29,7 +29,7 @@ export const ModalChange: FC<IModalChange> = ({
   id,
   text,
   teamId,
-  responsible,
+  responsibleEmail,
   status,
   isUrgently,
   date,
@@ -59,14 +59,14 @@ export const ModalChange: FC<IModalChange> = ({
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-  const {updateTeam, fetchTeams, fetchTeam, updateTeamIsLoading} = useTeams();
-  const {updateProject, fetchProject, updateProjectIsLoading} = useProjects();
-  const {updateTask, updateTaskIsLoading} = useTasks();
+  const {updateTeam, fetchTeams, updateTeamIsLoading} = useTeams();
+  const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
+  const {fetchTasks, updateTask, updateTaskIsLoading} = useTasks();
 
   useEffect(() => {
     if (isOpen) {
       setTextValue(text);
-      responsible && setResponsibleValue(responsible);
+      responsibleEmail && setResponsibleValue(responsibleEmail);
       status && setStatusValue(status);
       isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
       date && setDateValue(new Date(date));
@@ -95,7 +95,7 @@ export const ModalChange: FC<IModalChange> = ({
     [id, textValue],
   );
 
-  const responsibleHandler = useCallback(
+  const responsibleEmaileHandler = useCallback(
     (value: string) => {
       setResponsibleValue(value);
       setIsResponsibleError(false);
@@ -164,7 +164,7 @@ export const ModalChange: FC<IModalChange> = ({
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await updateProject(id, textValue));
-    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+    route.name === teamRoute && teamId && (await fetchProjects(teamId));
 
     route.name === projectRoute &&
       projectId &&
@@ -176,7 +176,7 @@ export const ModalChange: FC<IModalChange> = ({
         isUrgentlyValue,
         dateValue,
       ));
-    route.name === projectRoute && projectId && (await fetchProject(projectId));
+    route.name === projectRoute && projectId && (await fetchTasks(projectId));
 
     setIsOpen(false);
   }, [

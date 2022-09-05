@@ -107,16 +107,21 @@ export const AppCard: FC<IAppCard> = ({
   }, [itemCreatorId, creatorId, user]);
 
   const openHandler = useCallback(() => {
-    console.log('Открыть');
-  }, []);
+    if (onOpen && item.creator) {
+      onOpen(id, item.creator.id);
+    } else if (onOpen && creatorId) {
+      onOpen(id, creatorId);
+    }
+  }, [id, creatorId, item, onOpen]);
 
   const deleteHandler = useCallback(() => {
-    console.log('Удалить');
-  }, []);
+    onDelete && onDelete(id);
+  }, [onDelete, id]);
 
   const changeHandler = useCallback(() => {
-    console.log('Редактировать');
-  }, []);
+    onChange &&
+      onChange(id, text, responsible?.email, currentStatus, isUrgently, date);
+  }, [onChange, id, text, responsible, currentStatus, isUrgently, date]);
 
   return (
     <AppContainer>
@@ -124,9 +129,11 @@ export const AppCard: FC<IAppCard> = ({
         <TouchableOpacity
           style={[styles.cardHandler, !isAccess && styles.noAccess]}
           activeOpacity={0.9}
-          onPress={onOpen ? () => onOpen(item) : openHandler}>
+          onPress={openHandler}>
           <Text style={textStyles}>{text}</Text>
-          {responsible && <Text style={responsibleStyles}>{responsible}</Text>}
+          {responsible && (
+            <Text style={responsibleStyles}>{responsible.name}</Text>
+          )}
         </TouchableOpacity>
         {isAccess && (
           <View style={[styles.btns, isColors && styles.paddingRight0]}>
@@ -137,7 +144,7 @@ export const AppCard: FC<IAppCard> = ({
                       onChange(
                         id,
                         text,
-                        responsible,
+                        responsible?.email,
                         currentStatus,
                         isUrgently,
                         date,
@@ -149,7 +156,7 @@ export const AppCard: FC<IAppCard> = ({
               <Anticon name="edit" size={24} color={iconColor} />
             </TouchableHighlight>
             <TouchableHighlight
-              onPress={onDelete ? () => onDelete(id) : deleteHandler}
+              onPress={deleteHandler}
               underlayColor="none"
               style={styles.btn}>
               <Anticon name="delete" size={24} color={iconColor} />

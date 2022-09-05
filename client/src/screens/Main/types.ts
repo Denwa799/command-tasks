@@ -3,9 +3,11 @@ import {TaskStatusType} from 'models/ITasks';
 export type TeamScreenNavigateType = {
   Team: {
     teamId: number;
+    creatorId: number;
   };
   Project: {
     projectId: number;
+    creatorId: number;
   };
 };
 
@@ -24,7 +26,7 @@ export interface IModals {
   text: string;
   teamId?: number;
   projectId?: number;
-  responsible?: string;
+  responsibleEmail?: string;
   status?: TaskStatusType;
   isUrgently?: boolean;
   date?: Date;
@@ -43,7 +45,7 @@ export interface IModalChange {
   id: number;
   text: string;
   teamId?: number;
-  responsible?: string;
+  responsibleEmail?: string;
   status?: TaskStatusType;
   isUrgently?: boolean;
   date?: Date;

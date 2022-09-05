@@ -1,7 +1,9 @@
+import {IUser} from './IUser';
+
 export interface ITeam {
   id: number;
   name: string;
-  projects: IProject[];
+  projects?: IProject[];
   creator: {
     id: number;
     email: string;
@@ -18,7 +20,7 @@ export interface ITeam {
 export interface IProject {
   id: number;
   name: string;
-  tasks: ITask[];
+  tasks?: ITask[];
   team: ITeam;
 }
 
@@ -26,9 +28,10 @@ export interface ITask {
   id: number;
   text: string;
   status: TaskStatusType;
-  responsible: string;
   date: Date;
   isUrgently: boolean;
+  responsible: IUser;
+  project: IProject;
 }
 
 export type TaskStatusType = 'overdue' | 'inProgress' | 'done';
