@@ -20,6 +20,66 @@ export class ProjectsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
+  async getAllTeamProjects(token: string, id: number, take = 50, skip = 0) {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const tasks = await this.projectRepository.find({
+        select: {
+          id: true,
+          name: true,
+          team: {
+            id: true,
+            name: true,
+            activatedUsers: true,
+            creator: {
+              id: true,
+              name: true,
+              email: true,
+            },
+            users: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+        where: [
+          {
+            team: {
+              id: id,
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+          {
+            team: {
+              id: id,
+              users: {
+                id: decoded.id,
+              },
+              activatedUsers: ArrayContains([decoded.id]),
+            },
+          },
+        ],
+        relations: {
+          team: {
+            users: true,
+            creator: true,
+          },
+        },
+        take,
+        skip,
+        order: {
+          id: 'DESC',
+        },
+      });
+      if (tasks) return tasks;
+      throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async create(dto: CreateProjectDto, token: string) {
     const decoded = await this.decodeToken(token);
     if (decoded) {
@@ -36,19 +96,6 @@ export class ProjectsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getAllProjects(take = 50, skip = 0) {
-    const projects = await this.projectRepository.find({
-      relations: ['team', 'tasks'],
-      take,
-      skip,
-      order: {
-        id: 'ASC',
-      },
-    });
-    if (projects) return projects;
-    throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
-  }
-
   async getProjectById(id: number, token: string) {
     const decoded = await this.decodeToken(token);
     if (decoded) {
@@ -56,19 +103,13 @@ export class ProjectsService {
         select: {
           id: true,
           name: true,
-          tasks: {
-            id: true,
-            text: true,
-            responsible: true,
-            status: true,
-            isUrgently: true,
-            date: true,
-          },
           team: {
             id: true,
             name: true,
             creator: {
               id: true,
+              name: true,
+              email: true,
             },
             activatedUsers: true,
             users: {
@@ -98,7 +139,6 @@ export class ProjectsService {
           },
         ],
         relations: {
-          tasks: true,
           team: {
             creator: true,
             users: true,
@@ -156,5 +196,26 @@ export class ProjectsService {
       );
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async getAllProjects(take = 50, skip = 0) {
+    const projects = await this.projectRepository.find({
+      select: {
+        id: true,
+        name: true,
+        team: {
+          id: true,
+          name: true,
+        },
+      },
+      relations: ['team'],
+      take,
+      skip,
+      order: {
+        id: 'ASC',
+      },
+    });
+    if (projects) return projects;
+    throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
   }
 }

@@ -10,7 +10,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/api/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Tokens } from './types';
 import { RefreshTokenGuard } from './guards';
 import { GetCurrentUser, GetCurrentUserId, Public } from './decorators';
 

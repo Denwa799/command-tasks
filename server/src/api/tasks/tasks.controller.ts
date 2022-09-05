@@ -23,6 +23,31 @@ import { TasksService } from './tasks.service';
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
+  @ApiOperation({ summary: 'Получение всех задач в проекте' })
+  @ApiResponse({ status: 200, type: [Task] })
+  @Get('project/:id')
+  getAllProjectTasks(
+    @Param('id') id: number,
+    @Query() reqParam: PaginationQueryParamDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.tasksService.getAllProjectTasks(
+      token,
+      id,
+      reqParam.take,
+      reqParam.skip,
+    );
+  }
+
+  @ApiOperation({ summary: 'Получение всех задач. Только для администратора' })
+  @ApiResponse({ status: 200, type: [Task] })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Get('admin')
+  getAllTasks(@Query() reqParam: PaginationQueryParamDto) {
+    return this.tasksService.getAllTasks(reqParam.take, reqParam.skip);
+  }
+
   @ApiOperation({ summary: 'Создание задачи' })
   @ApiResponse({ status: 200, type: Task })
   @Post()
@@ -31,15 +56,6 @@ export class TasksController {
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.tasksService.create(taskDto, token);
-  }
-
-  @ApiOperation({ summary: 'Получение всех задач' })
-  @ApiResponse({ status: 200, type: [Task] })
-  @Roles('admin')
-  @UseGuards(RolesGuard)
-  @Get()
-  getAll(@Query() reqParam: PaginationQueryParamDto) {
-    return this.tasksService.getAllTasks(reqParam.take, reqParam.skip);
   }
 
   @ApiOperation({ summary: 'Удаление задачи по id' })
@@ -53,7 +69,7 @@ export class TasksController {
   }
 
   @ApiOperation({ summary: 'Обновление задачи по id' })
-  @ApiResponse({ status: 200, type: Task })
+  @ApiResponse({ status: 200 })
   @Patch(':id')
   update(
     @Param('id') id: number,

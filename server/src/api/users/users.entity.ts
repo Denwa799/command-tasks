@@ -19,6 +19,7 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Invitation } from '../invitations/invitations.entity';
+import { Task } from '../tasks/tasks.entity';
 import { Team } from '../teams/teams.entity';
 
 @Entity('users')
@@ -89,6 +90,15 @@ export class User {
     onDelete: 'CASCADE',
   })
   invitations: Invitation[];
+
+  @ApiProperty({
+    type: () => Task,
+    description: 'Задачи пользователя',
+  })
+  @OneToMany(() => Task, (task) => task.responsible, {
+    onDelete: 'CASCADE',
+  })
+  tasks: Task[];
 
   @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',

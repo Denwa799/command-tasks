@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsBoolean,
   IsDate,
+  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -19,7 +20,8 @@ export class CreateTaskDto {
   @ApiProperty({ example: 'Иванов Иван', description: 'ФИО ответственного' })
   @IsNotEmpty({ message: 'Пустое поле ФИО' })
   @IsString({ message: 'Должно быть строкой' })
-  @Length(3, 50, { message: 'Не меньше 3 и не больше 50' })
+  @IsEmail({ message: 'Должно быть email' })
+  @Length(3, 345, { message: 'Не меньше 3 и не больше 345' })
   readonly responsible: string;
 
   @ApiProperty({ example: 'overdue', description: 'Статус' })
