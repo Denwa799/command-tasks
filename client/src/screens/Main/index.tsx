@@ -132,7 +132,15 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   );
 
   const isLoading = useMemo(() => {
-    return teamsIsLoading || projectsIsLoading || tasksIsLoading;
+    if (route.name === teamsRoute) {
+      return teamsIsLoading;
+    }
+    if (route.name === teamRoute) {
+      return projectsIsLoading;
+    }
+    if (route.name === projectRoute) {
+      return tasksIsLoading;
+    }
   }, [teamsIsLoading, projectsIsLoading, tasksIsLoading]);
 
   return (

@@ -29,7 +29,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   const route = useRoute();
 
   const {user} = useAuth();
-  const {project} = useProjects();
+  const {tasks} = useTasks();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -65,15 +65,15 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
   const activeUsersEmail = useMemo(() => {
-    if (route.name === projectRoute && project) {
-      const activeUsers = project?.team.users.filter(item =>
-        project.team.activatedUsers.includes(item.id),
+    if (route.name === projectRoute && tasks) {
+      const activeUsers = tasks[0].project.team.users.filter(item =>
+        tasks[0].project.team.activatedUsers.includes(item.id),
       );
       return activeUsers.map(item => {
         return item.email;
       });
     }
-  }, [route, project]);
+  }, [route, tasks]);
 
   const autocompleteData = useMemo(() => {
     if (route.name === projectRoute && activeUsersEmail) {
