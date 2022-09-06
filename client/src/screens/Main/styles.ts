@@ -34,4 +34,7 @@ export const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginRight: 'auto',
   },
+  appDropdown: {
+    marginTop: 10,
+  },
 });

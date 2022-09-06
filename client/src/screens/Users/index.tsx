@@ -9,7 +9,7 @@ import {FlatList, View} from 'react-native';
 import {styles} from './styles';
 
 export const UsersScreen = () => {
-  const {team, teamIsLoading, fetchTeam} = useTeams();
+  const {team, teamIsLoading, selectedTeamId, fetchTeam} = useTeams();
   const {user} = useAuth();
 
   const [teamId, setTeamId] = useState(team?.id);
@@ -31,6 +31,10 @@ export const UsersScreen = () => {
     }
     return users;
   }, [team]);
+
+  useEffect(() => {
+    fetchTeam(selectedTeamId);
+  }, [selectedTeamId]);
 
   useEffect(() => {
     if (team) {

@@ -34,7 +34,15 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
 
-  const {teams, teamsIsLoading, teamIsLoading, fetchTeams} = useTeams();
+  const {
+    teams,
+    teamsIsLoading,
+    teamIsLoading,
+    fetchTeams,
+    setSelectedTeamId,
+    fetchTeam,
+    selectedTeamId,
+  } = useTeams();
   const {projects, projectsIsLoading, fetchProjects} = useProjects();
   const {tasks, fetchTasks, tasksIsLoading} = useTasks();
 
@@ -72,8 +80,13 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     route.name === teamsRoute && fetchTeams();
   }, []);
 
+  useEffect(() => {
+    !teamIsLoading && selectedTeamId && fetchTeam(selectedTeamId);
+  }, []);
+
   const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
+      setSelectedTeamId(itemId);
       await fetchProjects(itemId);
       navigation.navigate(teamRoute, {
         teamId: itemId,
@@ -85,6 +98,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       navigation.navigate(projectRoute, {
         projectId: itemId,
         creatorId: itemCreatorId ? itemCreatorId : 0,
+        teamId: params.teamId,
       });
     }
   }, []);

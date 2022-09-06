@@ -71,7 +71,7 @@ export class ProjectsService {
         take,
         skip,
         order: {
-          id: 'DESC',
+          id: 'ASC',
         },
       });
       if (tasks) return tasks;
@@ -118,6 +118,7 @@ export class ProjectsService {
               name: true,
             },
           },
+          tasks: false,
         },
         where: [
           {
@@ -143,6 +144,7 @@ export class ProjectsService {
             creator: true,
             users: true,
           },
+          tasks: true,
         },
         order: {
           tasks: {

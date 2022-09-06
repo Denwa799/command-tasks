@@ -1,8 +1,8 @@
 import {useRoute} from '@react-navigation/native';
 import {AppAutocomplete} from 'components/AppAutocomplete';
-import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
+import {AppDropdown} from 'components/AppDropdown';
 import {AppField} from 'components/AppField';
 import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
@@ -29,7 +29,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   const route = useRoute();
 
   const {user} = useAuth();
-  const {tasks} = useTasks();
+  const {team} = useTeams();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -45,6 +45,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
   const [dangerAutocompleteText, setDangerAutocompleteText] =
     useState('Пустое поле');
+  const [selectUserIsOpen, setSelectUserIsOpen] = useState(false);
 
   const [isUrgently, setIsUrgently] = useState(false);
 
@@ -64,28 +65,31 @@ export const ModalCreate: FC<IModalCreate> = ({
   const {fetchTasks, createTask, createTaskIsLoading} = useTasks();
   const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
 
-  const activeUsersEmail = useMemo(() => {
-    if (route.name === projectRoute && tasks) {
-      const activeUsers = tasks[0].project.team.users.filter(item =>
-        tasks[0].project.team.activatedUsers.includes(item.id),
-      );
-      return activeUsers.map(item => {
-        return item.email;
-      });
-    }
-  }, [route, tasks]);
-
   const autocompleteData = useMemo(() => {
-    if (route.name === projectRoute && activeUsersEmail) {
-      return activeUsersEmail.filter(item => {
-        return item.toLowerCase().includes(debouncedAutocompleteValue);
-      });
-    } else if (route.name === teamsRoute) {
+    if (route.name === teamsRoute) {
       return foundUsers.map(item => item.email);
     } else {
       return [];
     }
-  }, [foundUsers, route, debouncedAutocompleteValue, activeUsersEmail]);
+  }, [foundUsers, route]);
+
+  const itemsUsers = useMemo(() => {
+    let filteredUsers;
+    let data;
+    if (team?.users) {
+      filteredUsers = team.users.filter(element =>
+        team.activatedUsers.includes(element.id),
+      );
+      data = filteredUsers.map(element => {
+        return {
+          id: element.id,
+          title: element.name,
+          text: element.email,
+        };
+      });
+    }
+    return data;
+  }, [team]);
 
   useEffect(() => {
     if (user) {
@@ -102,6 +106,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     setIsUrgently(false);
     setIsAutocompleteError(false);
     setEmails([]);
+    setSelectUserIsOpen(false);
   }, [isOpen]);
 
   useEffect(() => {
@@ -194,6 +199,18 @@ export const ModalCreate: FC<IModalCreate> = ({
       setEmails(newEmails);
     },
     [emails],
+  );
+
+  const selectUserHandler = useCallback(() => {
+    setSelectUserIsOpen(true);
+  }, []);
+
+  const onDropdownItemClick = useCallback(
+    (id: number, name: string, email: string) => {
+      setAutocompletePress(email);
+      setSelectUserIsOpen(false);
+    },
+    [],
   );
 
   const onClose = useCallback(() => {
@@ -290,14 +307,16 @@ export const ModalCreate: FC<IModalCreate> = ({
       )}
       {route.name === projectRoute && (
         <>
-          <AppAutocompleteField
-            placeholder="Выберите email ответственного"
-            value={autocompleteValue}
-            data={autocompleteData}
-            isDisplay={isAutocomplete}
-            isLoading={findUsersIsLoading}
-            onChange={autocompleteHandler}
-            onPress={onAutocompletePress}
+          <AppDropdown
+            placeholder={
+              autocompletePress ? autocompletePress : 'Выбрать сотрудника'
+            }
+            onPress={selectUserHandler}
+            style={styles.appDropdown}
+            isOpen={selectUserIsOpen}
+            setIsOpen={setSelectUserIsOpen}
+            items={itemsUsers ? itemsUsers : []}
+            onItemClick={onDropdownItemClick}
             isDanger={isAutocompleteError}
             dangerText={dangerAutocompleteText}
           />

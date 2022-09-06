@@ -5,6 +5,8 @@ export type AppModalType = {
   style?: Object;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  wrapperStyle?: Object;
+  contentStyle?: Object;
 };
 
 export type ModalChildrenType = {
