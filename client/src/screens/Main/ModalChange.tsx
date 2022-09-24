@@ -1,7 +1,7 @@
 import {useRoute} from '@react-navigation/native';
-import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppCheckBox} from 'components/AppCheckBox';
 import {AppDatePicker} from 'components/AppDatePicker';
+import {AppDropdown} from 'components/AppDropdown';
 import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
 import {AppText} from 'components/AppText';
@@ -36,15 +36,17 @@ export const ModalChange: FC<IModalChange> = ({
   projectId,
 }) => {
   const route = useRoute();
+  const {team} = useTeams();
 
   const [textValue, setTextValue] = useState('');
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
 
-  const [responsibleValue, setResponsibleValue] = useState('');
+  const [responsiblePress, setResponsiblePress] = useState('');
   const [isResponsibleError, setIsResponsibleError] = useState(false);
   const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
+  const [selectResponsibleIsOpen, setSelectResponsibleIsOpen] = useState(false);
 
   const [isUrgentlyValue, setIsUrgentlyValue] = useState(false);
 
@@ -63,10 +65,28 @@ export const ModalChange: FC<IModalChange> = ({
   const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
   const {fetchTasks, updateTask, updateTaskIsLoading} = useTasks();
 
+  const itemsUsers = useMemo(() => {
+    let filteredUsers;
+    let data;
+    if (team?.users) {
+      filteredUsers = team.users.filter(element =>
+        team.activatedUsers.includes(element.id),
+      );
+      data = filteredUsers.map(element => {
+        return {
+          id: element.id,
+          title: element.name,
+          text: element.email,
+        };
+      });
+    }
+    return data;
+  }, [team]);
+
   useEffect(() => {
     if (isOpen) {
       setTextValue(text);
-      responsibleEmail && setResponsibleValue(responsibleEmail);
+      responsibleEmail && setResponsiblePress(responsibleEmail);
       status && setStatusValue(status);
       isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
       date && setDateValue(new Date(date));
@@ -74,11 +94,12 @@ export const ModalChange: FC<IModalChange> = ({
     if (!isOpen) {
       setTextValue('');
       setIsTextError(false);
-      setResponsibleValue('');
+      setResponsiblePress('');
       setIsResponsibleError(false);
       setStatusValue(inProgressStatus);
       setIsUrgentlyValue(false);
       setDateValue(new Date());
+      setSelectResponsibleIsOpen(false);
     }
   }, [isOpen]);
 
@@ -95,12 +116,16 @@ export const ModalChange: FC<IModalChange> = ({
     [id, textValue],
   );
 
-  const responsibleEmaileHandler = useCallback(
-    (value: string) => {
-      setResponsibleValue(value);
-      setIsResponsibleError(false);
+  const selectResponsibleHandler = useCallback(() => {
+    setSelectResponsibleIsOpen(true);
+  }, []);
+
+  const onDropdownItemClick = useCallback(
+    (id: number, name: string, email: string) => {
+      setResponsiblePress(email);
+      setSelectResponsibleIsOpen(false);
     },
-    [responsibleValue],
+    [],
   );
 
   const isUrgentlyHandler = useCallback(() => {
@@ -142,20 +167,8 @@ export const ModalChange: FC<IModalChange> = ({
     }
 
     if (route.name === projectRoute) {
-      if (
-        !responsibleValue ||
-        responsibleValue.length < 3 ||
-        responsibleValue.length > 50
-      ) {
-        if (responsibleValue.length < 3) {
-          setDangerResponsibleText('Меньше 3 символов');
-        }
-        if (responsibleValue.length > 50) {
-          setDangerResponsibleText('Больше 50 символов');
-        }
-        if (!responsibleValue) {
-          setDangerResponsibleText('Пустое поле');
-        }
+      if (!responsiblePress) {
+        setDangerResponsibleText('Пустое поле');
         return setIsResponsibleError(true);
       }
     }
@@ -171,7 +184,7 @@ export const ModalChange: FC<IModalChange> = ({
       (await updateTask(
         id,
         textValue,
-        responsibleValue,
+        responsiblePress,
         statusValue,
         isUrgentlyValue,
         dateValue,
@@ -183,7 +196,7 @@ export const ModalChange: FC<IModalChange> = ({
     id,
     textValue,
     teamId,
-    responsibleValue,
+    responsiblePress,
     projectId,
     statusValue,
     isUrgentlyValue,
@@ -201,12 +214,16 @@ export const ModalChange: FC<IModalChange> = ({
       />
       {route.name === projectRoute && (
         <>
-          <AppAutocompleteField
-            data={[]}
-            value={responsibleValue}
-            onChange={() => console.log('value change')}
-            onPress={() => console.log('value press')}
-            placeholder={'Введите ответственного'}
+          <AppDropdown
+            placeholder={
+              responsiblePress ? responsiblePress : 'Выбрать сотрудника'
+            }
+            onPress={selectResponsibleHandler}
+            style={styles.appDropdown}
+            isOpen={selectResponsibleIsOpen}
+            setIsOpen={setSelectResponsibleIsOpen}
+            items={itemsUsers ? itemsUsers : []}
+            onItemClick={onDropdownItemClick}
             isDanger={isResponsibleError}
             dangerText={dangerResponsibleText}
           />
