@@ -30,7 +30,7 @@ export const AppDropdown: FC<IAppDropdown> = ({
       <TouchableWithoutFeedback onPress={onPress}>
         <View
           style={[styles.container, isDanger && styles.dangerBorder, style]}>
-          <Text>{placeholder}</Text>
+          <AppText>{placeholder}</AppText>
           <Text>
             <Anticon name="caretdown" size={14} color={THEME.TEXT_COLOR} />
           </Text>

@@ -1,24 +1,18 @@
 import {useRoute} from '@react-navigation/native';
-import {AppAutocomplete} from 'components/AppAutocomplete';
-import {AppCheckBox} from 'components/AppCheckBox';
-import {AppDatePicker} from 'components/AppDatePicker';
-import {AppDropdown} from 'components/AppDropdown';
-import {AppField} from 'components/AppField';
-import {AppItemsGrid} from 'components/AppItemsGrid';
 import {AppModal} from 'components/AppModal';
-import {AppText} from 'components/AppText';
-import {AppTextButton} from 'components/Btns/AppTextButton';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
-import {useAuth} from 'hooks/useAuth';
-import {useDebounce} from 'hooks/useDebounce';
 import {useProjects} from 'hooks/useProjects';
 import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
-import {styles} from './styles';
+import {AutocompleteField} from './AutocompleteField';
+import {Dropdown} from './Dropdown';
+import {TextField} from './TextField';
 import {IModalCreate} from './types';
+import {CheckBox} from './CheckBox';
+import {DatePicker} from './DatePicker';
+import {useAuth} from 'hooks/useAuth';
 
 export const ModalCreate: FC<IModalCreate> = ({
   isOpen,
@@ -27,31 +21,26 @@ export const ModalCreate: FC<IModalCreate> = ({
   projectId,
 }) => {
   const route = useRoute();
-
   const {user} = useAuth();
-  const {team} = useTeams();
+  const {foundUsers} = useUsers();
+  const {team, createTeam, fetchTeams, createTeamIsLoading} = useTeams();
+  const {createProject, fetchProjects, createProjectIsLoading} = useProjects();
+  const {fetchTasks, createTask, createTaskIsLoading} = useTasks();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
 
-  const [autocompleteValue, setAutocompleteValue] = useState('');
-  const debouncedAutocompleteValue = useDebounce<string>(
-    autocompleteValue,
-    500,
-  );
   const [autocompletePress, setAutocompletePress] = useState('');
-  const [isAutocomplete, setIsAutocomplete] = useState(false);
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
   const [dangerAutocompleteText, setDangerAutocompleteText] =
     useState('Пустое поле');
-  const [selectUserIsOpen, setSelectUserIsOpen] = useState(false);
 
-  const [isUrgently, setIsUrgently] = useState(false);
-
+  const [emails, setEmails] = useState<string[]>([]);
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState(0);
-  const [emails, setEmails] = useState<string[]>([]);
+
+  const [isUrgently, setIsUrgently] = useState(false);
 
   const [date, setDate] = useState(
     useMemo(() => {
@@ -59,19 +48,9 @@ export const ModalCreate: FC<IModalCreate> = ({
     }, []),
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
-
-  const {createTeam, fetchTeams, createTeamIsLoading} = useTeams();
-  const {createProject, fetchProjects, createProjectIsLoading} = useProjects();
-  const {fetchTasks, createTask, createTaskIsLoading} = useTasks();
-  const {searchUsersByEmail, foundUsers, findUsersIsLoading} = useUsers();
-
-  const autocompleteData = useMemo(() => {
-    if (route.name === teamsRoute) {
-      return foundUsers.map(item => item.email);
-    } else {
-      return [];
-    }
-  }, [foundUsers, route]);
+  const selectedDate = useMemo(() => {
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  }, [date]);
 
   const itemsUsers = useMemo(() => {
     let filteredUsers;
@@ -91,6 +70,14 @@ export const ModalCreate: FC<IModalCreate> = ({
     return data;
   }, [team]);
 
+  const autocompleteData = useMemo(() => {
+    if (route.name === teamsRoute) {
+      return foundUsers.map(item => item.email);
+    } else {
+      return [];
+    }
+  }, [foundUsers, route]);
+
   useEffect(() => {
     if (user) {
       setUserEmail(user.email);
@@ -101,134 +88,18 @@ export const ModalCreate: FC<IModalCreate> = ({
   useEffect(() => {
     setText('');
     setIsTextError(false);
-    setAutocompleteValue('');
-    setAutocompletePress('');
     setIsUrgently(false);
+    setAutocompletePress('');
     setIsAutocompleteError(false);
     setEmails([]);
-    setSelectUserIsOpen(false);
+    setUserEmail('');
+    setIsUrgently(false);
+    setIsPickerOpen(false);
   }, [isOpen]);
-
-  useEffect(() => {
-    if (debouncedAutocompleteValue.length > 0 && route.name === teamsRoute) {
-      searchUsersByEmail(debouncedAutocompleteValue.toLowerCase());
-    }
-  }, [debouncedAutocompleteValue]);
-
-  useEffect(() => {
-    if (autocompleteData.length > 0 && debouncedAutocompleteValue.length > 0) {
-      setIsAutocomplete(true);
-    } else {
-      setIsAutocomplete(false);
-    }
-
-    if (autocompleteValue === autocompletePress) {
-      setIsAutocomplete(false);
-    }
-  }, [
-    autocompleteData,
-    autocompleteValue,
-    autocompletePress,
-    debouncedAutocompleteValue,
-  ]);
-
-  const textHandler = useCallback(
-    (value: string) => {
-      setText(value);
-      setIsTextError(false);
-    },
-    [text],
-  );
-
-  const autocompleteHandler = useCallback(
-    (value: string) => {
-      setAutocompleteValue(value);
-      setIsAutocompleteError(false);
-    },
-    [autocompleteValue],
-  );
-
-  const onAutocompletePress = useCallback(
-    (email: string) => {
-      setIsAutocompleteError(false);
-      setAutocompletePress(email);
-      setAutocompleteValue(email);
-    },
-    [autocompletePress],
-  );
-
-  const onAdd = useCallback(() => {
-    if (!autocompleteValue) {
-      setDangerAutocompleteText('Пустое поле');
-      return setIsAutocompleteError(true);
-    }
-
-    if (!autocompletePress) {
-      setDangerAutocompleteText('Email не выбран');
-      return setIsAutocompleteError(true);
-    }
-
-    if (autocompleteValue !== autocompletePress) {
-      setDangerAutocompleteText('Выберите email');
-      return setIsAutocompleteError(true);
-    }
-
-    if (autocompletePress === userEmail) {
-      setDangerAutocompleteText(
-        'Email не должен быть таким же, как почта владельца аккаунта',
-      );
-      return setIsAutocompleteError(true);
-    }
-
-    const email = emails.find(element => element === autocompletePress);
-    if (email) {
-      setDangerAutocompleteText('Email уже добавлен');
-      return setIsAutocompleteError(true);
-    }
-
-    setIsAutocompleteError(false);
-    setEmails(items => [...items, autocompletePress]);
-    setAutocompleteValue('');
-    setAutocompletePress('');
-  }, [autocompleteValue, autocompletePress, emails]);
-
-  const deleteEmailHandler = useCallback(
-    (index: number) => {
-      const newEmails = [...emails];
-      newEmails.splice(index, 1);
-      setEmails(newEmails);
-    },
-    [emails],
-  );
-
-  const selectUserHandler = useCallback(() => {
-    setSelectUserIsOpen(true);
-  }, []);
-
-  const onDropdownItemClick = useCallback(
-    (id: number, name: string, email: string) => {
-      setAutocompletePress(email);
-      setSelectUserIsOpen(false);
-    },
-    [],
-  );
 
   const onClose = useCallback(() => {
     setIsOpen(false);
-  }, []);
-
-  const isUrgentlyHandler = useCallback(() => {
-    setIsUrgently(value => !value);
-  }, [isUrgently]);
-
-  const onDateConfirm = useCallback((newDate: Date) => {
-    setIsPickerOpen(false);
-    setDate(newDate);
-  }, []);
-
-  const onDateCancel = useCallback(() => {
-    setIsPickerOpen(false);
-  }, []);
+  }, [isOpen]);
 
   const onCreate = useCallback(async () => {
     if (!text || text.length < 3 || text.length > 50) {
@@ -277,67 +148,65 @@ export const ModalCreate: FC<IModalCreate> = ({
     route.name === projectRoute && projectId && (await fetchTasks(projectId));
 
     setIsOpen(false);
-  }, [teamId, projectId, text, autocompletePress, isUrgently, date, emails]);
+  }, [
+    teamId,
+    projectId,
+    text,
+    autocompletePress,
+    isUrgently,
+    date,
+    emails,
+    userId,
+  ]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <AppField
-        value={text}
+      <TextField
+        textValue={text}
         placeholder={'Введите текст'}
-        onChange={textHandler}
-        isDanger={isTextError}
         dangerText={dangerText}
+        isDanger={isTextError}
+        setText={setText}
+        setIsTextError={setIsTextError}
       />
       {route.name === teamsRoute && (
-        <>
-          <AppAutocomplete
-            placeholder="Введите email пользователя"
-            value={autocompleteValue}
-            data={autocompleteData}
-            isDisplay={isAutocomplete}
-            isLoading={findUsersIsLoading}
-            onChange={autocompleteHandler}
-            onPress={onAutocompletePress}
-            onAdd={onAdd}
-            isDanger={isAutocompleteError}
-            dangerText={dangerAutocompleteText}
-          />
-          <AppItemsGrid items={emails} onDelete={deleteEmailHandler} />
-        </>
+        <AutocompleteField
+          userEmail={userEmail}
+          pressText={autocompletePress}
+          dangerText={dangerAutocompleteText}
+          emails={emails}
+          data={autocompleteData}
+          isOpen={isOpen}
+          error={isAutocompleteError}
+          setUserEmail={setUserEmail}
+          onPress={setAutocompletePress}
+          onDangerText={setDangerAutocompleteText}
+          setEmails={setEmails}
+          setUserId={setUserId}
+          onError={setIsAutocompleteError}
+        />
       )}
       {route.name === projectRoute && (
         <>
-          <AppDropdown
-            placeholder={
-              autocompletePress ? autocompletePress : 'Выбрать сотрудника'
-            }
-            onPress={selectUserHandler}
-            style={styles.appDropdown}
-            isOpen={selectUserIsOpen}
-            setIsOpen={setSelectUserIsOpen}
-            items={itemsUsers ? itemsUsers : []}
-            onItemClick={onDropdownItemClick}
-            isDanger={isAutocompleteError}
+          <Dropdown
             dangerText={dangerAutocompleteText}
+            placeholder="Выбрать сотрудника"
+            autocompletePress={autocompletePress}
+            isDanger={isAutocompleteError}
+            items={itemsUsers}
+            setAutocompletePress={setAutocompletePress}
           />
-          <TouchableOpacity
-            style={styles.checkbox}
-            activeOpacity={1}
-            onPress={isUrgentlyHandler}>
-            <AppCheckBox value={isUrgently} onValueChange={isUrgentlyHandler} />
-            <AppText>Срочно</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.date}>{`${date.getDate()}/${
-            date.getMonth() + 1
-          }/${date.getFullYear()}`}</AppText>
-          <AppTextButton onPress={() => setIsPickerOpen(true)}>
-            Выбрать дату
-          </AppTextButton>
-          <AppDatePicker
+          <CheckBox
+            value={isUrgently}
+            text={'Срочно'}
+            setStatus={setIsUrgently}
+          />
+          <DatePicker
+            selectedDate={selectedDate}
+            isPickerOpen={isPickerOpen}
             date={date}
-            isOpen={isPickerOpen}
-            onConfirm={onDateConfirm}
-            onCancel={onDateCancel}
+            setIsPickerOpen={setIsPickerOpen}
+            setDate={setDate}
           />
         </>
       )}

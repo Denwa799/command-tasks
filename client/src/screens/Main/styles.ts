@@ -22,19 +22,4 @@ export const styles = StyleSheet.create({
     right: 0,
     textAlign: 'center',
   },
-  checkbox: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  date: {
-    fontSize: SIZES.body2,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  appDropdown: {
-    marginTop: 10,
-  },
 });

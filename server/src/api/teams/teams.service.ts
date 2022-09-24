@@ -11,6 +11,7 @@ import { ArrayContains, Repository } from 'typeorm';
 import { InvitationsService } from '../invitations/invitations.service';
 import { UsersService } from '../users/users.service';
 import { CreateTeamDto } from './dto/create-team.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './teams.entity';
 
 @Injectable()
@@ -154,7 +155,7 @@ export class TeamsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async update(id: number, dto: CreateTeamDto, token): Promise<Team> {
+  async update(id: number, dto: UpdateTeamDto, token): Promise<Team> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamRepository.findOneBy({

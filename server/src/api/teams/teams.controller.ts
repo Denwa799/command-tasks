@@ -14,6 +14,7 @@ import { GetCurrentUser, Roles } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
+import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './teams.entity';
 import { TeamsService } from './teams.service';
 
@@ -80,7 +81,7 @@ export class TeamsController {
   @Patch(':id')
   update(
     @Param('id') id: number,
-    @Body() teamDto: CreateTeamDto,
+    @Body() teamDto: UpdateTeamDto,
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.teamsService.update(id, teamDto, token);

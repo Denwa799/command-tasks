@@ -1,15 +1,8 @@
 import {useRoute} from '@react-navigation/native';
-import {AppCheckBox} from 'components/AppCheckBox';
-import {AppDatePicker} from 'components/AppDatePicker';
-import {AppDropdown} from 'components/AppDropdown';
-import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
-import {AppText} from 'components/AppText';
-import {AppTextButton} from 'components/Btns/AppTextButton';
 import {
   doneStatus,
   inProgressStatus,
-  overdueStatus,
   projectRoute,
   teamRoute,
   teamsRoute,
@@ -19,9 +12,11 @@ import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
-import {styles} from './styles';
 import {IModalChange} from './types';
+import {TextField} from './TextField';
+import {Dropdown} from './Dropdown';
+import {CheckBox} from './CheckBox';
+import {DatePicker} from './DatePicker';
 
 export const ModalChange: FC<IModalChange> = ({
   isOpen,
@@ -46,7 +41,6 @@ export const ModalChange: FC<IModalChange> = ({
   const [isResponsibleError, setIsResponsibleError] = useState(false);
   const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
-  const [selectResponsibleIsOpen, setSelectResponsibleIsOpen] = useState(false);
 
   const [isUrgentlyValue, setIsUrgentlyValue] = useState(false);
 
@@ -60,6 +54,11 @@ export const ModalChange: FC<IModalChange> = ({
     }, []),
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const selectedDate = useMemo(() => {
+    return `${dateValue.getDate()}/${
+      dateValue.getMonth() + 1
+    }/${dateValue.getFullYear()}`;
+  }, [dateValue]);
 
   const {updateTeam, fetchTeams, updateTeamIsLoading} = useTeams();
   const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
@@ -99,7 +98,6 @@ export const ModalChange: FC<IModalChange> = ({
       setStatusValue(inProgressStatus);
       setIsUrgentlyValue(false);
       setDateValue(new Date());
-      setSelectResponsibleIsOpen(false);
     }
   }, [isOpen]);
 
@@ -107,46 +105,6 @@ export const ModalChange: FC<IModalChange> = ({
     statusValue === doneStatus && setIsDone(true);
     statusValue !== doneStatus && setIsDone(false);
   }, [statusValue]);
-
-  const textHandler = useCallback(
-    (value: string) => {
-      setTextValue(value);
-      setIsTextError(false);
-    },
-    [id, textValue],
-  );
-
-  const selectResponsibleHandler = useCallback(() => {
-    setSelectResponsibleIsOpen(true);
-  }, []);
-
-  const onDropdownItemClick = useCallback(
-    (id: number, name: string, email: string) => {
-      setResponsiblePress(email);
-      setSelectResponsibleIsOpen(false);
-    },
-    [],
-  );
-
-  const isUrgentlyHandler = useCallback(() => {
-    setIsUrgentlyValue(value => !value);
-  }, [isUrgentlyValue]);
-
-  const statusHandler = useCallback(() => {
-    if (statusValue === inProgressStatus || statusValue === overdueStatus) {
-      return setStatusValue(doneStatus);
-    }
-    return setStatusValue(inProgressStatus);
-  }, [statusValue]);
-
-  const onDateConfirm = useCallback((newDate: Date) => {
-    setIsPickerOpen(false);
-    setDateValue(newDate);
-  }, []);
-
-  const onDateCancel = useCallback(() => {
-    setIsPickerOpen(false);
-  }, []);
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -185,7 +143,7 @@ export const ModalChange: FC<IModalChange> = ({
         id,
         textValue,
         responsiblePress,
-        statusValue,
+        isDone ? doneStatus : inProgressStatus,
         isUrgentlyValue,
         dateValue,
       ));
@@ -199,62 +157,43 @@ export const ModalChange: FC<IModalChange> = ({
     responsiblePress,
     projectId,
     statusValue,
+    isDone,
     isUrgentlyValue,
     dateValue,
   ]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <AppField
-        value={textValue}
+      <TextField
+        textValue={textValue}
         placeholder={'Введите текст'}
-        onChange={textHandler}
-        isDanger={isTextError}
         dangerText={dangerText}
+        isDanger={isTextError}
+        setText={setTextValue}
+        setIsTextError={setIsTextError}
       />
       {route.name === projectRoute && (
         <>
-          <AppDropdown
-            placeholder={
-              responsiblePress ? responsiblePress : 'Выбрать сотрудника'
-            }
-            onPress={selectResponsibleHandler}
-            style={styles.appDropdown}
-            isOpen={selectResponsibleIsOpen}
-            setIsOpen={setSelectResponsibleIsOpen}
-            items={itemsUsers ? itemsUsers : []}
-            onItemClick={onDropdownItemClick}
-            isDanger={isResponsibleError}
+          <Dropdown
             dangerText={dangerResponsibleText}
+            placeholder="Выбрать сотрудника"
+            autocompletePress={responsiblePress}
+            isDanger={isResponsibleError}
+            items={itemsUsers}
+            setAutocompletePress={setResponsiblePress}
           />
-          <TouchableOpacity
-            style={styles.checkbox}
-            activeOpacity={1}
-            onPress={isUrgentlyHandler}>
-            <AppCheckBox
-              value={isUrgentlyValue}
-              onValueChange={isUrgentlyHandler}
-            />
-            <AppText>Срочно</AppText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.checkbox}
-            activeOpacity={1}
-            onPress={statusHandler}>
-            <AppCheckBox value={isDone} onValueChange={statusHandler} />
-            <AppText>Выполнено</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.date}>{`${dateValue.getDate()}/${
-            dateValue.getMonth() + 1
-          }/${dateValue.getFullYear()}`}</AppText>
-          <AppTextButton onPress={() => setIsPickerOpen(true)}>
-            Выбрать дату
-          </AppTextButton>
-          <AppDatePicker
+          <CheckBox
+            value={isUrgentlyValue}
+            text={'Срочно'}
+            setStatus={setIsUrgentlyValue}
+          />
+          <CheckBox value={isDone} text={'Выполнено'} setStatus={setIsDone} />
+          <DatePicker
+            selectedDate={selectedDate}
+            isPickerOpen={isPickerOpen}
             date={dateValue}
-            isOpen={isPickerOpen}
-            onConfirm={onDateConfirm}
-            onCancel={onDateCancel}
+            setIsPickerOpen={setIsPickerOpen}
+            setDate={setDateValue}
           />
         </>
       )}
