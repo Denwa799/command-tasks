@@ -6,6 +6,7 @@ import {Pressable, Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAuthData} from './types';
 import {AppButton} from 'components/Btns/AppButton';
+import {emailValidationReg} from 'utils/regularExpressions';
 
 export const AuthScreen: FC = () => {
   const {isLoading, login, register} = useAuth();
@@ -16,6 +17,9 @@ export const AuthScreen: FC = () => {
   const [isEmailError, setIsEmailError] = useState(false);
   const [isNameError, setIsNameError] = useState(false);
   const [isPasswordError, setIsPasswordError] = useState(false);
+  const [emailErrorText, setEmailErrorText] = useState(
+    'Слишком короткий email',
+  );
 
   const emailHandler = useCallback(
     (value: string) => {
@@ -47,6 +51,11 @@ export const AuthScreen: FC = () => {
 
   const authHandler = useCallback(async () => {
     if (!email || email.length < 8) {
+      setEmailErrorText('Слишком короткий email');
+      return setIsEmailError(true);
+    }
+    if (!emailValidationReg.test(email)) {
+      setEmailErrorText('Некорректный email');
       return setIsEmailError(true);
     }
     if (!name && isReg) {
@@ -57,9 +66,9 @@ export const AuthScreen: FC = () => {
     }
 
     if (isReg) {
-      await register(email, password, name);
+      await register(email.toLocaleLowerCase(), password, name);
     }
-    await login(email, password);
+    await login(email.toLocaleLowerCase(), password);
 
     setData({} as IAuthData);
   }, [email, name, isReg, password]);
@@ -80,7 +89,7 @@ export const AuthScreen: FC = () => {
                 placeholder={'Введите почту'}
                 onChange={emailHandler}
                 isDanger={isEmailError}
-                dangerText="Слишком короткий email"
+                dangerText={emailErrorText}
               />
               {isReg && (
                 <AppField

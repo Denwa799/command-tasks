@@ -53,13 +53,10 @@ export const AutocompleteField: FC<IAutocompleteField> = ({
     }
   }, [data, value, pressText, debouncedValue]);
 
-  const onAutocomplete = useCallback(
-    (value: string) => {
-      setValue(value);
-      onError(false);
-    },
-    [value],
-  );
+  const onAutocomplete = useCallback((itemValue: string) => {
+    setValue(itemValue);
+    onError(false);
+  }, []);
 
   const onAutocompletePress = useCallback(
     (email: string) => {
