@@ -15,7 +15,7 @@ export const Modals: FC<IModals> = ({
   text,
   teamId,
   projectId,
-  responsible,
+  responsibleEmail,
   status,
   isUrgently,
   date,
@@ -41,7 +41,7 @@ export const Modals: FC<IModals> = ({
         id={id}
         text={text}
         teamId={teamId}
-        responsible={responsible}
+        responsibleEmail={responsibleEmail}
         status={status}
         isUrgently={isUrgently}
         date={date}

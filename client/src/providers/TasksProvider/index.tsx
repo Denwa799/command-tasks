@@ -1,5 +1,6 @@
-import {DeleteService, PatchService, PostService} from 'api';
+import {DeleteService, GetService, PatchService, PostService} from 'api';
 import {variables} from 'constants/variables';
+import {ITask} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
@@ -8,11 +9,35 @@ import {ITasksContext, ITasksProvider} from './types';
 export const TasksContext = createContext<ITasksContext>({} as ITasksContext);
 
 export const TasksProvider: FC<ITasksProvider> = ({children}) => {
+  const [tasks, setTasks] = useState<ITask[] | null>(null);
+
+  const [tasksIsLoading, setTasksIsLoading] = useState(false);
   const [createTaskIsLoading, setCreateTaskIsLoading] = useState(false);
   const [deleteTaskIsLoading, setDeleteTaskIsLoading] = useState(false);
   const [updateTaskIsLoading, setUpdateTaskIsLoading] = useState(false);
 
   const tasksPath = `${variables.API_URL}${variables.TASKS}`;
+
+  const fetchTasks = useCallback(async (projectId: number) => {
+    setTasksIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        const response = await GetService(
+          `${tasksPath}/project/${projectId}`,
+          tokenBearer,
+        );
+        setTasks(response.data);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка загрузки списка задач');
+    } finally {
+      setTasksIsLoading(false);
+    }
+  }, []);
 
   const createTask = useCallback(
     async (
@@ -100,14 +125,23 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
 
   const value = useMemo(
     () => ({
+      tasks,
+      tasksIsLoading,
       createTaskIsLoading,
       deleteTaskIsLoading,
       updateTaskIsLoading,
+      fetchTasks,
       createTask,
       deleteTask,
       updateTask,
     }),
-    [createTaskIsLoading, deleteTaskIsLoading, updateTaskIsLoading],
+    [
+      tasks,
+      tasksIsLoading,
+      createTaskIsLoading,
+      deleteTaskIsLoading,
+      updateTaskIsLoading,
+    ],
   );
 
   return (

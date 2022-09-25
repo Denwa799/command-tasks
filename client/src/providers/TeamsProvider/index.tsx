@@ -11,6 +11,7 @@ export const TeamsContext = createContext<ITeamsContext>({} as ITeamsContext);
 export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [teams, setTeams] = useState<ITeam[] | null>(null);
   const [team, setTeam] = useState<ITeam | null>(null);
+  const [selectedTeamId, setSelectedTeamId] = useState(0);
 
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
   const [teamIsLoading, setTeamIsLoading] = useState(false);
@@ -120,6 +121,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     () => ({
       teams,
       team,
+      selectedTeamId,
       teamsIsLoading,
       teamIsLoading,
       createTeamIsLoading,
@@ -130,11 +132,13 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       createTeam,
       deleteTeam,
       updateTeam,
+      setSelectedTeamId,
     }),
     [
       teams,
       teamsIsLoading,
       team,
+      selectedTeamId,
       teamIsLoading,
       createTeamIsLoading,
       deleteTeamIsLoading,

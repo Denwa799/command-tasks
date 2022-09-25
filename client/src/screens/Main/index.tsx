@@ -6,7 +6,7 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {IProject, ITeam, TaskStatusType} from 'models/ITasks';
+import {TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, FlatList, View} from 'react-native';
 import {Modals} from './Modals';
@@ -15,6 +15,7 @@ import {IMainScreen, TeamScreenNavigateType} from './types';
 import {AppTitle} from 'components/AppTitle';
 import {useAuth} from 'hooks/useAuth';
 import {AppCard} from 'components/Cards/AppCard';
+import {useTasks} from 'hooks/useTasks';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
@@ -33,13 +34,17 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
 
-  const {teams, teamsIsLoading, team, teamIsLoading, fetchTeams, fetchTeam} =
-    useTeams();
-  const {project, fetchProject} = useProjects();
-
-  const [creatorId, setCreatorId] = useState<number | undefined>(
-    team?.creator.id,
-  );
+  const {
+    teams,
+    teamsIsLoading,
+    teamIsLoading,
+    fetchTeams,
+    setSelectedTeamId,
+    fetchTeam,
+    selectedTeamId,
+  } = useTeams();
+  const {projects, projectsIsLoading, fetchProjects} = useProjects();
+  const {tasks, fetchTasks, tasksIsLoading} = useTasks();
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -48,20 +53,24 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const [id, setId] = useState(0);
   const [text, setText] = useState('');
-  const [responsible, setResponsible] = useState('');
+  const [responsibleEmail, setResponsibleEmail] = useState('');
   const [status, setStatus] = useState<TaskStatusType>();
   const [isUrgently, setIsUrgently] = useState(false);
   const [date, setDate] = useState<Date>();
 
+  const creatorId = useMemo(() => {
+    return params?.creatorId;
+  }, [params]);
+
   const data = useMemo(() => {
     if (route.name === teamRoute) {
-      return team?.projects;
+      return projects;
     }
     if (route.name === projectRoute) {
-      return project?.tasks;
+      return tasks;
     }
     return teams;
-  }, [teams, team, project, route.name]);
+  }, [teams, projects, tasks, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -72,20 +81,24 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   }, []);
 
   useEffect(() => {
-    team && setCreatorId(team.creator.id);
-  }, [team]);
+    !teamIsLoading && selectedTeamId && fetchTeam(selectedTeamId);
+  }, []);
 
-  const onOpen = useCallback(async (item: ITeam | IProject) => {
+  const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
-      await fetchTeam(item.id);
+      setSelectedTeamId(itemId);
+      await fetchProjects(itemId);
       navigation.navigate(teamRoute, {
-        teamId: item.id,
+        teamId: itemId,
+        creatorId: itemCreatorId ? itemCreatorId : 0,
       });
     }
     if (route.name === teamRoute) {
-      await fetchProject(item.id);
+      await fetchTasks(itemId);
       navigation.navigate(projectRoute, {
-        projectId: item.id,
+        projectId: itemId,
+        creatorId: itemCreatorId ? itemCreatorId : 0,
+        teamId: params.teamId,
       });
     }
   }, []);
@@ -94,8 +107,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     setIsRefreshing(true);
     try {
       route.name === teamsRoute && fetchTeams();
-      route.name === teamRoute && fetchTeam(params.teamId);
-      route.name === projectRoute && fetchProject(params.projectId);
+      route.name === teamRoute && fetchProjects(params.teamId);
+      route.name === projectRoute && fetchTasks(params.projectId);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {
@@ -116,7 +129,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     (
       itemId: number,
       itemText: string,
-      itemResponsible: string | undefined,
+      itemResponsibleEmail: string | undefined,
       itemStatus: TaskStatusType | undefined,
       itemIsUrgently: boolean | undefined,
       itemDate: Date | undefined,
@@ -124,7 +137,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       setId(itemId);
       setChangeIsOpen(true);
       setText(itemText);
-      itemResponsible && setResponsible(itemResponsible);
+      itemResponsibleEmail && setResponsibleEmail(itemResponsibleEmail);
       itemStatus && setStatus(itemStatus);
       itemIsUrgently !== undefined && setIsUrgently(itemIsUrgently);
       itemDate !== undefined && setDate(itemDate);
@@ -132,9 +145,21 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     [],
   );
 
+  const isLoading = useMemo(() => {
+    if (route.name === teamsRoute) {
+      return teamsIsLoading;
+    }
+    if (route.name === teamRoute) {
+      return projectsIsLoading;
+    }
+    if (route.name === projectRoute) {
+      return tasksIsLoading;
+    }
+  }, [teamsIsLoading, projectsIsLoading, tasksIsLoading]);
+
   return (
     <View style={styles.main}>
-      {teamsIsLoading || (route.name === teamRoute && teamIsLoading) ? (
+      {isLoading || (route.name === teamRoute && teamIsLoading) ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
@@ -182,7 +207,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               text={text}
               teamId={route.name === teamRoute && params.teamId}
               projectId={route.name === projectRoute && params.projectId}
-              responsible={responsible}
+              responsibleEmail={responsibleEmail}
               status={status}
               isUrgently={isUrgently}
               date={date}

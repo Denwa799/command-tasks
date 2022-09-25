@@ -1,4 +1,4 @@
-import {SIZES, THEME} from 'constants/theme';
+import {THEME} from 'constants/theme';
 import {StyleSheet} from 'react-native';
 
 export const styles = StyleSheet.create({
@@ -21,17 +21,5 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
-  },
-  checkbox: {
-    marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  date: {
-    fontSize: SIZES.body2,
-    marginTop: 5,
-    marginBottom: 10,
-    marginLeft: 'auto',
-    marginRight: 'auto',
   },
 });

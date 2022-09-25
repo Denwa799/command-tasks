@@ -1,9 +1,13 @@
+import {ITask} from 'models/ITasks';
 import {ReactNode} from 'react';
 
 export interface ITasksContext {
+  tasks: ITask[] | null;
+  tasksIsLoading: boolean;
   createTaskIsLoading: boolean;
   deleteTaskIsLoading: boolean;
   updateTaskIsLoading: boolean;
+  fetchTasks: (projectId: number) => Promise<void>;
   createTask: (
     projectId: number,
     text: string,

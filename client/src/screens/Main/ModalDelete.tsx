@@ -16,9 +16,9 @@ const ModalDelete: FC<IModalDelete> = ({
 }) => {
   const route = useRoute();
 
-  const {fetchTeams, fetchTeam, deleteTeam, deleteTeamIsLoading} = useTeams();
-  const {deleteProject, fetchProject, deleteProjectIsLoading} = useProjects();
-  const {deleteTask, deleteTaskIsLoading} = useTasks();
+  const {fetchTeams, deleteTeam, deleteTeamIsLoading} = useTeams();
+  const {deleteProject, fetchProjects, deleteProjectIsLoading} = useProjects();
+  const {fetchTasks, deleteTask, deleteTaskIsLoading} = useTasks();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -29,10 +29,10 @@ const ModalDelete: FC<IModalDelete> = ({
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await deleteProject(id));
-    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+    route.name === teamRoute && teamId && (await fetchProjects(teamId));
 
     route.name === projectRoute && projectId && (await deleteTask(id));
-    route.name === projectRoute && projectId && (await fetchProject(projectId));
+    route.name === projectRoute && projectId && (await fetchTasks(projectId));
 
     setIsOpen(false);
   }, [id, teamId, projectId]);

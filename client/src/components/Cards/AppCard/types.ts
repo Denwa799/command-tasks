@@ -1,17 +1,18 @@
 import {TaskStatusType} from 'models/ITasks';
+import {IUser} from 'models/IUser';
 
 export interface IAppCard {
   id: number;
   text: string;
   status?: TaskStatusType;
-  responsible?: string;
+  responsible?: IUser;
   item: any;
-  onOpen?: (item: any) => void;
+  onOpen?: (id: number, creatorId: number) => void;
   onDelete?: (id: number) => void;
   onChange?: (
     id: number,
     text: string,
-    responsible: string | undefined,
+    responsibleEmail: string | undefined,
     status: TaskStatusType | undefined,
     isUrgently: boolean | undefined,
     date: Date | undefined,

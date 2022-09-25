@@ -92,7 +92,7 @@ export class TasksService {
         take,
         skip,
         order: {
-          id: 'DESC',
+          id: 'ASC',
         },
       });
       if (tasks) return tasks;

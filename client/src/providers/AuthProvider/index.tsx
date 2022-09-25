@@ -135,8 +135,13 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
         setIsFirstRefresh(false);
         setIsCheck(prev => !prev);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log('Ошибка обновления токена', error);
+      if (error.response.data.statusCode === 401) {
+        logoutHandler();
+        Alert.alert('Авторизуйтесь заново');
+        Alert.alert('Давно не заходили в приложение');
+      }
     } finally {
       setIsFirstRefresh(false);
     }

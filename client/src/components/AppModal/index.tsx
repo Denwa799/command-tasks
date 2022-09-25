@@ -11,6 +11,8 @@ export const AppModal = ({
   style,
   isOpen,
   setIsOpen,
+  wrapperStyle,
+  contentStyle,
 }: AppModalType) => {
   const orientation = useOrientation();
 
@@ -24,7 +26,7 @@ export const AppModal = ({
         <>
           <TouchableOpacity
             onPress={wrapperHandler}
-            style={styles.wrapper}
+            style={[styles.wrapper, wrapperStyle]}
             activeOpacity={1}
           />
           <ScrollView
@@ -33,8 +35,9 @@ export const AppModal = ({
               orientation === 'LANDSCAPE' && styles.scroll,
               style,
             ]}
-            keyboardShouldPersistTaps="handled">
-            <View style={styles.content}>{children}</View>
+            keyboardShouldPersistTaps="handled"
+            nestedScrollEnabled={true}>
+            <View style={[styles.content, contentStyle]}>{children}</View>
           </ScrollView>
         </>
       )}

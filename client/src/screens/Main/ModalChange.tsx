@@ -1,15 +1,8 @@
 import {useRoute} from '@react-navigation/native';
-import {AppAutocompleteField} from 'components/AppAutocompleteField';
-import {AppCheckBox} from 'components/AppCheckBox';
-import {AppDatePicker} from 'components/AppDatePicker';
-import {AppField} from 'components/AppField';
 import {AppModal} from 'components/AppModal';
-import {AppText} from 'components/AppText';
-import {AppTextButton} from 'components/Btns/AppTextButton';
 import {
   doneStatus,
   inProgressStatus,
-  overdueStatus,
   projectRoute,
   teamRoute,
   teamsRoute,
@@ -19,9 +12,11 @@ import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {TouchableOpacity} from 'react-native';
-import {styles} from './styles';
 import {IModalChange} from './types';
+import {TextField} from './TextField';
+import {Dropdown} from './Dropdown';
+import {CheckBox} from './CheckBox';
+import {DatePicker} from './DatePicker';
 
 export const ModalChange: FC<IModalChange> = ({
   isOpen,
@@ -29,19 +24,20 @@ export const ModalChange: FC<IModalChange> = ({
   id,
   text,
   teamId,
-  responsible,
+  responsibleEmail,
   status,
   isUrgently,
   date,
   projectId,
 }) => {
   const route = useRoute();
+  const {team} = useTeams();
 
   const [textValue, setTextValue] = useState('');
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
 
-  const [responsibleValue, setResponsibleValue] = useState('');
+  const [responsiblePress, setResponsiblePress] = useState('');
   const [isResponsibleError, setIsResponsibleError] = useState(false);
   const [dangerResponsibleText, setDangerResponsibleText] =
     useState('Пустое поле');
@@ -58,15 +54,38 @@ export const ModalChange: FC<IModalChange> = ({
     }, []),
   );
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const selectedDate = useMemo(() => {
+    return `${dateValue.getDate()}/${
+      dateValue.getMonth() + 1
+    }/${dateValue.getFullYear()}`;
+  }, [dateValue]);
 
-  const {updateTeam, fetchTeams, fetchTeam, updateTeamIsLoading} = useTeams();
-  const {updateProject, fetchProject, updateProjectIsLoading} = useProjects();
-  const {updateTask, updateTaskIsLoading} = useTasks();
+  const {updateTeam, fetchTeams, updateTeamIsLoading} = useTeams();
+  const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
+  const {fetchTasks, updateTask, updateTaskIsLoading} = useTasks();
+
+  const itemsUsers = useMemo(() => {
+    let filteredUsers;
+    let data;
+    if (team?.users) {
+      filteredUsers = team.users.filter(element =>
+        team.activatedUsers.includes(element.id),
+      );
+      data = filteredUsers.map(element => {
+        return {
+          id: element.id,
+          title: element.name,
+          text: element.email,
+        };
+      });
+    }
+    return data;
+  }, [team]);
 
   useEffect(() => {
     if (isOpen) {
       setTextValue(text);
-      responsible && setResponsibleValue(responsible);
+      responsibleEmail && setResponsiblePress(responsibleEmail);
       status && setStatusValue(status);
       isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
       date && setDateValue(new Date(date));
@@ -74,7 +93,7 @@ export const ModalChange: FC<IModalChange> = ({
     if (!isOpen) {
       setTextValue('');
       setIsTextError(false);
-      setResponsibleValue('');
+      setResponsiblePress('');
       setIsResponsibleError(false);
       setStatusValue(inProgressStatus);
       setIsUrgentlyValue(false);
@@ -86,42 +105,6 @@ export const ModalChange: FC<IModalChange> = ({
     statusValue === doneStatus && setIsDone(true);
     statusValue !== doneStatus && setIsDone(false);
   }, [statusValue]);
-
-  const textHandler = useCallback(
-    (value: string) => {
-      setTextValue(value);
-      setIsTextError(false);
-    },
-    [id, textValue],
-  );
-
-  const responsibleHandler = useCallback(
-    (value: string) => {
-      setResponsibleValue(value);
-      setIsResponsibleError(false);
-    },
-    [responsibleValue],
-  );
-
-  const isUrgentlyHandler = useCallback(() => {
-    setIsUrgentlyValue(value => !value);
-  }, [isUrgentlyValue]);
-
-  const statusHandler = useCallback(() => {
-    if (statusValue === inProgressStatus || statusValue === overdueStatus) {
-      return setStatusValue(doneStatus);
-    }
-    return setStatusValue(inProgressStatus);
-  }, [statusValue]);
-
-  const onDateConfirm = useCallback((newDate: Date) => {
-    setIsPickerOpen(false);
-    setDateValue(newDate);
-  }, []);
-
-  const onDateCancel = useCallback(() => {
-    setIsPickerOpen(false);
-  }, []);
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -142,20 +125,8 @@ export const ModalChange: FC<IModalChange> = ({
     }
 
     if (route.name === projectRoute) {
-      if (
-        !responsibleValue ||
-        responsibleValue.length < 3 ||
-        responsibleValue.length > 50
-      ) {
-        if (responsibleValue.length < 3) {
-          setDangerResponsibleText('Меньше 3 символов');
-        }
-        if (responsibleValue.length > 50) {
-          setDangerResponsibleText('Больше 50 символов');
-        }
-        if (!responsibleValue) {
-          setDangerResponsibleText('Пустое поле');
-        }
+      if (!responsiblePress) {
+        setDangerResponsibleText('Пустое поле');
         return setIsResponsibleError(true);
       }
     }
@@ -164,80 +135,65 @@ export const ModalChange: FC<IModalChange> = ({
     route.name === teamsRoute && (await fetchTeams());
 
     route.name === teamRoute && teamId && (await updateProject(id, textValue));
-    route.name === teamRoute && teamId && (await fetchTeam(teamId));
+    route.name === teamRoute && teamId && (await fetchProjects(teamId));
 
     route.name === projectRoute &&
       projectId &&
       (await updateTask(
         id,
         textValue,
-        responsibleValue,
-        statusValue,
+        responsiblePress,
+        isDone ? doneStatus : inProgressStatus,
         isUrgentlyValue,
         dateValue,
       ));
-    route.name === projectRoute && projectId && (await fetchProject(projectId));
+    route.name === projectRoute && projectId && (await fetchTasks(projectId));
 
     setIsOpen(false);
   }, [
     id,
     textValue,
     teamId,
-    responsibleValue,
+    responsiblePress,
     projectId,
     statusValue,
+    isDone,
     isUrgentlyValue,
     dateValue,
   ]);
 
   return (
     <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
-      <AppField
-        value={textValue}
+      <TextField
+        textValue={textValue}
         placeholder={'Введите текст'}
-        onChange={textHandler}
-        isDanger={isTextError}
         dangerText={dangerText}
+        isDanger={isTextError}
+        setText={setTextValue}
+        setIsTextError={setIsTextError}
       />
       {route.name === projectRoute && (
         <>
-          <AppAutocompleteField
-            data={[]}
-            value={responsibleValue}
-            onChange={() => console.log('value change')}
-            onPress={() => console.log('value press')}
-            placeholder={'Введите ответственного'}
-            isDanger={isResponsibleError}
+          <Dropdown
             dangerText={dangerResponsibleText}
+            placeholder="Выбрать сотрудника"
+            autocompletePress={responsiblePress}
+            isDanger={isResponsibleError}
+            items={itemsUsers}
+            setAutocompletePress={setResponsiblePress}
           />
-          <TouchableOpacity
-            style={styles.checkbox}
-            activeOpacity={1}
-            onPress={isUrgentlyHandler}>
-            <AppCheckBox
-              value={isUrgentlyValue}
-              onValueChange={isUrgentlyHandler}
-            />
-            <AppText>Срочно</AppText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.checkbox}
-            activeOpacity={1}
-            onPress={statusHandler}>
-            <AppCheckBox value={isDone} onValueChange={statusHandler} />
-            <AppText>Выполнено</AppText>
-          </TouchableOpacity>
-          <AppText style={styles.date}>{`${dateValue.getDate()}/${
-            dateValue.getMonth() + 1
-          }/${dateValue.getFullYear()}`}</AppText>
-          <AppTextButton onPress={() => setIsPickerOpen(true)}>
-            Выбрать дату
-          </AppTextButton>
-          <AppDatePicker
+          <CheckBox
+            value={isUrgentlyValue}
+            text={'Срочно'}
+            setStatus={setIsUrgentlyValue}
+          />
+          <CheckBox value={isDone} text={'Выполнено'} setStatus={setIsDone} />
+          <DatePicker
+            selectedDate={selectedDate}
+            isPickerOpen={isPickerOpen}
             date={dateValue}
-            isOpen={isPickerOpen}
-            onConfirm={onDateConfirm}
-            onCancel={onDateCancel}
+            setIsPickerOpen={setIsPickerOpen}
+            setDate={setDateValue}
           />
         </>
       )}
