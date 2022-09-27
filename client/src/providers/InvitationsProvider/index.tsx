@@ -25,7 +25,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
         const response = await GetService(`${invitationsPath}`, tokenBearer);
-        setInvitations(response.data);
+        setInvitations(response.data?.invitations);
       } else {
         throw new Error('Ошибка сессии');
       }

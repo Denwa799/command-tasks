@@ -27,7 +27,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           `${tasksPath}/project/${projectId}`,
           tokenBearer,
         );
-        setTasks(response.data);
+        setTasks(response.data?.tasks);
       } else {
         throw new Error('Ошибка сессии');
       }

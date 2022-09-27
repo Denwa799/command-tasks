@@ -31,7 +31,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
           `${projectsPath}/team/${teamId}`,
           tokenBearer,
         );
-        setProjects(response.data);
+        setProjects(response.data?.projects);
       } else {
         throw new Error('Ошибка сессии');
       }

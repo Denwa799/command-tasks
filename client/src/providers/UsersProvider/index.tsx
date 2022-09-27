@@ -45,7 +45,7 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
           email,
           take: 5,
         });
-        setFoundUsers(response.data);
+        setFoundUsers(response.data?.users);
       } else {
         throw new Error('Ошибка сессии');
       }
