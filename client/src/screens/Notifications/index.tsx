@@ -4,13 +4,12 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
-import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, FlatList, View} from 'react-native';
+import React, {useCallback, useState} from 'react';
+import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {styles} from './styles';
 
 export const NotificationsScreen = () => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(0);
 
@@ -23,17 +22,6 @@ export const NotificationsScreen = () => {
   } = useInvitations();
 
   const {fetchTeams} = useTeams();
-
-  useEffect(() => {
-    setIsRefreshing(true);
-    try {
-      fetchInvitations();
-    } catch {
-      Alert.alert('Ошибка обновления');
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, []);
 
   const onRefresh = useCallback(() => {
     fetchInvitations();
@@ -53,7 +41,7 @@ export const NotificationsScreen = () => {
 
   return (
     <View style={styles.notifications}>
-      {invitationsIsLoading || isRefreshing ? (
+      {invitationsIsLoading ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
@@ -62,7 +50,7 @@ export const NotificationsScreen = () => {
           <FlatList
             data={invitations}
             style={styles.list}
-            refreshing={isRefreshing}
+            refreshing={invitationsIsLoading}
             onRefresh={onRefresh}
             renderItem={({item}) => (
               <AppMessageCard

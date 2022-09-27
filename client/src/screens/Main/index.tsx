@@ -16,10 +16,12 @@ import {AppTitle} from 'components/AppTitle';
 import {useAuth} from 'hooks/useAuth';
 import {AppCard} from 'components/Cards/AppCard';
 import {useTasks} from 'hooks/useTasks';
+import {useInvitations} from 'hooks/useInvitations';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
   const {user} = useAuth();
+  const {fetchInvitations} = useInvitations();
 
   const routeName = useMemo(() => {
     if (route.name === teamRoute) {
@@ -77,7 +79,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       title: routeName,
     });
 
-    route.name === teamsRoute && fetchTeams();
+    if (route.name === teamsRoute) {
+      fetchTeams();
+      fetchInvitations();
+    }
   }, []);
 
   useEffect(() => {

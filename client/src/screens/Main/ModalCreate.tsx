@@ -92,7 +92,6 @@ export const ModalCreate: FC<IModalCreate> = ({
     setAutocompletePress('');
     setIsAutocompleteError(false);
     setEmails([]);
-    setUserEmail('');
     setIsUrgently(false);
     setIsPickerOpen(false);
   }, [isOpen]);
@@ -182,7 +181,6 @@ export const ModalCreate: FC<IModalCreate> = ({
           onPress={setAutocompletePress}
           onDangerText={setDangerAutocompleteText}
           setEmails={setEmails}
-          setUserId={setUserId}
           onError={setIsAutocompleteError}
         />
       )}
