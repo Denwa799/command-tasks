@@ -47,7 +47,7 @@ export class TeamsController {
   }
 
   @ApiOperation({ summary: 'Создание команды' })
-  @ApiResponse({ status: 200, type: 'Команда создана' })
+  @ApiResponse({ status: 200, description: 'Команда создана' })
   @Post()
   create(
     @Body() teamDto: CreateTeamDto,

@@ -21,7 +21,7 @@ const start = async () => {
 
     app.useGlobalPipes(new ValidationPipe());
 
-    await app.listen(PORT, () => console.log(`server started on POST ${PORT}`));
+    await app.listen(PORT, () => console.log(`server started on PORT ${PORT}`));
   } catch (e) {
     console.log(e);
   }

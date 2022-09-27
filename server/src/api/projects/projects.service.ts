@@ -20,67 +20,73 @@ export class ProjectsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async getAllTeamProjects(token: string, id: number, take = 50, skip = 0) {
+  async getAllTeamProjects(
+    token: string,
+    id: number,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; projects: Project[] }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const tasks = await this.projectRepository.find({
-        select: {
-          id: true,
-          name: true,
-          team: {
+      const [projects, projectsCount] =
+        await this.projectRepository.findAndCount({
+          select: {
             id: true,
             name: true,
-            activatedUsers: true,
-            creator: {
-              id: true,
-              name: true,
-              email: true,
-            },
-            users: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-        where: [
-          {
             team: {
-              id: id,
+              id: true,
+              name: true,
+              activatedUsers: true,
               creator: {
-                id: decoded.id,
+                id: true,
+                name: true,
+                email: true,
               },
-            },
-          },
-          {
-            team: {
-              id: id,
               users: {
-                id: decoded.id,
+                id: true,
+                name: true,
+                email: true,
               },
-              activatedUsers: ArrayContains([decoded.id]),
             },
           },
-        ],
-        relations: {
-          team: {
-            users: true,
-            creator: true,
+          where: [
+            {
+              team: {
+                id: id,
+                creator: {
+                  id: decoded.id,
+                },
+              },
+            },
+            {
+              team: {
+                id: id,
+                users: {
+                  id: decoded.id,
+                },
+                activatedUsers: ArrayContains([decoded.id]),
+              },
+            },
+          ],
+          relations: {
+            team: {
+              users: true,
+              creator: true,
+            },
           },
-        },
-        take,
-        skip,
-        order: {
-          id: 'ASC',
-        },
-      });
-      if (tasks) return tasks;
+          take,
+          skip,
+          order: {
+            id: 'ASC',
+          },
+        });
+      if (projects) return { count: projectsCount, projects };
       throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async create(dto: CreateProjectDto, token: string) {
+  async create(dto: CreateProjectDto, token: string): Promise<Project> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamService.getTeamById(dto.teamId, token);
@@ -96,7 +102,7 @@ export class ProjectsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getProjectById(id: number, token: string) {
+  async getProjectById(id: number, token: string): Promise<Project> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const project = await this.projectRepository.findOne({
@@ -200,24 +206,29 @@ export class ProjectsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getAllProjects(take = 50, skip = 0) {
-    const projects = await this.projectRepository.find({
-      select: {
-        id: true,
-        name: true,
-        team: {
+  async getAllProjects(
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; projects: Project[] }> {
+    const [projects, projectsCount] = await this.projectRepository.findAndCount(
+      {
+        select: {
           id: true,
           name: true,
+          team: {
+            id: true,
+            name: true,
+          },
+        },
+        relations: ['team'],
+        take,
+        skip,
+        order: {
+          id: 'ASC',
         },
       },
-      relations: ['team'],
-      take,
-      skip,
-      order: {
-        id: 'ASC',
-      },
-    });
-    if (projects) return projects;
+    );
+    if (projects) return { count: projectsCount, projects };
     throw new HttpException('Проекты не найдены', HttpStatus.NOT_FOUND);
   }
 }

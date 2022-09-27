@@ -22,10 +22,15 @@ export class TasksService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async getAllProjectTasks(token: string, id: number, take = 50, skip = 0) {
+  async getAllProjectTasks(
+    token: string,
+    id: number,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; tasks: Task[] }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const tasks = await this.taskRepository.find({
+      const [tasks, tasksCount] = await this.taskRepository.findAndCount({
         select: {
           id: true,
           text: true,
@@ -95,13 +100,13 @@ export class TasksService {
           id: 'ASC',
         },
       });
-      if (tasks) return tasks;
+      if (tasks) return { count: tasksCount, tasks };
       throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async create(dto: CreateTaskDto, token) {
+  async create(dto: CreateTaskDto, token): Promise<{ id: number }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const project = await this.projectService.getProjectById(
@@ -153,7 +158,18 @@ export class TasksService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async update(id: number, dto: UpdateTaskDto, token) {
+  async update(
+    id: number,
+    dto: UpdateTaskDto,
+    token,
+  ): Promise<{
+    id: number;
+    text: string;
+    status: string;
+    isUrgently: boolean;
+    date: Date;
+    responsible: string;
+  }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const task = await this.taskRepository.findOne({
@@ -210,8 +226,11 @@ export class TasksService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getAllTasks(take = 50, skip = 0) {
-    const tasks = await this.taskRepository.find({
+  async getAllTasks(
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; tasks: Task[] }> {
+    const [tasks, tasksCount] = await this.taskRepository.findAndCount({
       relations: ['project'],
       take,
       skip,
@@ -219,7 +238,7 @@ export class TasksService {
         id: 'DESC',
       },
     });
-    if (tasks) return tasks;
+    if (tasks) return { count: tasksCount, tasks };
     throw new HttpException('Задачи не найдены', HttpStatus.NOT_FOUND);
   }
 }

@@ -10,6 +10,7 @@ import * as bcrypt from 'bcryptjs';
 import { User } from 'src/api/users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Tokens } from './types';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(userDto: LoginUserDto) {
+  async login(userDto: LoginUserDto): Promise<{
+    id: number;
+    email: string;
+    name: string;
+    tokens: Tokens;
+  }> {
     const user = await this.validateUser(userDto);
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
@@ -31,7 +37,12 @@ export class AuthService {
     return response;
   }
 
-  async registration(userDto: CreateUserDto) {
+  async registration(userDto: CreateUserDto): Promise<{
+    id: number;
+    email: string;
+    name: string;
+    tokens: Tokens;
+  }> {
     const candidate = await this.userService.findUserByEmail(userDto.email);
     if (candidate) {
       throw new HttpException(
@@ -59,7 +70,15 @@ export class AuthService {
     await this.userService.addRefreshToken(userId, null);
   }
 
-  async refreshTokens(userId: number, refreshToken: string) {
+  async refreshTokens(
+    userId: number,
+    refreshToken: string,
+  ): Promise<{
+    id: number;
+    email: string;
+    name: string;
+    tokens: Tokens;
+  }> {
     const user = await this.userService.findUserById(userId);
 
     if (user) {
@@ -84,7 +103,7 @@ export class AuthService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  private async generateTokens(user: User) {
+  private async generateTokens(user: User): Promise<Tokens> {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(
         {
@@ -121,7 +140,7 @@ export class AuthService {
     await this.userService.addRefreshToken(userId, hashedToken);
   }
 
-  private async validateUser(userDto: LoginUserDto) {
+  private async validateUser(userDto: LoginUserDto): Promise<User> {
     const user = await this.userService.findUserByEmail(userDto.email);
 
     if (user) {

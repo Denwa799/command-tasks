@@ -13,6 +13,7 @@ import { GetCurrentUser } from '../auth/decorators';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
+import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
 import { InvitationsService } from './invitations.service';
 
@@ -43,6 +44,18 @@ export class InvitationsController {
       reqParam.take,
       reqParam.skip,
     );
+  }
+
+  @ApiOperation({
+    summary: 'Обновление статуса прочитанно для массива приглашений',
+  })
+  @ApiResponse({ status: 200, description: 'Приглашения прочитаны' })
+  @Patch('/read')
+  updateRead(
+    @Body() invitationDto: UpdateReadInvitationDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.invitationsService.updateRead(invitationDto, token);
   }
 
   @ApiOperation({ summary: 'Удаление приглашения по id' })

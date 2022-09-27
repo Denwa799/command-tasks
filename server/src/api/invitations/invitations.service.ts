@@ -6,6 +6,7 @@ import { TeamsService } from '../teams/teams.service';
 import { UsersService } from '../users/users.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
+import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
 
 @Injectable()
@@ -22,7 +23,7 @@ export class InvitationsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async create(dto: CreateInvitationDto, token: string) {
+  async create(dto: CreateInvitationDto, token: string): Promise<Invitation> {
     const decoded = await this.decodeToken(token);
     const user = await this.userService.findUserByEmail(dto.userEmail);
     const team = await this.teamsService.getTeamById(dto.teamId, token);
@@ -44,6 +45,7 @@ export class InvitationsService {
         team,
         user,
         isAccepted: false,
+        isRead: false,
       });
       if (newInvitation) return this.invitationRepository.save(newInvitation);
       throw new HttpException('Приглашение не создано', HttpStatus.BAD_REQUEST);
@@ -51,20 +53,25 @@ export class InvitationsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getAllInvitations(token: string, take = 50, skip = 0) {
+  async getAllInvitations(
+    token: string,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; invitations: Invitation[] }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const invitations = await this.invitationRepository.find({
-        where: {
-          user: { id: decoded.id },
-        },
-        take,
-        skip,
-        order: {
-          id: 'DESC',
-        },
-      });
-      if (invitations) return invitations;
+      const [invitations, invitationsCount] =
+        await this.invitationRepository.findAndCount({
+          where: {
+            user: { id: decoded.id },
+          },
+          take,
+          skip,
+          order: {
+            id: 'DESC',
+          },
+        });
+      if (invitations) return { count: invitationsCount, invitations };
       throw new HttpException('Приглашения не найдены', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
@@ -140,6 +147,39 @@ export class InvitationsService {
           );
           return this.invitationRepository.save(newInvitation);
         }
+      }
+      throw new HttpException(
+        'Ошибка обновления приглашения',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async updateRead(dto: UpdateReadInvitationDto, token): Promise<string> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const invitations = [];
+      for (const item of dto.id) {
+        const invitation = await this.invitationRepository.findOne({
+          where: {
+            id: item,
+            user: {
+              id: decoded.id,
+            },
+          },
+        });
+        invitations.push(invitation);
+      }
+      if (invitations) {
+        for (const item of invitations) {
+          const newInvitation = await this.invitationRepository.merge(item, {
+            isRead: true,
+          });
+          this.invitationRepository.save(newInvitation);
+        }
+
+        return 'Приглашения прочитаны';
       }
       throw new HttpException(
         'Ошибка обновления приглашения',
