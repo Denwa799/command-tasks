@@ -28,10 +28,14 @@ export class TeamsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async getAllUserTeams(token: string, take = 50, skip = 0) {
+  async getAllUserTeams(
+    token: string,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; teams: Team[] }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const teams = await this.teamRepository.find({
+      const [teams, teamsCount] = await this.teamRepository.findAndCount({
         select: {
           id: true,
           name: true,
@@ -53,13 +57,17 @@ export class TeamsService {
           id: 'ASC',
         },
       });
-      if (teams) return teams;
+      if (teams)
+        return {
+          count: teamsCount,
+          teams,
+        };
       throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async create(dto: CreateTeamDto, token: string) {
+  async create(dto: CreateTeamDto, token: string): Promise<string> {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
       const users = [];
@@ -96,7 +104,7 @@ export class TeamsService {
     throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
   }
 
-  async getTeamById(id: number, token: string) {
+  async getTeamById(id: number, token: string): Promise<Team> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamRepository.findOne({
@@ -178,7 +186,7 @@ export class TeamsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async addActivatedUser(id: number, userId: number) {
+  async addActivatedUser(id: number, userId: number): Promise<Team> {
     const team = await this.teamRepository.findOneBy({
       id,
     });
@@ -192,7 +200,7 @@ export class TeamsService {
     throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
   }
 
-  async removeActivatedUser(id: number, userId: number) {
+  async removeActivatedUser(id: number, userId: number): Promise<Team> {
     const team = await this.teamRepository.findOneBy({
       id,
     });
@@ -206,8 +214,11 @@ export class TeamsService {
     throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
   }
 
-  async getAllTeams(take = 50, skip = 0) {
-    const teams = await this.teamRepository.find({
+  async getAllTeams(
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; teams: Team[] }> {
+    const [teams, teamsCount] = await this.teamRepository.findAndCount({
       select: {
         id: true,
         name: true,
@@ -222,7 +233,7 @@ export class TeamsService {
         id: 'ASC',
       },
     });
-    if (teams) return teams;
+    if (teams) return { count: teamsCount, teams };
     throw new HttpException('Команды не найдены', HttpStatus.NOT_FOUND);
   }
 }

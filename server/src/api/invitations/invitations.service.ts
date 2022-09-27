@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ArrayContains, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { TeamsService } from '../teams/teams.service';
 import { UsersService } from '../users/users.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
@@ -23,7 +23,7 @@ export class InvitationsService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async create(dto: CreateInvitationDto, token: string) {
+  async create(dto: CreateInvitationDto, token: string): Promise<Invitation> {
     const decoded = await this.decodeToken(token);
     const user = await this.userService.findUserByEmail(dto.userEmail);
     const team = await this.teamsService.getTeamById(dto.teamId, token);
@@ -53,20 +53,25 @@ export class InvitationsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async getAllInvitations(token: string, take = 50, skip = 0) {
+  async getAllInvitations(
+    token: string,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; invitations: Invitation[] }> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const invitations = await this.invitationRepository.find({
-        where: {
-          user: { id: decoded.id },
-        },
-        take,
-        skip,
-        order: {
-          id: 'DESC',
-        },
-      });
-      if (invitations) return invitations;
+      const [invitations, invitationsCount] =
+        await this.invitationRepository.findAndCount({
+          where: {
+            user: { id: decoded.id },
+          },
+          take,
+          skip,
+          order: {
+            id: 'DESC',
+          },
+        });
+      if (invitations) return { count: invitationsCount, invitations };
       throw new HttpException('Приглашения не найдены', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
@@ -151,7 +156,7 @@ export class InvitationsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
-  async updateRead(dto: UpdateReadInvitationDto, token) {
+  async updateRead(dto: UpdateReadInvitationDto, token): Promise<string> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const invitations = [];

@@ -10,25 +10,28 @@ export class RolesService {
     @InjectRepository(Role) private roleRepository: Repository<Role>,
   ) {}
 
-  async getAllRoles(take = 50, skip = 0) {
-    const roles = await this.roleRepository.find({
+  async getAllRoles(
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; roles: Role[] }> {
+    const [roles, rolesCount] = await this.roleRepository.findAndCount({
       take,
       skip,
       order: {
         id: 'ASC',
       },
     });
-    if (roles) return roles;
+    if (roles) return { count: rolesCount, roles };
     throw new HttpException('Роли не найдены', HttpStatus.NOT_FOUND);
   }
 
-  async createRole(dto: CreateRoleDto) {
+  async createRole(dto: CreateRoleDto): Promise<Role> {
     const role = await this.roleRepository.create({ ...dto });
     if (role) return this.roleRepository.save(role);
     throw new HttpException('Роль не найдена', HttpStatus.NOT_FOUND);
   }
 
-  async getRoleByValue(value: string) {
+  async getRoleByValue(value: string): Promise<Role> {
     const role = await this.roleRepository.findOne({ where: { value: value } });
     if (role) return role;
     throw new HttpException('Роль не найдена', HttpStatus.NOT_FOUND);

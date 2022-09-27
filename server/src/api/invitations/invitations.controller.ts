@@ -49,7 +49,7 @@ export class InvitationsController {
   @ApiOperation({
     summary: 'Обновление статуса прочитанно для массива приглашений',
   })
-  @ApiResponse({ status: 200, type: Invitation })
+  @ApiResponse({ status: 200, description: 'Приглашения прочитаны' })
   @Patch('/read')
   updateRead(
     @Body() invitationDto: UpdateReadInvitationDto,

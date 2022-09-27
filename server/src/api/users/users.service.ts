@@ -22,15 +22,18 @@ export class UsersService {
     return JSON.parse(JSON.stringify(this.jwtService.decode(token)));
   }
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<User> {
     const role = await this.roleService.getRoleByValue('user');
     const user = await this.userRepository.create({ ...dto, roles: [role] });
     if (user) return this.userRepository.save(user);
     throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
 
-  async getAllUsers(take = 50, skip = 0) {
-    const users = await this.userRepository.find({
+  async getAllUsers(
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; users: User[] }> {
+    const [users, usersCount] = await this.userRepository.findAndCount({
       relations: ['roles'],
       take,
       skip,
@@ -38,7 +41,7 @@ export class UsersService {
         id: 'DESC',
       },
     });
-    if (users) return users;
+    if (users) return { count: usersCount, users };
     throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
 
@@ -51,8 +54,12 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async findUsersByEmail(email: string, take = 10, skip = 0): Promise<User[]> {
-    const users = await this.userRepository.find({
+  async findUsersByEmail(
+    email: string,
+    take = 10,
+    skip = 0,
+  ): Promise<{ count: number; users: User[] }> {
+    const [users, usersCount] = await this.userRepository.findAndCount({
       where: { email: Like(`%${email}%`) },
       take,
       skip,
@@ -65,7 +72,7 @@ export class UsersService {
         name: 'ASC',
       },
     });
-    if (users) return users;
+    if (users) return { count: usersCount, users };
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
@@ -78,7 +85,7 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async addRefreshToken(id: number, hashedToken: string | null) {
+  async addRefreshToken(id: number, hashedToken: string | null): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
     });
@@ -99,7 +106,11 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async update(id: number, dto: UpdateUserDto, token: string) {
+  async update(
+    id: number,
+    dto: UpdateUserDto,
+    token: string,
+  ): Promise<{ name: string }> {
     const user = await this.userRepository.findOneBy({ id });
     if (user) {
       const decoded = await this.decodeToken(token);
@@ -120,7 +131,7 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
-  async addRole(dto: AddRoleDto) {
+  async addRole(dto: AddRoleDto): Promise<AddRoleDto> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
       relations: ['roles'],
@@ -137,12 +148,13 @@ export class UsersService {
     );
   }
 
-  async ban(dto: BanUserDto) {
+  async ban(dto: BanUserDto): Promise<string> {
     const user = await this.userRepository.findOneBy({ id: dto.userId });
     if (!user)
       throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
     user.banned = true;
     user.banReason = dto.banReason;
     await this.userRepository.save(user);
+    return `Пользователь с id ${user.id} заблокирован`;
   }
 }
