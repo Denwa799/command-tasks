@@ -79,7 +79,7 @@ export const AuthScreen: FC = () => {
       return setIsPasswordError(true);
     }
 
-    if (!secondPassword || secondPassword.length < 5) {
+    if (isReg && (!secondPassword || secondPassword.length < 5)) {
       setSecondPasswordErrorText('Пароль меньше 5 символов');
       return setIsSecondPasswordError(true);
     }
