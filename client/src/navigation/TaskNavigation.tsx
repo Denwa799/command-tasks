@@ -15,7 +15,7 @@ const Stack = createNativeStackNavigator();
 
 export const TaskNavigation = () => {
   const navigation = useNavigation();
-  const {invitations} = useInvitations();
+  const {invitations, checkedInvitationsId} = useInvitations();
 
   const [isNewNotification, setIsNewNotification] = useState(false);
 
@@ -23,12 +23,12 @@ export const TaskNavigation = () => {
     const newInvitation = invitations?.find(
       invitation => invitation.isRead === false,
     );
-    if (newInvitation) {
+    if (newInvitation && !checkedInvitationsId.includes(newInvitation.id)) {
       setIsNewNotification(true);
     } else {
       setIsNewNotification(false);
     }
-  }, [invitations]);
+  }, [invitations, checkedInvitationsId]);
 
   const notificationsHandler = useCallback(() => {
     navigation.navigate('Notifications');

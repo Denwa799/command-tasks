@@ -4,24 +4,32 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {styles} from './styles';
+import {OnViewableItemsChangedType} from './types';
 
 export const NotificationsScreen = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(0);
+  const [newInvitationsId, setNewInvitationsId] = useState<number[]>([]);
 
   const {
     fetchInvitations,
     updateInvitation,
+    updateInvitationRead,
     invitations,
     invitationsIsLoading,
     updateInvitationIsLoading,
+    updateInvitationReadIsLoading,
   } = useInvitations();
 
   const {fetchTeams} = useTeams();
+
+  useEffect(() => {
+    !updateInvitationReadIsLoading && updateInvitationRead(newInvitationsId);
+  }, [newInvitationsId]);
 
   const onRefresh = useCallback(() => {
     fetchInvitations();
@@ -31,6 +39,20 @@ export const NotificationsScreen = () => {
     setNotificationId(id);
     setDialogIsOpen(true);
   }, []);
+
+  const onViewableItemsChanged = useCallback<OnViewableItemsChangedType>(
+    info => {
+      const filteredInvitations = info.changed.filter(
+        element => element.item.isRead === false,
+      );
+      const newInvitations = [];
+      for (const item of filteredInvitations) {
+        newInvitations.push(item.item.id);
+      }
+      setNewInvitationsId(newInvitations);
+    },
+    [],
+  );
 
   const onAccept = useCallback(async () => {
     await updateInvitation(notificationId, true);
@@ -52,6 +74,7 @@ export const NotificationsScreen = () => {
             style={styles.list}
             refreshing={invitationsIsLoading}
             onRefresh={onRefresh}
+            onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
               <AppMessageCard
                 id={item.id}
