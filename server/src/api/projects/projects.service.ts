@@ -209,7 +209,7 @@ export class ProjectsService {
   async getAllProjects(
     take = 50,
     skip = 0,
-  ): Promise<{ count: number; projects: Projects[] }> {
+  ): Promise<{ count: number; projects: Project[] }> {
     const [projects, projectsCount] = await this.projectRepository.findAndCount(
       {
         select: {
