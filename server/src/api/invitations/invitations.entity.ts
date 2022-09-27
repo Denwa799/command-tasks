@@ -48,6 +48,14 @@ export class Invitation {
   isAccepted: boolean;
 
   @ApiProperty({
+    example: 'true',
+    description: 'Прочитано приглашение или нет',
+  })
+  @Column()
+  @IsBoolean()
+  isRead: boolean;
+
+  @ApiProperty({
     example: '2022-07-04 14:31:42.45068+03',
     description: 'Дата создания',
   })
