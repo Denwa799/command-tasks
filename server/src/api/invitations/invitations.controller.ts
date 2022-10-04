@@ -32,7 +32,7 @@ export class InvitationsController {
     return this.invitationsService.create(invitationDto, token);
   }
 
-  @ApiOperation({ summary: 'Получение всех приглашений' })
+  @ApiOperation({ summary: 'Получение всех приглашений пользователя' })
   @ApiResponse({ status: 200, type: [Invitation] })
   @Get()
   getAll(
@@ -41,6 +41,22 @@ export class InvitationsController {
   ) {
     return this.invitationsService.getAllInvitations(
       token,
+      reqParam.take,
+      reqParam.skip,
+    );
+  }
+
+  @ApiOperation({ summary: 'Получение всех приглашений команды' })
+  @ApiResponse({ status: 200, type: [Invitation] })
+  @Get('team/:id')
+  getAllTeamInvitations(
+    @Query() reqParam: PaginationQueryParamDto,
+    @Param('id') teamId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.invitationsService.getAllTeamInvitations(
+      token,
+      teamId,
       reqParam.take,
       reqParam.skip,
     );

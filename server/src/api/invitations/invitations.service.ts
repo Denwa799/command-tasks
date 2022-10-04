@@ -77,6 +77,60 @@ export class InvitationsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
+  async getAllTeamInvitations(
+    token: string,
+    teamId: number,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; invitations: Invitation[] }> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const [invitations, invitationsCount] =
+        await this.invitationRepository.findAndCount({
+          select: {
+            id: true,
+            message: true,
+            isAccepted: true,
+            isRead: true,
+            team: {
+              id: true,
+              name: true,
+            },
+            user: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          where: [
+            {
+              team: {
+                id: teamId,
+                users: {
+                  id: decoded.id,
+                },
+              },
+            },
+            {
+              team: {
+                id: teamId,
+                creator: decoded.id,
+              },
+            },
+          ],
+          take,
+          skip,
+          order: {
+            id: 'DESC',
+          },
+          relations: ['team', 'user'],
+        });
+      if (invitations) return { count: invitationsCount, invitations };
+      throw new HttpException('Приглашения не найдены', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async delete(id: number, token: string): Promise<Invitation> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
