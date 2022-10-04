@@ -5,35 +5,31 @@ import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useState} from 'react';
-import {Alert, FlatList, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {styles} from './styles';
+import {OnViewableItemsChangedType} from './types';
 
 export const NotificationsScreen = () => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(0);
+  const [newInvitationsId, setNewInvitationsId] = useState<number[]>([]);
 
   const {
     fetchInvitations,
     updateInvitation,
+    updateInvitationRead,
     invitations,
     invitationsIsLoading,
     updateInvitationIsLoading,
+    updateInvitationReadIsLoading,
   } = useInvitations();
 
   const {fetchTeams} = useTeams();
 
   useEffect(() => {
-    setIsRefreshing(true);
-    try {
-      fetchInvitations();
-    } catch {
-      Alert.alert('Ошибка обновления');
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, []);
+    !updateInvitationReadIsLoading && updateInvitationRead(newInvitationsId);
+  }, [newInvitationsId]);
 
   const onRefresh = useCallback(() => {
     fetchInvitations();
@@ -44,6 +40,20 @@ export const NotificationsScreen = () => {
     setDialogIsOpen(true);
   }, []);
 
+  const onViewableItemsChanged = useCallback<OnViewableItemsChangedType>(
+    info => {
+      const filteredInvitations = info.changed.filter(
+        element => element.item.isRead === false,
+      );
+      const newInvitations = [];
+      for (const item of filteredInvitations) {
+        newInvitations.push(item.item.id);
+      }
+      setNewInvitationsId(newInvitations);
+    },
+    [],
+  );
+
   const onAccept = useCallback(async () => {
     await updateInvitation(notificationId, true);
     setDialogIsOpen(false);
@@ -53,7 +63,7 @@ export const NotificationsScreen = () => {
 
   return (
     <View style={styles.notifications}>
-      {invitationsIsLoading || isRefreshing ? (
+      {invitationsIsLoading ? (
         <AppPositionContainer isCenter>
           <AppLoader />
         </AppPositionContainer>
@@ -62,8 +72,9 @@ export const NotificationsScreen = () => {
           <FlatList
             data={invitations}
             style={styles.list}
-            refreshing={isRefreshing}
+            refreshing={invitationsIsLoading}
             onRefresh={onRefresh}
+            onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
               <AppMessageCard
                 id={item.id}

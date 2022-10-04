@@ -17,6 +17,12 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
   const [updateInvitationIsLoading, setUpdateInvitationIsLoading] =
     useState(false);
 
+  const [checkedInvitationsId, setCheckedInvitationsId] = useState<number[]>(
+    [],
+  );
+  const [updateInvitationReadIsLoading, setUpdateInvitationReadIsLoading] =
+    useState(false);
+
   const invitationsPath = `${variables.API_URL}${variables.INVITATIONS}`;
 
   const fetchInvitations = useCallback(async () => {
@@ -25,7 +31,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
         const response = await GetService(`${invitationsPath}`, tokenBearer);
-        setInvitations(response.data);
+        setInvitations(response.data?.invitations);
       } else {
         throw new Error('Ошибка сессии');
       }
@@ -59,15 +65,43 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
     [],
   );
 
+  const updateInvitationRead = useCallback(async (id: number[]) => {
+    setUpdateInvitationReadIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await PatchService(`${invitationsPath}/read`, tokenBearer, {
+          id,
+        });
+        setCheckedInvitationsId(prev => [...prev, ...id]);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setUpdateInvitationReadIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       invitations,
+      checkedInvitationsId,
       invitationsIsLoading,
       updateInvitationIsLoading,
+      updateInvitationReadIsLoading,
       fetchInvitations,
       updateInvitation,
+      updateInvitationRead,
     }),
-    [invitations, invitationsIsLoading, updateInvitationIsLoading],
+    [
+      invitations,
+      checkedInvitationsId,
+      invitationsIsLoading,
+      updateInvitationIsLoading,
+      updateInvitationReadIsLoading,
+    ],
   );
 
   return (

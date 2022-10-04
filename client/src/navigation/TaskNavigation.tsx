@@ -1,19 +1,34 @@
-import React, {useCallback, useMemo} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {THEME} from 'constants/theme';
 import {MainScreen} from 'screens/Main';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import Anticon from 'react-native-vector-icons/AntDesign';
-import {TouchableOpacity} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NotificationsScreen} from 'screens/Notifications';
 import {styles} from './styles';
 import {UsersScreen} from 'screens/Users';
+import {AppNavigationBtn} from 'components/Btns/AppNavigationBtn';
+import {useInvitations} from 'hooks/useInvitations';
 
 const Stack = createNativeStackNavigator();
 
 export const TaskNavigation = () => {
   const navigation = useNavigation();
+  const {invitations, checkedInvitationsId} = useInvitations();
+
+  const [isNewNotification, setIsNewNotification] = useState(false);
+
+  useEffect(() => {
+    const newInvitation = invitations?.find(
+      invitation => invitation.isRead === false,
+    );
+    if (newInvitation && !checkedInvitationsId.includes(newInvitation.id)) {
+      setIsNewNotification(true);
+    } else {
+      setIsNewNotification(false);
+    }
+  }, [invitations, checkedInvitationsId]);
 
   const notificationsHandler = useCallback(() => {
     navigation.navigate('Notifications');
@@ -25,27 +40,24 @@ export const TaskNavigation = () => {
 
   const notificationsButton = useMemo(() => {
     return (
-      <TouchableOpacity
-        activeOpacity={0.3}
+      <AppNavigationBtn
         onPress={notificationsHandler}
-        style={styles.iconRight}>
+        style={styles.iconRight}
+        onNotification={isNewNotification}>
         <Ionicon
           name="notifications-outline"
           size={24}
           color={THEME.TEXT_COLOR}
         />
-      </TouchableOpacity>
+      </AppNavigationBtn>
     );
-  }, []);
+  }, [isNewNotification]);
 
   const usersButton = useMemo(() => {
     return (
-      <TouchableOpacity
-        activeOpacity={0.3}
-        onPress={usersHandler}
-        style={styles.iconRight}>
+      <AppNavigationBtn onPress={usersHandler} style={styles.iconRight}>
         <Anticon name="adduser" size={24} color={THEME.TEXT_COLOR} />
-      </TouchableOpacity>
+      </AppNavigationBtn>
     );
   }, []);
 
