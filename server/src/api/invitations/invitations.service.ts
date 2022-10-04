@@ -114,7 +114,9 @@ export class InvitationsService {
             {
               team: {
                 id: teamId,
-                creator: decoded.id,
+                creator: {
+                  id: decoded.id,
+                },
               },
             },
           ],
@@ -134,11 +136,24 @@ export class InvitationsService {
   async delete(id: number, token: string): Promise<Invitation> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const invitation = await this.invitationRepository.findOneBy({
-        id,
-        user: {
-          id: decoded.id,
-        },
+      const invitation = await this.invitationRepository.findOne({
+        where: [
+          {
+            id,
+            user: {
+              id: decoded.id,
+            },
+          },
+          {
+            id,
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        ],
+        relations: ['team'],
       });
       if (invitation) return this.invitationRepository.remove(invitation);
       throw new HttpException(
