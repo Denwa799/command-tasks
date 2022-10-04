@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { TeamsService } from '../teams/teams.service';
 import { UsersService } from '../users/users.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
+import { RecreateInvitationDto } from './dto/recreate-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
@@ -254,6 +255,80 @@ export class InvitationsService {
         'Ошибка обновления приглашения',
         HttpStatus.NOT_FOUND,
       );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async recreate(
+    id: number,
+    dto: RecreateInvitationDto,
+    token: string,
+  ): Promise<{
+    id: number;
+    message: string;
+    isAccepted: boolean;
+    isRead: boolean;
+    team: {
+      id: number;
+      name: string;
+    };
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  }> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const invitation = await this.invitationRepository.findOne({
+        where: {
+          id: id,
+          team: {
+            id: dto.teamId,
+            creator: {
+              id: decoded.id,
+            },
+          },
+        },
+        relations: ['team', 'user'],
+      });
+
+      if (!invitation)
+        throw new HttpException(
+          'Ошибка пересоздания приглашения',
+          HttpStatus.NOT_FOUND,
+        );
+
+      await this.teamsService.removeActivatedUser(
+        invitation.team.id,
+        invitation.user.id,
+      );
+      const newInvitation = {
+        message: dto.message,
+        team: invitation.team,
+        user: invitation.user,
+        isAccepted: false,
+        isRead: false,
+      };
+      await this.delete(invitation.id, token);
+      const createdInvitation = await this.invitationRepository.save(
+        newInvitation,
+      );
+      return {
+        id: createdInvitation.id,
+        message: createdInvitation.message,
+        isAccepted: createdInvitation.isAccepted,
+        isRead: createdInvitation.isRead,
+        team: {
+          id: createdInvitation.team.id,
+          name: createdInvitation.team.name,
+        },
+        user: {
+          id: createdInvitation.user.id,
+          name: createdInvitation.user.name,
+          email: createdInvitation.user.email,
+        },
+      };
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
