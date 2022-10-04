@@ -5,6 +5,7 @@ export type DialogType = {
   setIsOpen: (value: boolean) => void;
   onAccept: () => void;
   disabled: boolean;
+  isDelete?: boolean;
 };
 
 export type OnViewableItemsChangedType = (info: {

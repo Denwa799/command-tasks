@@ -1,4 +1,4 @@
-import {GetService, PatchService} from 'api';
+import {DeleteService, GetService, PatchService} from 'api';
 import {variables} from 'constants/variables';
 import {IInvitations} from 'models/IInvitations';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
@@ -13,6 +13,9 @@ export const InvitationsContext = createContext<IInvitationsContext>(
 export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
   const [invitations, setInvitations] = useState<IInvitations[] | null>(null);
   const [invitationsIsLoading, setInvitationsIsLoading] = useState(false);
+
+  const [deleteInvitationIsLoading, setDeleteInvitationIsLoading] =
+    useState(false);
 
   const [updateInvitationIsLoading, setUpdateInvitationIsLoading] =
     useState(false);
@@ -40,6 +43,23 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       Alert.alert('Ошибка загрузки списка приглашений');
     } finally {
       setInvitationsIsLoading(false);
+    }
+  }, []);
+
+  const deleteInvitation = useCallback(async (id: number) => {
+    setDeleteInvitationIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await DeleteService(`${invitationsPath}/${id}`, tokenBearer);
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка удаления приглашения');
+    } finally {
+      setDeleteInvitationIsLoading(false);
     }
   }, []);
 
@@ -89,8 +109,10 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       invitations,
       checkedInvitationsId,
       invitationsIsLoading,
+      deleteInvitationIsLoading,
       updateInvitationIsLoading,
       updateInvitationReadIsLoading,
+      deleteInvitation,
       fetchInvitations,
       updateInvitation,
       updateInvitationRead,
@@ -99,6 +121,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       invitations,
       checkedInvitationsId,
       invitationsIsLoading,
+      deleteInvitationIsLoading,
       updateInvitationIsLoading,
       updateInvitationReadIsLoading,
     ],

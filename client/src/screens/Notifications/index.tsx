@@ -14,12 +14,15 @@ export const NotificationsScreen = () => {
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(0);
   const [newInvitationsId, setNewInvitationsId] = useState<number[]>([]);
+  const [isDelete, setIsDelete] = useState(false);
 
   const {
     fetchInvitations,
     updateInvitation,
     updateInvitationRead,
+    deleteInvitation,
     invitations,
+    deleteInvitationIsLoading,
     invitationsIsLoading,
     updateInvitationIsLoading,
     updateInvitationReadIsLoading,
@@ -35,8 +38,15 @@ export const NotificationsScreen = () => {
     fetchInvitations();
   }, []);
 
-  const dialogOpen = useCallback((id: number) => {
+  const onAcceptDialogOpen = useCallback((id: number) => {
     setNotificationId(id);
+    setIsDelete(false);
+    setDialogIsOpen(true);
+  }, []);
+
+  const onDeleteDialogOpen = useCallback((id: number) => {
+    setNotificationId(id);
+    setIsDelete(true);
     setDialogIsOpen(true);
   }, []);
 
@@ -55,11 +65,16 @@ export const NotificationsScreen = () => {
   );
 
   const onAccept = useCallback(async () => {
-    await updateInvitation(notificationId, true);
+    if (isDelete) {
+      await deleteInvitation(notificationId);
+    } else {
+      await updateInvitation(notificationId, true);
+    }
+
     setDialogIsOpen(false);
     fetchInvitations();
     fetchTeams();
-  }, [notificationId]);
+  }, [notificationId, isDelete]);
 
   return (
     <View style={styles.notifications}>
@@ -80,7 +95,9 @@ export const NotificationsScreen = () => {
                 id={item.id}
                 message={item.message}
                 isAccepted={item.isAccepted}
-                onPress={dialogOpen}
+                onPress={onAcceptDialogOpen}
+                onSecondPress={onDeleteDialogOpen}
+                secondBtnText={'Удалить'}
               />
             )}
           />
@@ -93,7 +110,8 @@ export const NotificationsScreen = () => {
             isOpen={dialogIsOpen}
             setIsOpen={setDialogIsOpen}
             onAccept={onAccept}
-            disabled={updateInvitationIsLoading}
+            disabled={updateInvitationIsLoading || deleteInvitationIsLoading}
+            isDelete={isDelete}
           />
         </>
       )}
