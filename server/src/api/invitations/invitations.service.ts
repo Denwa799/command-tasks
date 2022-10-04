@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { TeamsService } from '../teams/teams.service';
 import { UsersService } from '../users/users.service';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
+import { RecreateInvitationDto } from './dto/recreate-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
@@ -77,14 +78,83 @@ export class InvitationsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
+  async getAllTeamInvitations(
+    token: string,
+    teamId: number,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; invitations: Invitation[] }> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const [invitations, invitationsCount] =
+        await this.invitationRepository.findAndCount({
+          select: {
+            id: true,
+            message: true,
+            isAccepted: true,
+            isRead: true,
+            team: {
+              id: true,
+              name: true,
+            },
+            user: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          where: [
+            {
+              team: {
+                id: teamId,
+                users: {
+                  id: decoded.id,
+                },
+              },
+            },
+            {
+              team: {
+                id: teamId,
+                creator: {
+                  id: decoded.id,
+                },
+              },
+            },
+          ],
+          take,
+          skip,
+          order: {
+            id: 'DESC',
+          },
+          relations: ['team', 'user'],
+        });
+      if (invitations) return { count: invitationsCount, invitations };
+      throw new HttpException('Приглашения не найдены', HttpStatus.NOT_FOUND);
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async delete(id: number, token: string): Promise<Invitation> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
-      const invitation = await this.invitationRepository.findOneBy({
-        id,
-        user: {
-          id: decoded.id,
-        },
+      const invitation = await this.invitationRepository.findOne({
+        where: [
+          {
+            id,
+            user: {
+              id: decoded.id,
+            },
+          },
+          {
+            id,
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        ],
+        relations: ['team'],
       });
       if (invitation) return this.invitationRepository.remove(invitation);
       throw new HttpException(
@@ -185,6 +255,80 @@ export class InvitationsService {
         'Ошибка обновления приглашения',
         HttpStatus.NOT_FOUND,
       );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async recreate(
+    id: number,
+    dto: RecreateInvitationDto,
+    token: string,
+  ): Promise<{
+    id: number;
+    message: string;
+    isAccepted: boolean;
+    isRead: boolean;
+    team: {
+      id: number;
+      name: string;
+    };
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    };
+  }> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const invitation = await this.invitationRepository.findOne({
+        where: {
+          id: id,
+          team: {
+            id: dto.teamId,
+            creator: {
+              id: decoded.id,
+            },
+          },
+        },
+        relations: ['team', 'user'],
+      });
+
+      if (!invitation)
+        throw new HttpException(
+          'Ошибка пересоздания приглашения',
+          HttpStatus.NOT_FOUND,
+        );
+
+      await this.teamsService.removeActivatedUser(
+        invitation.team.id,
+        invitation.user.id,
+      );
+      const newInvitation = {
+        message: dto.message,
+        team: invitation.team,
+        user: invitation.user,
+        isAccepted: false,
+        isRead: false,
+      };
+      await this.delete(invitation.id, token);
+      const createdInvitation = await this.invitationRepository.save(
+        newInvitation,
+      );
+      return {
+        id: createdInvitation.id,
+        message: createdInvitation.message,
+        isAccepted: createdInvitation.isAccepted,
+        isRead: createdInvitation.isRead,
+        team: {
+          id: createdInvitation.team.id,
+          name: createdInvitation.team.name,
+        },
+        user: {
+          id: createdInvitation.user.id,
+          name: createdInvitation.user.name,
+          email: createdInvitation.user.email,
+        },
+      };
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }

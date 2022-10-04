@@ -6,12 +6,14 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
+import { RecreateInvitationDto } from './dto/recreate-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
@@ -32,7 +34,7 @@ export class InvitationsController {
     return this.invitationsService.create(invitationDto, token);
   }
 
-  @ApiOperation({ summary: 'Получение всех приглашений' })
+  @ApiOperation({ summary: 'Получение всех приглашений пользователя' })
   @ApiResponse({ status: 200, type: [Invitation] })
   @Get()
   getAll(
@@ -41,6 +43,22 @@ export class InvitationsController {
   ) {
     return this.invitationsService.getAllInvitations(
       token,
+      reqParam.take,
+      reqParam.skip,
+    );
+  }
+
+  @ApiOperation({ summary: 'Получение всех приглашений команды' })
+  @ApiResponse({ status: 200, type: [Invitation] })
+  @Get('team/:id')
+  getAllTeamInvitations(
+    @Query() reqParam: PaginationQueryParamDto,
+    @Param('id') teamId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.invitationsService.getAllTeamInvitations(
+      token,
+      teamId,
       reqParam.take,
       reqParam.skip,
     );
@@ -77,5 +95,16 @@ export class InvitationsController {
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.invitationsService.update(id, invitationDto, token);
+  }
+
+  @ApiOperation({ summary: 'Пересоздание приглашения по id' })
+  @ApiResponse({ status: 200, type: Invitation })
+  @Put(':id')
+  recreate(
+    @Param('id') id: number,
+    @Body() invitationDto: RecreateInvitationDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.invitationsService.recreate(id, invitationDto, token);
   }
 }
