@@ -5,4 +5,5 @@ export interface IAppTextButton {
   containerStyle?: Object;
   isTextCenter?: boolean;
   numberOfLines?: number;
+  isDisabled?: boolean;
 }

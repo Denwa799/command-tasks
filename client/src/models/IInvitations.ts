@@ -3,4 +3,13 @@ export interface IInvitations {
   message: string;
   isAccepted: boolean;
   isRead: boolean;
+  team?: {
+    id: number;
+    name: string;
+  };
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+  };
 }
