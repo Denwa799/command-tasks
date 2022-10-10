@@ -34,7 +34,7 @@ export class UsersService {
     skip = 0,
   ): Promise<{ count: number; users: User[] }> {
     const [users, usersCount] = await this.userRepository.findAndCount({
-      relations: ['roles'],
+      relations: ['roles', 'teams'],
       take,
       skip,
       order: {
@@ -79,7 +79,7 @@ export class UsersService {
   async findUserById(id: number): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id },
-      relations: ['roles'],
+      relations: ['roles', 'teams'],
     });
     if (user) return user;
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
@@ -156,5 +156,19 @@ export class UsersService {
     user.banReason = dto.banReason;
     await this.userRepository.save(user);
     return `Пользователь с id ${user.id} заблокирован`;
+  }
+
+  async removeTeam(teamId, userId) {
+    const user = await this.userRepository.findOne({
+      where: {
+        id: userId,
+      },
+      relations: ['teams'],
+    });
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+    user.teams.filter((id) => id !== teamId);
+    await this.userRepository.save(user);
+    return `Команда с id ${teamId} удалена у пользователя с id ${userId}`;
   }
 }

@@ -86,7 +86,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   }, []);
 
   useEffect(() => {
-    !teamIsLoading && selectedTeamId && fetchTeam(selectedTeamId);
+    !teamIsLoading &&
+      selectedTeamId &&
+      route.name === teamRoute &&
+      fetchTeam(selectedTeamId);
   }, []);
 
   const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {

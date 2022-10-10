@@ -11,4 +11,7 @@ export const styles = StyleSheet.create({
   center: {
     textAlign: 'center',
   },
+  disabled: {
+    color: THEME.SECOND_TEXT_COLOR,
+  },
 });

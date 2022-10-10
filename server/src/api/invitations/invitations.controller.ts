@@ -13,7 +13,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GetCurrentUser } from '../auth/decorators';
 import { CreateInvitationDto } from './dto/create-invitation.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
-import { RecreateInvitationDto } from './dto/recreate-invitation.dto';
 import { UpdateInvitationDto } from './dto/update-invitation.dto';
 import { UpdateReadInvitationDto } from './dto/update-read-invitation.dto';
 import { Invitation } from './invitations.entity';
@@ -102,9 +101,8 @@ export class InvitationsController {
   @Put(':id')
   recreate(
     @Param('id') id: number,
-    @Body() invitationDto: RecreateInvitationDto,
     @GetCurrentUser('accessToken') token: string,
   ) {
-    return this.invitationsService.recreate(id, invitationDto, token);
+    return this.invitationsService.recreate(id, token);
   }
 }

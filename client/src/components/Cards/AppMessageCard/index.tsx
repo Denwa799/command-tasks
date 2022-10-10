@@ -12,11 +12,18 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
   btnText = 'Принять',
   secondBtnText = 'Скрыть',
   onPress,
+  onSecondPress,
   disabled,
 }) => {
-  const btnHandler = useCallback(() => {
+  const buttonHandler = useCallback(() => {
     if (onPress) {
       onPress(id);
+    }
+  }, []);
+
+  const secondButtonHandler = useCallback(() => {
+    if (onSecondPress) {
+      onSecondPress(id);
     }
   }, []);
 
@@ -28,7 +35,7 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
           <View style={styles.btnsContainer}>
             <AppNativeFeedbackBtn
               text={btnText}
-              onPress={btnHandler}
+              onPress={buttonHandler}
               style={styles.btn}
               isCenter
               isMainColor
@@ -36,7 +43,7 @@ export const AppMessageCard: FC<IAppMessageCard> = ({
             />
             <AppNativeFeedbackBtn
               text={secondBtnText}
-              onPress={btnHandler}
+              onPress={secondButtonHandler}
               style={styles.btn}
               isCenter
               isMainColor
