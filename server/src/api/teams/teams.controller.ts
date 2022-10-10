@@ -89,6 +89,17 @@ export class TeamsController {
 
   @ApiOperation({ summary: 'Обновление команды по id' })
   @ApiResponse({ status: 200, type: Team })
+  @Patch('/:id/user/:userId')
+  addUser(
+    @Param('id') id: number,
+    @Param('userId') userId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.addUser(id, userId, token);
+  }
+
+  @ApiOperation({ summary: 'Обновление команды по id' })
+  @ApiResponse({ status: 200, type: Team })
   @Patch(':id')
   update(
     @Param('id') id: number,

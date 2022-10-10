@@ -268,6 +268,50 @@ export class TeamsService {
     throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
   }
 
+  async addUser(id: number, userId: number, token: string): Promise<string> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const team = await this.teamRepository.findOne({
+        where: {
+          id,
+          creator: {
+            id: decoded.id,
+          },
+        },
+        relations: ['users', 'creator'],
+      });
+      const user = await this.userService.findUserById(userId);
+      if (team && user) {
+        const userInTeam = team.users.find((item) => item.id === user.id);
+        if (userInTeam)
+          throw new HttpException(
+            'Ошибка добавления пользователя',
+            HttpStatus.BAD_REQUEST,
+          );
+
+        const users = [...team.users, user];
+        const newTeam = await this.teamRepository.merge(team, {
+          users,
+        });
+        await this.teamRepository.save(newTeam);
+
+        const invitationBody = {
+          message: `Приглашение в команду ${team.name} от ${team.creator.email}`,
+          teamId: team.id,
+          userEmail: user.email,
+        };
+        await this.invitationsService.create(invitationBody, token);
+
+        return 'Пользователь добавлен';
+      }
+      throw new HttpException(
+        'Ошибка добавления пользователя',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async getAllTeams(
     take = 50,
     skip = 0,
