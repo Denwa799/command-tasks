@@ -15,11 +15,13 @@ export const AppUserCard: FC<IAppUserCard> = ({
   isActive = true,
   isBtnVisible = false,
   isCreator = false,
+  isInvitation = false,
+  isDisabled = false,
   style,
 }) => {
   const btnHandler = useCallback(() => {
-    onPress(id);
-  }, [id]);
+    onPress(id, email);
+  }, [id, email]);
 
   return (
     <View style={[styles.card, style]}>
@@ -27,13 +29,19 @@ export const AppUserCard: FC<IAppUserCard> = ({
         <View style={styles.textContainer}>
           <AppText style={styles.email}>{email}</AppText>
           <AppText style={styles.name}>{name}</AppText>
-          {!isActive && <AppText>Приглашение отправлено</AppText>}
+          {!isActive && isInvitation && (
+            <AppText>Приглашение отправлено</AppText>
+          )}
+          {!isActive && !isInvitation && (
+            <AppText>Приглашение отклонено</AppText>
+          )}
         </View>
         {!isActive && isBtnVisible && (
           <AppTextButton
             onPress={btnHandler}
             isTextCenter
-            style={styles.sendBtn}>
+            style={styles.sendBtn}
+            isDisabled={isDisabled}>
             Отправить{'\n'}повторно
           </AppTextButton>
         )}

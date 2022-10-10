@@ -77,3 +77,15 @@ export const PatchService = <T>(
     },
   });
 };
+
+export const PutService = <T>(
+  api: string,
+  tokenBearer: string = '',
+  data?: T,
+) => {
+  return axios.put(api, data, {
+    headers: {
+      Authorization: `Bearer ${tokenBearer}`,
+    },
+  });
+};
