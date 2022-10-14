@@ -163,6 +163,60 @@ export class TeamsService {
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
+  async removeUser(id: number, userId: number, token: string): Promise<string> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const team = await this.teamRepository.findOne({
+        where: {
+          id,
+          creator: {
+            id: decoded.id,
+          },
+        },
+        relations: {
+          users: true,
+          invitations: {
+            user: true,
+          },
+        },
+      });
+      const user = await this.userService.findUserById(userId);
+      if (team && user) {
+        const userInTeam = team.users.find((item) => item.id === user.id);
+        const invitation = team.invitations.find(
+          (item) => item.user.id === user.id,
+        );
+        if (!userInTeam)
+          throw new HttpException(
+            'Ошибка удаления пользователя в команде',
+            HttpStatus.NOT_FOUND,
+          );
+
+        const users = team.users.filter((item) => item.id != userId);
+        const activatedUsers = team.activatedUsers.filter(
+          (itemId) => itemId != userId,
+        );
+
+        await this.userService.removeTeam(team.id, user.id);
+        await this.invitationsService.delete(invitation.id, token);
+
+        const newTeam = await this.teamRepository.preload({
+          id: team.id,
+          activatedUsers,
+          users,
+        });
+
+        this.teamRepository.save(newTeam);
+        return 'Пользователь удален из команды';
+      }
+      throw new HttpException(
+        'Ошибка удаления пользователя в команде',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
   async update(id: number, dto: UpdateTeamDto, token): Promise<Team> {
     const decoded = await this.decodeToken(token);
     if (decoded) {
@@ -212,6 +266,50 @@ export class TeamsService {
       return this.teamRepository.save(newTeam);
     }
     throw new HttpException('Ошибка обновления команды', HttpStatus.NOT_FOUND);
+  }
+
+  async addUser(id: number, userId: number, token: string): Promise<string> {
+    const decoded = await this.decodeToken(token);
+    if (decoded) {
+      const team = await this.teamRepository.findOne({
+        where: {
+          id,
+          creator: {
+            id: decoded.id,
+          },
+        },
+        relations: ['users', 'creator'],
+      });
+      const user = await this.userService.findUserById(userId);
+      if (team && user) {
+        const userInTeam = team.users.find((item) => item.id === user.id);
+        if (userInTeam)
+          throw new HttpException(
+            'Ошибка добавления пользователя',
+            HttpStatus.BAD_REQUEST,
+          );
+
+        const users = [...team.users, user];
+        const newTeam = await this.teamRepository.merge(team, {
+          users,
+        });
+        await this.teamRepository.save(newTeam);
+
+        const invitationBody = {
+          message: `Приглашение в команду ${team.name} от ${team.creator.email}`,
+          teamId: team.id,
+          userEmail: user.email,
+        };
+        await this.invitationsService.create(invitationBody, token);
+
+        return 'Пользователь добавлен';
+      }
+      throw new HttpException(
+        'Ошибка добавления пользователя',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
   }
 
   async getAllTeams(

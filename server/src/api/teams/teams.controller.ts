@@ -66,6 +66,17 @@ export class TeamsController {
     return this.teamsService.getTeamById(id, token);
   }
 
+  @ApiOperation({ summary: 'Удаление пользователя из команды по id' })
+  @ApiResponse({ status: 200, type: Team })
+  @Delete('/:id/users/:userId')
+  removeUser(
+    @Param('id') id: number,
+    @Param('userId') userId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.removeUser(id, userId, token);
+  }
+
   @ApiOperation({ summary: 'Удаление команды по id' })
   @ApiResponse({ status: 200, type: Team })
   @Delete(':id')
@@ -74,6 +85,17 @@ export class TeamsController {
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.teamsService.delete(id, token);
+  }
+
+  @ApiOperation({ summary: 'Обновление команды по id' })
+  @ApiResponse({ status: 200, type: Team })
+  @Patch('/:id/user/:userId')
+  addUser(
+    @Param('id') id: number,
+    @Param('userId') userId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.teamsService.addUser(id, userId, token);
   }
 
   @ApiOperation({ summary: 'Обновление команды по id' })
