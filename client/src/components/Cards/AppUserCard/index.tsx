@@ -11,17 +11,22 @@ export const AppUserCard: FC<IAppUserCard> = ({
   name,
   email,
   btnText,
-  onPress,
   isActive = true,
   isBtnVisible = false,
   isCreator = false,
   isInvitation = false,
   isDisabled = false,
   style,
+  onPress,
+  onButtonTextPress,
 }) => {
-  const btnHandler = useCallback(() => {
+  const onPressHandler = useCallback(() => {
     onPress(id, email);
   }, [id, email]);
+
+  const onButtonTextPressHandler = useCallback(() => {
+    onButtonTextPress(id);
+  }, [id]);
 
   return (
     <View style={[styles.card, style]}>
@@ -38,7 +43,7 @@ export const AppUserCard: FC<IAppUserCard> = ({
         </View>
         {!isActive && isBtnVisible && (
           <AppTextButton
-            onPress={btnHandler}
+            onPress={onPressHandler}
             isTextCenter
             style={styles.sendBtn}
             isDisabled={isDisabled}>
@@ -46,7 +51,9 @@ export const AppUserCard: FC<IAppUserCard> = ({
           </AppTextButton>
         )}
         {isBtnVisible && !isCreator && (
-          <AppTextButton onPress={btnHandler}>{btnText}</AppTextButton>
+          <AppTextButton onPress={onButtonTextPressHandler}>
+            {btnText}
+          </AppTextButton>
         )}
       </AppContainer>
     </View>

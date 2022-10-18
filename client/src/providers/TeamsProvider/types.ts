@@ -10,12 +10,14 @@ export interface ITeamsContext {
   createTeamIsLoading: boolean;
   deleteTeamIsLoading: boolean;
   updateTeamIsLoading: boolean;
+  deleteUserInTeamIsLoading: boolean;
   fetchTeams: () => Promise<void>;
   fetchTeam: (id: number) => Promise<void>;
   createTeam: (name: string, creator: number, users: string[]) => Promise<void>;
   deleteTeam: (id: number) => Promise<void>;
   updateTeam: (id: number, name: string) => Promise<void>;
   setSelectedTeamId: (value: number) => void;
+  deleteUserInTeam: (userId: number, teamId: number) => Promise<void>;
 }
 
 export interface ITeamsProvider {

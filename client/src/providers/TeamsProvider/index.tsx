@@ -18,6 +18,8 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [createTeamIsLoading, setCreateTeamIsLoading] = useState(false);
   const [deleteTeamIsLoading, setDeleteTeamIsLoading] = useState(false);
   const [updateTeamIsLoading, setUpdateTeamIsLoading] = useState(false);
+  const [deleteUserInTeamIsLoading, setDeleteUserInTeamIsLoading] =
+    useState(false);
 
   const teamsPath = `${variables.API_URL}${variables.TEAMS}`;
 
@@ -117,6 +119,29 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     }
   }, []);
 
+  const deleteUserInTeam = useCallback(
+    async (userId: number, teamId: number) => {
+      setDeleteUserInTeamIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          await DeleteService(
+            `${teamsPath}/${teamId}/users/${userId}`,
+            tokenBearer,
+          );
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка удаления пользователя');
+      } finally {
+        setDeleteUserInTeamIsLoading(false);
+      }
+    },
+    [],
+  );
+
   const value = useMemo(
     () => ({
       teams,
@@ -127,12 +152,14 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       createTeamIsLoading,
       deleteTeamIsLoading,
       updateTeamIsLoading,
+      deleteUserInTeamIsLoading,
       fetchTeams,
       fetchTeam,
       createTeam,
       deleteTeam,
       updateTeam,
       setSelectedTeamId,
+      deleteUserInTeam,
     }),
     [
       teams,
@@ -143,6 +170,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       createTeamIsLoading,
       deleteTeamIsLoading,
       updateTeamIsLoading,
+      deleteUserInTeamIsLoading,
     ],
   );
 

@@ -7,7 +7,8 @@ export interface IAppUserCard {
   isBtnVisible?: boolean;
   isCreator?: boolean;
   isInvitation?: boolean;
-  onPress: (id: number, email: string) => void;
-  style?: Object;
   isDisabled?: boolean;
+  style?: Object;
+  onPress: (id: number, email: string) => void;
+  onButtonTextPress: (id: number) => void;
 }
