@@ -17,9 +17,10 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [teamIsLoading, setTeamIsLoading] = useState(false);
   const [createTeamIsLoading, setCreateTeamIsLoading] = useState(false);
   const [deleteTeamIsLoading, setDeleteTeamIsLoading] = useState(false);
-  const [updateTeamIsLoading, setUpdateTeamIsLoading] = useState(false);
   const [deleteUserInTeamIsLoading, setDeleteUserInTeamIsLoading] =
     useState(false);
+  const [updateTeamIsLoading, setUpdateTeamIsLoading] = useState(false);
+  const [addUserInTeamIsLoading, setAddUserInTeamIsLoading] = useState(false);
 
   const teamsPath = `${variables.API_URL}${variables.TEAMS}`;
 
@@ -100,25 +101,6 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     }
   }, []);
 
-  const updateTeam = useCallback(async (id: number, name: string) => {
-    setUpdateTeamIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        await PatchService(`${teamsPath}/${id}`, tokenBearer, {
-          name,
-        });
-      } else {
-        throw new Error('Ошибка сессии');
-      }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления команды');
-    } finally {
-      setUpdateTeamIsLoading(false);
-    }
-  }, []);
-
   const deleteUserInTeam = useCallback(
     async (userId: number, teamId: number) => {
       setDeleteUserInTeamIsLoading(true);
@@ -142,6 +124,46 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     [],
   );
 
+  const updateTeam = useCallback(async (id: number, name: string) => {
+    setUpdateTeamIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await PatchService(`${teamsPath}/${id}`, tokenBearer, {
+          name,
+        });
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка обновления команды');
+    } finally {
+      setUpdateTeamIsLoading(false);
+    }
+  }, []);
+
+  const addUserInTeam = useCallback(async (userId: number, teamId: number) => {
+    setAddUserInTeamIsLoading(true);
+    try {
+      const tokenBearer = await getAccessToken();
+      if (tokenBearer) {
+        await PatchService(
+          `${teamsPath}/${teamId}/user/${userId}`,
+          tokenBearer,
+          {},
+        );
+      } else {
+        throw new Error('Ошибка сессии');
+      }
+    } catch (error) {
+      console.log(error);
+      Alert.alert('Ошибка добавления пользователя');
+    } finally {
+      setAddUserInTeamIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       teams,
@@ -152,6 +174,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       createTeamIsLoading,
       deleteTeamIsLoading,
       updateTeamIsLoading,
+      addUserInTeamIsLoading,
       deleteUserInTeamIsLoading,
       fetchTeams,
       fetchTeam,
@@ -160,6 +183,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       updateTeam,
       setSelectedTeamId,
       deleteUserInTeam,
+      addUserInTeam,
     }),
     [
       teams,
@@ -170,6 +194,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       createTeamIsLoading,
       deleteTeamIsLoading,
       updateTeamIsLoading,
+      addUserInTeamIsLoading,
       deleteUserInTeamIsLoading,
     ],
   );

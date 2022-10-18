@@ -1,6 +1,7 @@
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
+import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppUserCard} from 'components/Cards/AppUserCard';
 import {useAuth} from 'hooks/useAuth';
 import {useInvitations} from 'hooks/useInvitations';
@@ -8,6 +9,7 @@ import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
+import {ModalCreate} from './ModalCreate';
 import {styles} from './styles';
 
 export const UsersScreen = () => {
@@ -40,6 +42,7 @@ export const UsersScreen = () => {
   const [disabledButtonsId, setDisabledButtonsId] = useState<number[]>([]);
 
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const data = useMemo(() => {
     let users;
@@ -120,8 +123,9 @@ export const UsersScreen = () => {
     [userId],
   );
 
-  console.log(userId);
-  console.log(teamId);
+  const onModalOpen = useCallback(() => {
+    setModalIsOpen(true);
+  }, [modalIsOpen]);
 
   const onDelete = useCallback(async () => {
     if (userId && teamId) {
@@ -164,12 +168,23 @@ export const UsersScreen = () => {
               />
             )}
           />
-          <Dialog
-            isOpen={dialogIsOpen}
-            setIsOpen={setDialogIsOpen}
-            onDelete={onDelete}
-            disabled={deleteUserInTeamIsLoading}
-          />
+          {team && Object.keys(team).length > 0 && (
+            <>
+              <AppIconButton onPress={onModalOpen} />
+              <Dialog
+                isOpen={dialogIsOpen}
+                setIsOpen={setDialogIsOpen}
+                onDelete={onDelete}
+                disabled={deleteUserInTeamIsLoading}
+              />
+              <ModalCreate
+                teamId={team.id}
+                isOpen={modalIsOpen}
+                usersInTeam={team.users}
+                setIsOpen={setModalIsOpen}
+              />
+            </>
+          )}
           {!team ||
             (Object.keys(team).length === 0 && (
               <AppTitle level="2" style={styles.messageCenter}>

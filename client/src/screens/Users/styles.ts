@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
   list: {
-    height: '100%',
+    height: '95%',
+    flexGrow: 0,
   },
   messageCenter: {
     position: 'absolute',
