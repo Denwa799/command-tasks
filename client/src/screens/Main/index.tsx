@@ -163,7 +163,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     if (route.name === projectRoute) {
       return tasksIsLoading;
     }
-  }, [teamsIsLoading, projectsIsLoading, tasksIsLoading]);
+  }, [teamsIsLoading, projectsIsLoading, tasksIsLoading, route.name]);
 
   return (
     <View style={styles.main}>
