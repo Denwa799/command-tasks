@@ -3,10 +3,15 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
-import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {
+  projectRoute,
+  takeNumber,
+  teamRoute,
+  teamsRoute,
+} from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {TaskStatusType} from 'models/ITasks';
+import {ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, FlatList, View} from 'react-native';
 import {Modals} from './Modals';
@@ -38,15 +43,25 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const {
     teams,
+    teamsCount,
+    loadedMoreTeams,
     teamsIsLoading,
+    moreTeamsIsLoading,
     teamIsLoading,
     fetchTeams,
+    fetchMoreTeams,
+    cleanMoreTeams,
     setSelectedTeamId,
     fetchTeam,
     selectedTeamId,
   } = useTeams();
   const {projects, projectsIsLoading, fetchProjects} = useProjects();
   const {tasks, fetchTasks, tasksIsLoading} = useTasks();
+
+  const [fetchSkip, setFetchSkip] = useState(takeNumber);
+
+  const [dataTeams, setDataTeams] = useState<ITeam[]>([]);
+  const [isFirstFetch, setIsFirstFetch] = useState(true);
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -71,8 +86,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     if (route.name === projectRoute) {
       return tasks;
     }
-    return teams;
-  }, [teams, projects, tasks, route.name]);
+    return dataTeams;
+  }, [dataTeams, projects, tasks, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -80,8 +95,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     });
 
     if (route.name === teamsRoute) {
-      fetchTeams();
       fetchInvitations();
+      fetchTeams();
     }
   }, []);
 
@@ -91,6 +106,20 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       route.name === teamRoute &&
       fetchTeam(selectedTeamId);
   }, []);
+
+  useEffect(() => {
+    if (isFirstFetch && teams) {
+      setDataTeams(teams);
+      setIsFirstFetch(false);
+    }
+  }, [teams, isFirstFetch]);
+
+  useEffect(() => {
+    if (loadedMoreTeams.length > 0) {
+      setDataTeams(prev => [...prev, ...loadedMoreTeams]);
+      cleanMoreTeams();
+    }
+  }, [loadedMoreTeams]);
 
   const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
@@ -111,10 +140,14 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     }
   }, []);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      route.name === teamsRoute && fetchTeams();
+      if (route.name === teamsRoute) {
+        await fetchTeams();
+        teams && setDataTeams(teams);
+        setFetchSkip(takeNumber);
+      }
       route.name === teamRoute && fetchProjects(params.teamId);
       route.name === projectRoute && fetchTasks(params.projectId);
     } catch {
@@ -122,7 +155,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     } finally {
       setIsRefreshing(false);
     }
-  }, [params]);
+  }, [params, teams]);
 
   const onAdd = useCallback(() => {
     setCreateIsOpen(true);
@@ -153,6 +186,15 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     [],
   );
 
+  const onLoadMore = useCallback(async () => {
+    if (route.name === teamsRoute) {
+      if (teams && teams.length > 1 && fetchSkip < teamsCount) {
+        setFetchSkip(prev => (prev = prev + takeNumber));
+        await fetchMoreTeams(fetchSkip, takeNumber);
+      }
+    }
+  }, [teams, fetchSkip, route.name]);
+
   const isLoading = useMemo(() => {
     if (route.name === teamsRoute) {
       return teamsIsLoading;
@@ -177,7 +219,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             <FlatList
               data={data}
               style={styles.list}
-              refreshing={isRefreshing}
+              refreshing={isRefreshing || moreTeamsIsLoading}
               onRefresh={onRefresh}
               renderItem={({item}) => (
                 <AppCard
@@ -195,6 +237,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
                   creatorId={creatorId}
                 />
               )}
+              onEndReached={onLoadMore}
+              onEndReachedThreshold={0.1}
             />
             {(!data || data.length === 0) && (
               <AppTitle level="2" style={styles.messageCenter}>

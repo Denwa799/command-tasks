@@ -131,23 +131,27 @@ export const ModalChange: FC<IModalChange> = ({
       }
     }
 
-    route.name === teamsRoute && (await updateTeam(id, textValue));
-    route.name === teamsRoute && (await fetchTeams());
+    if (route.name === teamsRoute) {
+      await updateTeam(id, textValue);
+      await fetchTeams();
+    }
 
-    route.name === teamRoute && teamId && (await updateProject(id, textValue));
-    route.name === teamRoute && teamId && (await fetchProjects(teamId));
+    if (route.name === teamRoute && teamId) {
+      await updateProject(id, textValue);
+      await fetchProjects(teamId);
+    }
 
-    route.name === projectRoute &&
-      projectId &&
-      (await updateTask(
+    if (route.name === projectRoute && projectId) {
+      await updateTask(
         id,
         textValue,
         responsiblePress,
         isDone ? doneStatus : inProgressStatus,
         isUrgentlyValue,
         dateValue,
-      ));
-    route.name === projectRoute && projectId && (await fetchTasks(projectId));
+      );
+      await fetchTasks(projectId);
+    }
 
     setIsOpen(false);
   }, [

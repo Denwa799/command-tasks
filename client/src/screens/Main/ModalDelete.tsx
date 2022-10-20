@@ -25,14 +25,20 @@ const ModalDelete: FC<IModalDelete> = ({
   }, []);
 
   const onDelete = useCallback(async () => {
-    route.name === teamsRoute && (await deleteTeam(id));
-    route.name === teamsRoute && (await fetchTeams());
+    if (route.name === teamsRoute) {
+      await deleteTeam(id);
+      await fetchTeams();
+    }
 
-    route.name === teamRoute && teamId && (await deleteProject(id));
-    route.name === teamRoute && teamId && (await fetchProjects(teamId));
+    if (route.name === teamRoute && teamId) {
+      await deleteProject(id);
+      await fetchProjects(teamId);
+    }
 
-    route.name === projectRoute && projectId && (await deleteTask(id));
-    route.name === projectRoute && projectId && (await fetchTasks(projectId));
+    if (route.name === projectRoute && projectId) {
+      await deleteTask(id);
+      await fetchTasks(projectId);
+    }
 
     setIsOpen(false);
   }, [id, teamId, projectId]);

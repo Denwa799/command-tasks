@@ -128,23 +128,27 @@ export const ModalCreate: FC<IModalCreate> = ({
       }
     }
 
-    route.name === teamsRoute && (await createTeam(text, userId, emails));
-    route.name === teamsRoute && (await fetchTeams());
+    if (route.name === teamsRoute) {
+      await createTeam(text, userId, emails);
+      await fetchTeams();
+    }
 
-    route.name === teamRoute && teamId && (await createProject(teamId, text));
-    route.name === teamRoute && teamId && (await fetchProjects(teamId));
+    if (route.name === teamRoute && teamId) {
+      await createProject(teamId, text);
+      await fetchProjects(teamId);
+    }
 
-    route.name === projectRoute &&
-      projectId &&
-      (await createTask(
+    if (route.name === projectRoute && projectId) {
+      await createTask(
         projectId,
         text,
         autocompletePress,
         'inProgress',
         isUrgently,
         date,
-      ));
-    route.name === projectRoute && projectId && (await fetchTasks(projectId));
+      );
+      await fetchTasks(projectId);
+    }
 
     setIsOpen(false);
   }, [

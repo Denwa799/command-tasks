@@ -1,5 +1,5 @@
 import {DeleteService, GetService, PatchService, PostService} from 'api';
-import {variables} from 'constants/variables';
+import {takeNumber, variables} from 'constants/variables';
 import {ITeam} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
@@ -10,10 +10,14 @@ export const TeamsContext = createContext<ITeamsContext>({} as ITeamsContext);
 
 export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [teams, setTeams] = useState<ITeam[] | null>(null);
+  const [loadedMoreTeams, setLoadedMoreTeams] = useState<ITeam[]>([]);
+  const [teamsCount, setTeamsCount] = useState(0);
+
   const [team, setTeam] = useState<ITeam | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState(0);
 
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
+  const [moreTeamsIsLoading, setMoreTeamsIsLoading] = useState(false);
   const [teamIsLoading, setTeamIsLoading] = useState(false);
   const [createTeamIsLoading, setCreateTeamIsLoading] = useState(false);
   const [deleteTeamIsLoading, setDeleteTeamIsLoading] = useState(false);
@@ -24,22 +28,58 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
 
   const teamsPath = `${variables.API_URL}${variables.TEAMS}`;
 
-  const fetchTeams = useCallback(async () => {
-    setTeamsIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        const response = await GetService(`${teamsPath}`, tokenBearer);
-        setTeams(response.data?.teams);
-      } else {
-        throw new Error('Ошибка сессии');
+  const fetchTeams = useCallback(
+    async (skip: number = 0, take: number = takeNumber) => {
+      setTeamsIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(`${teamsPath}`, tokenBearer, {
+            skip,
+            take,
+          });
+          setTeams(response.data?.teams);
+          setTeamsCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка команд');
+      } finally {
+        setTeamsIsLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка загрузки списка команд');
-    } finally {
-      setTeamsIsLoading(false);
-    }
+    },
+    [],
+  );
+
+  const fetchMoreTeams = useCallback(
+    async (skip: number = 0, take: number = takeNumber) => {
+      setMoreTeamsIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(`${teamsPath}`, tokenBearer, {
+            skip,
+            take,
+          });
+          setLoadedMoreTeams(response.data?.teams);
+          setTeamsCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка команд');
+      } finally {
+        setMoreTeamsIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  const cleanMoreTeams = useCallback(() => {
+    setLoadedMoreTeams([]);
   }, []);
 
   const fetchTeam = useCallback(async (id: number) => {
@@ -167,9 +207,12 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       teams,
+      teamsCount,
+      loadedMoreTeams,
       team,
       selectedTeamId,
       teamsIsLoading,
+      moreTeamsIsLoading,
       teamIsLoading,
       createTeamIsLoading,
       deleteTeamIsLoading,
@@ -177,6 +220,8 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       addUserInTeamIsLoading,
       deleteUserInTeamIsLoading,
       fetchTeams,
+      fetchMoreTeams,
+      cleanMoreTeams,
       fetchTeam,
       createTeam,
       deleteTeam,
@@ -187,7 +232,10 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     }),
     [
       teams,
+      teamsCount,
+      loadedMoreTeams,
       teamsIsLoading,
+      moreTeamsIsLoading,
       team,
       selectedTeamId,
       teamIsLoading,
