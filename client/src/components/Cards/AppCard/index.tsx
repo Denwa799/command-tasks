@@ -19,17 +19,17 @@ const colorScheme = Appearance.getColorScheme();
 
 export const AppCard: FC<IAppCard> = ({
   id,
+  creatorId,
   text,
+  isColors = false,
+  isUrgently = false,
+  date,
   status,
   responsible,
   item,
   onOpen,
   onDelete,
   onChange,
-  isColors = false,
-  isUrgently = false,
-  date,
-  creatorId,
 }) => {
   const {user} = useAuth();
 
@@ -80,6 +80,16 @@ export const AppCard: FC<IAppCard> = ({
     }
     return colorScheme === 'dark' ? THEME.TEXT_COLOR : THEME.SECOND_COLOR;
   }, [colorScheme, isColors, currentStatus, isUrgently]);
+
+  const selectedDate = useMemo(() => {
+    if (date) {
+      const correctDate = new Date(date);
+      return `${correctDate.getDate()}-${
+        correctDate.getMonth() + 1
+      }-${correctDate.getFullYear()}`;
+    }
+    return null;
+  }, [date]);
 
   useEffect(() => {
     if (
@@ -132,7 +142,10 @@ export const AppCard: FC<IAppCard> = ({
           onPress={openHandler}>
           <Text style={textStyles}>{text}</Text>
           {responsible && (
-            <Text style={responsibleStyles}>{responsible.name}</Text>
+            <>
+              <Text style={responsibleStyles}>{responsible.name}</Text>
+              <Text style={responsibleStyles}>{selectedDate}</Text>
+            </>
           )}
         </TouchableOpacity>
         {isAccess && (
