@@ -31,7 +31,11 @@ export const ModalChange: FC<IModalChange> = ({
   projectId,
 }) => {
   const route = useRoute();
-  const {team} = useTeams();
+  const {team, updateTeamIsLoading, updateTeam, fetchTeams} = useTeams();
+  const {updateProjectIsLoading, fetchProjects, updateProject} = useProjects();
+  const {updateTaskIsLoading, fetchTasks, updateTask} = useTasks();
+
+  const [isWrapperDisabled, setIsWrapperDisabled] = useState(false);
 
   const [textValue, setTextValue] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -59,10 +63,6 @@ export const ModalChange: FC<IModalChange> = ({
       dateValue.getMonth() + 1
     }/${dateValue.getFullYear()}`;
   }, [dateValue]);
-
-  const {updateTeam, fetchTeams, updateTeamIsLoading} = useTeams();
-  const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
-  const {fetchTasks, updateTask, updateTaskIsLoading} = useTasks();
 
   const itemsUsers = useMemo(() => {
     let filteredUsers;
@@ -163,7 +163,10 @@ export const ModalChange: FC<IModalChange> = ({
   ]);
 
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
+    <AppModal
+      isOpen={isOpen}
+      isWrapperDisabled={isWrapperDisabled}
+      setIsOpen={setIsOpen}>
       <TextField
         textValue={textValue}
         placeholder={'Введите текст'}
@@ -181,6 +184,7 @@ export const ModalChange: FC<IModalChange> = ({
             isDanger={isResponsibleError}
             items={itemsUsers}
             setAutocompletePress={setResponsiblePress}
+            setIsWrapperDisabled={setIsWrapperDisabled}
           />
           <CheckBox
             value={isUrgentlyValue}

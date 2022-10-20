@@ -7,18 +7,19 @@ import {styles} from './styles';
 import {AppModalType} from './types';
 
 export const AppModal = ({
-  children,
-  style,
   isOpen,
-  setIsOpen,
+  isWrapperDisabled = false,
   wrapperStyle,
   contentStyle,
+  style,
+  children,
+  setIsOpen,
 }: AppModalType) => {
   const orientation = useOrientation();
 
   const wrapperHandler = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    !isWrapperDisabled && setIsOpen(false);
+  }, [isWrapperDisabled]);
 
   return (
     <>
