@@ -31,11 +31,13 @@ export interface IModals {
   status?: TaskStatusType;
   isUrgently?: boolean;
   date?: Date;
+  onUpdateData: () => void;
 }
 
 interface IModal {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  onUpdateData: () => void;
 }
 
 export interface IModalCreate extends IModal {

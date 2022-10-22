@@ -19,6 +19,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   setIsOpen,
   teamId,
   projectId,
+  onUpdateData,
 }) => {
   const route = useRoute();
   const {user} = useAuth();
@@ -151,6 +152,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     }
 
     setIsOpen(false);
+    onUpdateData();
   }, [
     teamId,
     projectId,

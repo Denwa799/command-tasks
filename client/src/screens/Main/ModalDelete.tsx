@@ -13,6 +13,7 @@ const ModalDelete: FC<IModalDelete> = ({
   id,
   teamId,
   projectId,
+  onUpdateData,
 }) => {
   const route = useRoute();
 
@@ -40,6 +41,7 @@ const ModalDelete: FC<IModalDelete> = ({
       await fetchTasks(projectId);
     }
 
+    onUpdateData();
     setIsOpen(false);
   }, [id, teamId, projectId]);
 

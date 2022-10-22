@@ -29,6 +29,7 @@ export const ModalChange: FC<IModalChange> = ({
   isUrgently,
   date,
   projectId,
+  onUpdateData,
 }) => {
   const route = useRoute();
   const {team, updateTeamIsLoading, updateTeam, fetchTeams} = useTeams();
@@ -153,6 +154,7 @@ export const ModalChange: FC<IModalChange> = ({
       await fetchTasks(projectId);
     }
 
+    onUpdateData();
     setIsOpen(false);
   }, [
     id,
