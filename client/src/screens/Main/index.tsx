@@ -27,20 +27,6 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
   const {user} = useAuth();
   const {fetchInvitations} = useInvitations();
-
-  const routeName = useMemo(() => {
-    if (route.name === teamRoute) {
-      return 'Проекты';
-    }
-    if (route.name === projectRoute) {
-      return 'Задачи';
-    }
-    return 'Команды';
-  }, [route.name]);
-
-  const navigation =
-    useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
-
   const {
     teams,
     teamsCount,
@@ -58,7 +44,22 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const {projects, projectsIsLoading, fetchProjects} = useProjects();
   const {tasks, fetchTasks, tasksIsLoading} = useTasks();
 
+  const routeName = useMemo(() => {
+    if (route.name === teamRoute) {
+      return 'Проекты';
+    }
+    if (route.name === projectRoute) {
+      return 'Задачи';
+    }
+    return 'Команды';
+  }, [route.name]);
+
+  const navigation =
+    useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
+
   const [fetchSkip, setFetchSkip] = useState(takeNumber);
+  
+  console.log(fetchSkip);
 
   const [dataTeams, setDataTeams] = useState<ITeam[]>([]);
   const [isFirstFetch, setIsFirstFetch] = useState(true);
@@ -193,7 +194,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         await fetchMoreTeams(fetchSkip, takeNumber);
       }
     }
-  }, [teams, fetchSkip, route.name]);
+  }, [teams, teamsCount, fetchSkip, route.name]);
 
   const isLoading = useMemo(() => {
     if (route.name === teamsRoute) {
