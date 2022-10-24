@@ -1,4 +1,4 @@
-import {ITeam, TaskStatusType} from 'models/ITasks';
+import {TaskStatusType} from 'models/ITasks';
 
 export type TeamScreenNavigateType = {
   Team: {

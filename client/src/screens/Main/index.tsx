@@ -11,7 +11,7 @@ import {
 } from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {IProject, ITeam, TaskStatusType} from 'models/ITasks';
+import {IProject, ITask, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, FlatList, View} from 'react-native';
 import {Modals} from './Modals';
@@ -34,12 +34,12 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     teamsIsLoading,
     moreTeamsIsLoading,
     teamIsLoading,
+    selectedTeamId,
     fetchTeams,
     fetchMoreTeams,
     cleanMoreTeams,
     setSelectedTeamId,
     fetchTeam,
-    selectedTeamId,
   } = useTeams();
   const {
     projects,
@@ -51,7 +51,16 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     fetchMoreProjects,
     cleanMoreProjects,
   } = useProjects();
-  const {tasks, fetchTasks, tasksIsLoading} = useTasks();
+  const {
+    tasks,
+    loadedMoreTasks,
+    tasksCount,
+    tasksIsLoading,
+    moreTasksIsLoading,
+    fetchTasks,
+    fetchMoreTasks,
+    cleanMoreTasks,
+  } = useTasks();
 
   const routeName = useMemo(() => {
     if (route.name === teamRoute) {
@@ -70,6 +79,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
 
   const [dataTeams, setDataTeams] = useState<ITeam[]>([]);
   const [dataProjects, setDataProjects] = useState<IProject[]>([]);
+  const [dataTasks, setDataTasks] = useState<ITask[]>([]);
   const [isCanUpdateData, setIsCanUpdateData] = useState(true);
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
@@ -103,8 +113,17 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     if (route.name === teamRoute && moreProjectsIsLoading) {
       return moreProjectsIsLoading;
     }
+    if (route.name === projectRoute && moreTasksIsLoading) {
+      return moreTasksIsLoading;
+    }
     return isRefreshing;
-  }, [isRefreshing, moreTeamsIsLoading, moreProjectsIsLoading, route.name]);
+  }, [
+    isRefreshing,
+    moreTeamsIsLoading,
+    moreProjectsIsLoading,
+    moreTasksIsLoading,
+    route.name,
+  ]);
 
   const creatorId = useMemo(() => {
     return params?.creatorId;
@@ -115,10 +134,10 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       return dataProjects;
     }
     if (route.name === projectRoute) {
-      return tasks;
+      return dataTasks;
     }
     return dataTeams;
-  }, [dataTeams, dataProjects, tasks, route.name]);
+  }, [dataTeams, dataProjects, dataTasks, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -145,8 +164,12 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         setDataProjects(projects);
         setIsCanUpdateData(false);
       }
+      if (route.name === projectRoute && tasks) {
+        setDataTasks(tasks);
+        setIsCanUpdateData(false);
+      }
     }
-  }, [teams, projects, isCanUpdateData]);
+  }, [teams, projects, tasks, isCanUpdateData]);
 
   useEffect(() => {
     if (loadedMoreTeams.length > 0) {
@@ -157,7 +180,11 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       setDataProjects(prev => [...prev, ...loadedMoreProjects]);
       cleanMoreProjects();
     }
-  }, [loadedMoreTeams, loadedMoreProjects]);
+    if (loadedMoreTasks.length > 0) {
+      setDataTasks(prev => [...prev, ...loadedMoreTasks]);
+      cleanMoreTasks();
+    }
+  }, [loadedMoreTeams, loadedMoreProjects, loadedMoreTasks]);
 
   const onUpdateData = () => {
     setFetchSkip(takeNumber);
@@ -194,14 +221,17 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         await fetchProjects(params.teamId);
         projects && setDataProjects(projects);
       }
-      route.name === projectRoute && fetchTasks(params.projectId);
+      if (route.name === projectRoute) {
+        await fetchTasks(params.projectId);
+        tasks && setDataTasks(tasks);
+      }
       setFetchSkip(takeNumber);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {
       setIsRefreshing(false);
     }
-  }, [params, teams, projects]);
+  }, [params, teams, projects, tasks]);
 
   const onAdd = useCallback(() => {
     setCreateIsOpen(true);
@@ -245,11 +275,19 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         await fetchMoreProjects(params.teamId, fetchSkip, takeNumber);
       }
     }
+    if (route.name === projectRoute) {
+      if (tasks && tasks.length > 1 && fetchSkip < tasksCount) {
+        setFetchSkip(prev => (prev = prev + takeNumber));
+        await fetchMoreTasks(params.projectId, fetchSkip, takeNumber);
+      }
+    }
   }, [
     teams,
     teamsCount,
     projects,
     projectsCount,
+    tasks,
+    tasksCount,
     fetchSkip,
     route.name,
     params,

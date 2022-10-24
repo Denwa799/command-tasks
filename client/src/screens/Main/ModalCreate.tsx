@@ -32,6 +32,8 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
 
+  const [isWrapperDisabled, setIsWrapperDisabled] = useState(false);
+
   const [autocompletePress, setAutocompletePress] = useState('');
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
   const [dangerAutocompleteText, setDangerAutocompleteText] =
@@ -165,7 +167,10 @@ export const ModalCreate: FC<IModalCreate> = ({
   ]);
 
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
+    <AppModal
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      isWrapperDisabled={isWrapperDisabled}>
       <TextField
         textValue={text}
         placeholder={'Введите текст'}
@@ -199,6 +204,7 @@ export const ModalCreate: FC<IModalCreate> = ({
             isDanger={isAutocompleteError}
             items={itemsUsers}
             setAutocompletePress={setAutocompletePress}
+            setIsWrapperDisabled={setIsWrapperDisabled}
           />
           <CheckBox
             value={isUrgently}
