@@ -18,4 +18,4 @@ export const overdueStatus = 'overdue';
 export const inProgressStatus = 'inProgress';
 export const doneStatus = 'done';
 
-export const takeNumber = 10;
+export const takeNumber = 50;
