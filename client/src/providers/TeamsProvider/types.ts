@@ -17,6 +17,7 @@ export interface ITeamsContext {
   deleteUserInTeamIsLoading: boolean;
   fetchTeams: (skip?: number, take?: number) => Promise<void>;
   fetchMoreTeams: (skip?: number, take?: number) => Promise<void>;
+  cleanTeams: () => void;
   cleanMoreTeams: () => void;
   fetchTeam: (id: number) => Promise<void>;
   createTeam: (name: string, creator: number, users: string[]) => Promise<void>;

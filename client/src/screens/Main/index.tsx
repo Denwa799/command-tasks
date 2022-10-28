@@ -144,14 +144,19 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       title: routeName,
     });
 
-    if (route.name === teamsRoute) {
-      fetchInvitations();
-      fetchTeams();
-    }
+    const initialFetch = async () => {
+      if (route.name === teamsRoute) {
+        fetchInvitations();
+        await fetchTeams();
+        setIsCanUpdateData(true);
+      }
+    };
 
     if (!teamIsLoading && selectedTeamId && route.name === teamRoute) {
       fetchTeam(selectedTeamId);
     }
+
+    initialFetch();
   }, []);
 
   useEffect(() => {

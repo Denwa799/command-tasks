@@ -1,4 +1,9 @@
-import {LoginService, RefreshService, RegistrationService} from 'api';
+import {
+  LoginService,
+  PostService,
+  RefreshService,
+  RegistrationService,
+} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -14,10 +19,14 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppLoader} from 'components/AppLoader';
 import {IUser} from 'models/IUser';
+import {getAccessToken} from 'utils/getSession';
+import {useTeams} from 'hooks/useTeams';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
 export const AuthProvider: FC<IAuthProvider> = ({children}) => {
+  const {cleanTeams} = useTeams();
+
   const [user, setUser] = useState<IUser | null>(null);
   const [isCheck, setIsCheck] = useState(false);
   const [isAuthLoad, setIsAuthLoad] = useState(true);
@@ -40,7 +49,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           setIsAuthLoad(false);
         }
       } catch (error) {
-        console.log('Установка пользователя в стейт', error);
         setIsAuthLoad(false);
       } finally {
         setIsLoading(false);
@@ -104,10 +112,13 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const logoutHandler = useCallback(async () => {
     setIsLoading(true);
     try {
+      const tokenBearer = await getAccessToken();
+      tokenBearer && (await PostService(`${authPath}logout`, tokenBearer, {}));
       await EncryptedStorage.removeItem('user_session');
       setIsCheck(prev => !prev);
+      cleanTeams();
     } catch (error) {
-      Alert.alert('Ошибка выхода');
+      Alert.alert('Ошибка во время выхода');
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +168,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     () => ({
       user,
       isLoading,
-
       login: loginHandler,
       register: registerHandler,
       logout: logoutHandler,

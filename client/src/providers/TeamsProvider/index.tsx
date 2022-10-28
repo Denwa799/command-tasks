@@ -78,6 +78,10 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
     [],
   );
 
+  const cleanTeams = useCallback(() => {
+    setTeams([]);
+  }, []);
+
   const cleanMoreTeams = useCallback(() => {
     setLoadedMoreTeams([]);
   }, []);
@@ -221,6 +225,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       deleteUserInTeamIsLoading,
       fetchTeams,
       fetchMoreTeams,
+      cleanTeams,
       cleanMoreTeams,
       fetchTeam,
       createTeam,

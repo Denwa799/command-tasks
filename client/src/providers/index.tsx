@@ -21,9 +21,9 @@ export const Providers: FC<IProviders> = ({children}) => {
   return (
     <ProviderComposer
       providers={[
+        provider(TeamsProvider),
         provider(AuthProvider),
         provider(UsersProvider),
-        provider(TeamsProvider),
         provider(ProjectsProvider),
         provider(TasksProvider),
         provider(InvitationsProvider),
