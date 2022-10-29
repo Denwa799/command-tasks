@@ -4,31 +4,56 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {styles} from './styles';
 import {OnViewableItemsChangedType} from './types';
+import {takeNumber} from 'constants/variables';
+import {IInvitations} from 'models/IInvitations';
 
 export const NotificationsScreen = () => {
+  const {
+    invitations,
+    loadedMoreInvitations,
+    invitationsCount,
+    deleteInvitationIsLoading,
+    invitationsIsLoading,
+    moreInvitationsIsLoading,
+    updateInvitationIsLoading,
+    updateInvitationReadIsLoading,
+    fetchInvitations,
+    fetchMoreInvitations,
+    cleanMoreInvitations,
+    updateInvitation,
+    updateInvitationRead,
+    deleteInvitation,
+  } = useInvitations();
+
+  const {fetchTeams} = useTeams();
+
+  const [fetchSkip, setFetchSkip] = useState(takeNumber);
+  const [dataInvitations, setDataInvitations] = useState<IInvitations[]>([]);
+
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [notificationId, setNotificationId] = useState(0);
   const [newInvitationsId, setNewInvitationsId] = useState<number[]>([]);
   const [isDelete, setIsDelete] = useState(false);
 
-  const {
-    fetchInvitations,
-    updateInvitation,
-    updateInvitationRead,
-    deleteInvitation,
-    invitations,
-    deleteInvitationIsLoading,
-    invitationsIsLoading,
-    updateInvitationIsLoading,
-    updateInvitationReadIsLoading,
-  } = useInvitations();
+  const data = useMemo(() => {
+    return dataInvitations;
+  }, [dataInvitations]);
 
-  const {fetchTeams} = useTeams();
+  useEffect(() => {
+    invitations && setDataInvitations(invitations);
+  }, [invitations]);
+
+  useEffect(() => {
+    if (loadedMoreInvitations.length > 0) {
+      setDataInvitations(prev => [...prev, ...loadedMoreInvitations]);
+      cleanMoreInvitations();
+    }
+  }, [loadedMoreInvitations]);
 
   useEffect(() => {
     !updateInvitationReadIsLoading && updateInvitationRead(newInvitationsId);
@@ -36,6 +61,7 @@ export const NotificationsScreen = () => {
 
   const onRefresh = useCallback(() => {
     fetchInvitations();
+    setFetchSkip(takeNumber);
   }, []);
 
   const onAcceptDialogOpen = useCallback((id: number) => {
@@ -64,6 +90,13 @@ export const NotificationsScreen = () => {
     [],
   );
 
+  const onLoadMore = useCallback(async () => {
+    if (invitations && invitations.length > 1 && fetchSkip < invitationsCount) {
+      setFetchSkip(prev => (prev = prev + takeNumber));
+      await fetchMoreInvitations(fetchSkip, takeNumber);
+    }
+  }, [invitations, fetchSkip, invitationsCount, takeNumber]);
+
   const onAccept = useCallback(async () => {
     if (isDelete) {
       await deleteInvitation(notificationId);
@@ -85,9 +118,9 @@ export const NotificationsScreen = () => {
       ) : (
         <>
           <FlatList
-            data={invitations}
+            data={data}
             style={styles.list}
-            refreshing={invitationsIsLoading}
+            refreshing={invitationsIsLoading || moreInvitationsIsLoading}
             onRefresh={onRefresh}
             onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
@@ -100,6 +133,8 @@ export const NotificationsScreen = () => {
                 secondBtnText={'Удалить'}
               />
             )}
+            onEndReached={onLoadMore}
+            onEndReachedThreshold={0.1}
           />
           {(!invitations || invitations.length === 0) && (
             <AppTitle level="2" style={styles.messageCenter}>

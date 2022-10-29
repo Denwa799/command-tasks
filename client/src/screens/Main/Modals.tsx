@@ -19,6 +19,7 @@ export const Modals: FC<IModals> = ({
   status,
   isUrgently,
   date,
+  onUpdateData,
 }) => {
   return (
     <>
@@ -27,6 +28,7 @@ export const Modals: FC<IModals> = ({
         setIsOpen={setCreateIsOpen}
         teamId={teamId}
         projectId={projectId}
+        onUpdateData={onUpdateData}
       />
       <ModalDelete
         isOpen={deleteIsOpen}
@@ -34,6 +36,7 @@ export const Modals: FC<IModals> = ({
         id={id}
         teamId={teamId}
         projectId={projectId}
+        onUpdateData={onUpdateData}
       />
       <ModalChange
         isOpen={changeIsOpen}
@@ -46,6 +49,7 @@ export const Modals: FC<IModals> = ({
         isUrgently={isUrgently}
         date={date}
         projectId={projectId}
+        onUpdateData={onUpdateData}
       />
     </>
   );

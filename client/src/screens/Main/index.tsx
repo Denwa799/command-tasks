@@ -3,10 +3,15 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
-import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {
+  projectRoute,
+  takeNumber,
+  teamRoute,
+  teamsRoute,
+} from 'constants/variables';
 import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
-import {TaskStatusType} from 'models/ITasks';
+import {IProject, ITask, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert, FlatList, View} from 'react-native';
 import {Modals} from './Modals';
@@ -22,6 +27,40 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
   const {user} = useAuth();
   const {fetchInvitations} = useInvitations();
+  const {
+    teams,
+    teamsCount,
+    loadedMoreTeams,
+    teamsIsLoading,
+    moreTeamsIsLoading,
+    teamIsLoading,
+    selectedTeamId,
+    fetchTeams,
+    fetchMoreTeams,
+    cleanMoreTeams,
+    setSelectedTeamId,
+    fetchTeam,
+  } = useTeams();
+  const {
+    projects,
+    loadedMoreProjects,
+    moreProjectsIsLoading,
+    projectsCount,
+    projectsIsLoading,
+    fetchProjects,
+    fetchMoreProjects,
+    cleanMoreProjects,
+  } = useProjects();
+  const {
+    tasks,
+    loadedMoreTasks,
+    tasksCount,
+    tasksIsLoading,
+    moreTasksIsLoading,
+    fetchTasks,
+    fetchMoreTasks,
+    cleanMoreTasks,
+  } = useTasks();
 
   const routeName = useMemo(() => {
     if (route.name === teamRoute) {
@@ -36,17 +75,12 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<TeamScreenNavigateType>>();
 
-  const {
-    teams,
-    teamsIsLoading,
-    teamIsLoading,
-    fetchTeams,
-    setSelectedTeamId,
-    fetchTeam,
-    selectedTeamId,
-  } = useTeams();
-  const {projects, projectsIsLoading, fetchProjects} = useProjects();
-  const {tasks, fetchTasks, tasksIsLoading} = useTasks();
+  const [fetchSkip, setFetchSkip] = useState(takeNumber);
+
+  const [dataTeams, setDataTeams] = useState<ITeam[]>([]);
+  const [dataProjects, setDataProjects] = useState<IProject[]>([]);
+  const [dataTasks, setDataTasks] = useState<ITask[]>([]);
+  const [isCanUpdateData, setIsCanUpdateData] = useState(true);
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
   const [deleteIsOpen, setDeleteIsOpen] = useState(false);
@@ -60,37 +94,107 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const [isUrgently, setIsUrgently] = useState(false);
   const [date, setDate] = useState<Date>();
 
+  const isLoading = useMemo(() => {
+    if (route.name === teamsRoute) {
+      return teamsIsLoading;
+    }
+    if (route.name === teamRoute) {
+      return projectsIsLoading;
+    }
+    if (route.name === projectRoute) {
+      return tasksIsLoading;
+    }
+  }, [teamsIsLoading, projectsIsLoading, tasksIsLoading, route.name]);
+
+  const isFlatListRefreshing = useMemo(() => {
+    if (route.name === teamsRoute && moreTeamsIsLoading) {
+      return moreTeamsIsLoading;
+    }
+    if (route.name === teamRoute && moreProjectsIsLoading) {
+      return moreProjectsIsLoading;
+    }
+    if (route.name === projectRoute && moreTasksIsLoading) {
+      return moreTasksIsLoading;
+    }
+    return isRefreshing;
+  }, [
+    isRefreshing,
+    moreTeamsIsLoading,
+    moreProjectsIsLoading,
+    moreTasksIsLoading,
+    route.name,
+  ]);
+
   const creatorId = useMemo(() => {
     return params?.creatorId;
   }, [params]);
 
   const data = useMemo(() => {
     if (route.name === teamRoute) {
-      return projects;
+      return dataProjects;
     }
     if (route.name === projectRoute) {
-      return tasks;
+      return dataTasks;
     }
-    return teams;
-  }, [teams, projects, tasks, route.name]);
+    return dataTeams;
+  }, [dataTeams, dataProjects, dataTasks, route.name]);
 
   useEffect(() => {
     navigation.setOptions({
       title: routeName,
     });
 
-    if (route.name === teamsRoute) {
-      fetchTeams();
-      fetchInvitations();
+    const initialFetch = async () => {
+      if (route.name === teamsRoute) {
+        fetchInvitations();
+        await fetchTeams();
+        setIsCanUpdateData(true);
+      }
+    };
+
+    if (!teamIsLoading && selectedTeamId && route.name === teamRoute) {
+      fetchTeam(selectedTeamId);
     }
+
+    initialFetch();
   }, []);
 
   useEffect(() => {
-    !teamIsLoading &&
-      selectedTeamId &&
-      route.name === teamRoute &&
-      fetchTeam(selectedTeamId);
-  }, []);
+    if (isCanUpdateData) {
+      if (route.name === teamsRoute && teams) {
+        setDataTeams(teams);
+        setIsCanUpdateData(false);
+      }
+      if (route.name === teamRoute && projects) {
+        setDataProjects(projects);
+        setIsCanUpdateData(false);
+      }
+      if (route.name === projectRoute && tasks) {
+        setDataTasks(tasks);
+        setIsCanUpdateData(false);
+      }
+    }
+  }, [teams, projects, tasks, isCanUpdateData]);
+
+  useEffect(() => {
+    if (loadedMoreTeams.length > 0) {
+      setDataTeams(prev => [...prev, ...loadedMoreTeams]);
+      cleanMoreTeams();
+    }
+    if (loadedMoreProjects.length > 0) {
+      setDataProjects(prev => [...prev, ...loadedMoreProjects]);
+      cleanMoreProjects();
+    }
+    if (loadedMoreTasks.length > 0) {
+      setDataTasks(prev => [...prev, ...loadedMoreTasks]);
+      cleanMoreTasks();
+    }
+  }, [loadedMoreTeams, loadedMoreProjects, loadedMoreTasks]);
+
+  const onUpdateData = () => {
+    setFetchSkip(takeNumber);
+    setIsCanUpdateData(true);
+  };
 
   const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
@@ -111,18 +215,28 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     }
   }, []);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      route.name === teamsRoute && fetchTeams();
-      route.name === teamRoute && fetchProjects(params.teamId);
-      route.name === projectRoute && fetchTasks(params.projectId);
+      if (route.name === teamsRoute) {
+        await fetchTeams();
+        teams && setDataTeams(teams);
+      }
+      if (route.name === teamRoute) {
+        await fetchProjects(params.teamId);
+        projects && setDataProjects(projects);
+      }
+      if (route.name === projectRoute) {
+        await fetchTasks(params.projectId);
+        tasks && setDataTasks(tasks);
+      }
+      setFetchSkip(takeNumber);
     } catch {
       Alert.alert('Ошибка обновления');
     } finally {
       setIsRefreshing(false);
     }
-  }, [params]);
+  }, [params, teams, projects, tasks]);
 
   const onAdd = useCallback(() => {
     setCreateIsOpen(true);
@@ -153,17 +267,36 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     [],
   );
 
-  const isLoading = useMemo(() => {
+  const onLoadMore = useCallback(async () => {
     if (route.name === teamsRoute) {
-      return teamsIsLoading;
+      if (teams && teams.length > 1 && fetchSkip < teamsCount) {
+        setFetchSkip(prev => (prev = prev + takeNumber));
+        await fetchMoreTeams(fetchSkip, takeNumber);
+      }
     }
     if (route.name === teamRoute) {
-      return projectsIsLoading;
+      if (projects && projects.length > 1 && fetchSkip < projectsCount) {
+        setFetchSkip(prev => (prev = prev + takeNumber));
+        await fetchMoreProjects(params.teamId, fetchSkip, takeNumber);
+      }
     }
     if (route.name === projectRoute) {
-      return tasksIsLoading;
+      if (tasks && tasks.length > 1 && fetchSkip < tasksCount) {
+        setFetchSkip(prev => (prev = prev + takeNumber));
+        await fetchMoreTasks(params.projectId, fetchSkip, takeNumber);
+      }
     }
-  }, [teamsIsLoading, projectsIsLoading, tasksIsLoading]);
+  }, [
+    teams,
+    teamsCount,
+    projects,
+    projectsCount,
+    tasks,
+    tasksCount,
+    fetchSkip,
+    route.name,
+    params,
+  ]);
 
   return (
     <View style={styles.main}>
@@ -177,7 +310,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
             <FlatList
               data={data}
               style={styles.list}
-              refreshing={isRefreshing}
+              refreshing={isFlatListRefreshing}
               onRefresh={onRefresh}
               renderItem={({item}) => (
                 <AppCard
@@ -195,6 +328,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
                   creatorId={creatorId}
                 />
               )}
+              onEndReached={onLoadMore}
+              onEndReachedThreshold={0.1}
             />
             {(!data || data.length === 0) && (
               <AppTitle level="2" style={styles.messageCenter}>
@@ -219,6 +354,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               status={status}
               isUrgently={isUrgently}
               date={date}
+              onUpdateData={onUpdateData}
             />
           </View>
         </>

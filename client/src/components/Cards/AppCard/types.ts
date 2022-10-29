@@ -3,7 +3,11 @@ import {IUser} from 'models/IUser';
 
 export interface IAppCard {
   id: number;
+  creatorId?: number;
   text: string;
+  isColors?: boolean;
+  isUrgently?: boolean;
+  date?: Date;
   status?: TaskStatusType;
   responsible?: IUser;
   item: any;
@@ -17,8 +21,4 @@ export interface IAppCard {
     isUrgently: boolean | undefined,
     date: Date | undefined,
   ) => void;
-  isColors?: boolean;
-  isUrgently?: boolean;
-  date?: Date;
-  creatorId?: number;
 }

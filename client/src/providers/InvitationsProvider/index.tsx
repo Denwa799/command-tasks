@@ -5,7 +5,7 @@ import {
   PostService,
   PutService,
 } from 'api';
-import {variables} from 'constants/variables';
+import {takeNumber, variables} from 'constants/variables';
 import {IInvitations} from 'models/IInvitations';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
@@ -18,11 +18,18 @@ export const InvitationsContext = createContext<IInvitationsContext>(
 
 export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
   const [invitations, setInvitations] = useState<IInvitations[] | null>(null);
-  const [invitationsIsLoading, setInvitationsIsLoading] = useState(false);
+  const [loadedMoreInvitations, setLoadedMoreInvitations] = useState<
+    IInvitations[]
+  >([]);
+  const [invitationsCount, setInvitationsCount] = useState(0);
 
   const [teamInvitations, setTeamInvitations] = useState<IInvitations[] | null>(
     null,
   );
+
+  const [invitationsIsLoading, setInvitationsIsLoading] = useState(false);
+  const [moreInvitationsIsLoading, setMoreInvitationsIsLoading] =
+    useState(false);
   const [teamInvitationsIsLoading, setTeamInvitationsIsLoading] =
     useState(false);
 
@@ -46,23 +53,55 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
 
   const invitationsPath = `${variables.API_URL}${variables.INVITATIONS}`;
 
-  const fetchInvitations = useCallback(async () => {
-    setInvitationsIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        const response = await GetService(`${invitationsPath}`, tokenBearer);
-        setInvitations(response.data?.invitations);
-      } else {
-        throw new Error('Ошибка сессии');
+  const fetchInvitations = useCallback(
+    async (skip: number = 0, take: number = takeNumber) => {
+      setInvitationsIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(`${invitationsPath}`, tokenBearer, {
+            skip,
+            take,
+          });
+          setInvitations(response.data?.invitations);
+          setInvitationsCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка приглашений');
+      } finally {
+        setInvitationsIsLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка загрузки списка приглашений');
-    } finally {
-      setInvitationsIsLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
+
+  const fetchMoreInvitations = useCallback(
+    async (skip: number = 0, take: number = takeNumber) => {
+      setMoreInvitationsIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(`${invitationsPath}`, tokenBearer, {
+            skip,
+            take,
+          });
+          setLoadedMoreInvitations(response.data?.invitations);
+          setInvitationsCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка приглашений');
+      } finally {
+        setMoreInvitationsIsLoading(false);
+      }
+    },
+    [],
+  );
 
   const fetchTeamInvitations = useCallback(async (teamId: number) => {
     setTeamInvitationsIsLoading(true);
@@ -82,6 +121,10 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
     } finally {
       setTeamInvitationsIsLoading(false);
     }
+  }, []);
+
+  const cleanMoreInvitations = useCallback(() => {
+    setLoadedMoreInvitations([]);
   }, []);
 
   const createInvitation = useCallback(
@@ -185,9 +228,12 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       invitations,
+      invitationsCount,
+      loadedMoreInvitations,
       teamInvitations,
       checkedInvitationsId,
       invitationsIsLoading,
+      moreInvitationsIsLoading,
       createInvitationIsLoading,
       teamInvitationsIsLoading,
       deleteInvitationIsLoading,
@@ -197,16 +243,21 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
       createInvitation,
       deleteInvitation,
       fetchInvitations,
+      fetchMoreInvitations,
       fetchTeamInvitations,
       updateInvitation,
       updateInvitationRead,
       recreateInvitation,
+      cleanMoreInvitations,
     }),
     [
       invitations,
+      invitationsCount,
+      loadedMoreInvitations,
       teamInvitations,
       checkedInvitationsId,
       invitationsIsLoading,
+      moreInvitationsIsLoading,
       createInvitationIsLoading,
       teamInvitationsIsLoading,
       deleteInvitationIsLoading,

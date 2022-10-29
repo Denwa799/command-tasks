@@ -1,12 +1,13 @@
 import {ReactNode} from 'react';
 
 export type AppModalType = {
-  children: ReactNode;
-  style?: Object;
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+  isWrapperDisabled?: boolean;
   wrapperStyle?: Object;
   contentStyle?: Object;
+  style?: Object;
+  children: ReactNode;
+  setIsOpen: (value: boolean) => void;
 };
 
 export type ModalChildrenType = {

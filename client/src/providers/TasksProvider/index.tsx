@@ -1,5 +1,5 @@
 import {DeleteService, GetService, PatchService, PostService} from 'api';
-import {variables} from 'constants/variables';
+import {takeNumber, variables} from 'constants/variables';
 import {ITask} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
@@ -10,33 +10,71 @@ export const TasksContext = createContext<ITasksContext>({} as ITasksContext);
 
 export const TasksProvider: FC<ITasksProvider> = ({children}) => {
   const [tasks, setTasks] = useState<ITask[] | null>(null);
+  const [loadedMoreTasks, setLoadedMoreTasks] = useState<ITask[]>([]);
+  const [tasksCount, setTasksCount] = useState(0);
 
   const [tasksIsLoading, setTasksIsLoading] = useState(false);
+  const [moreTasksIsLoading, setMoreTasksIsLoading] = useState(false);
   const [createTaskIsLoading, setCreateTaskIsLoading] = useState(false);
   const [deleteTaskIsLoading, setDeleteTaskIsLoading] = useState(false);
   const [updateTaskIsLoading, setUpdateTaskIsLoading] = useState(false);
 
   const tasksPath = `${variables.API_URL}${variables.TASKS}`;
 
-  const fetchTasks = useCallback(async (projectId: number) => {
-    setTasksIsLoading(true);
-    try {
-      const tokenBearer = await getAccessToken();
-      if (tokenBearer) {
-        const response = await GetService(
-          `${tasksPath}/project/${projectId}`,
-          tokenBearer,
-        );
-        setTasks(response.data?.tasks);
-      } else {
-        throw new Error('Ошибка сессии');
+  const fetchTasks = useCallback(
+    async (projectId: number, skip: number = 0, take: number = takeNumber) => {
+      setTasksIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(
+            `${tasksPath}/project/${projectId}`,
+            tokenBearer,
+            {skip, take},
+          );
+          setTasks(response.data?.tasks);
+          setTasksCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка задач');
+      } finally {
+        setTasksIsLoading(false);
       }
-    } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка загрузки списка задач');
-    } finally {
-      setTasksIsLoading(false);
-    }
+    },
+    [],
+  );
+
+  const fetchMoreTasks = useCallback(
+    async (projectId: number, skip: number = 0, take: number = takeNumber) => {
+      setMoreTasksIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          const response = await GetService(
+            `${tasksPath}/project/${projectId}`,
+            tokenBearer,
+            {skip, take},
+          );
+          setLoadedMoreTasks(response.data?.tasks);
+          setTasksCount(response.data?.count);
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert('Ошибка загрузки списка задач');
+      } finally {
+        setMoreTasksIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  const cleanMoreTasks = useCallback(() => {
+    setLoadedMoreTasks([]);
   }, []);
 
   const createTask = useCallback(
@@ -126,18 +164,26 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       tasks,
+      loadedMoreTasks,
+      tasksCount,
       tasksIsLoading,
+      moreTasksIsLoading,
       createTaskIsLoading,
       deleteTaskIsLoading,
       updateTaskIsLoading,
       fetchTasks,
+      fetchMoreTasks,
+      cleanMoreTasks,
       createTask,
       deleteTask,
       updateTask,
     }),
     [
       tasks,
+      loadedMoreTasks,
+      tasksCount,
       tasksIsLoading,
+      moreTasksIsLoading,
       createTaskIsLoading,
       deleteTaskIsLoading,
       updateTaskIsLoading,

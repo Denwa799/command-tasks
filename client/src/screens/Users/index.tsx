@@ -1,16 +1,26 @@
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
+import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppUserCard} from 'components/Cards/AppUserCard';
 import {useAuth} from 'hooks/useAuth';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
+import {Dialog} from './Dialog';
+import {ModalCreate} from './ModalCreate';
 import {styles} from './styles';
 
 export const UsersScreen = () => {
-  const {team, teamIsLoading, selectedTeamId, fetchTeam} = useTeams();
+  const {
+    team,
+    teamIsLoading,
+    selectedTeamId,
+    deleteUserInTeamIsLoading,
+    fetchTeam,
+    deleteUserInTeam,
+  } = useTeams();
   const {user} = useAuth();
   const {
     teamInvitations,
@@ -30,6 +40,9 @@ export const UsersScreen = () => {
   const [userId, setUserId] = useState(0);
 
   const [disabledButtonsId, setDisabledButtonsId] = useState<number[]>([]);
+
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const data = useMemo(() => {
     let users;
@@ -78,9 +91,8 @@ export const UsersScreen = () => {
     }
   }, []);
 
-  const dialogOpen = useCallback(
+  const onResendInvitation = useCallback(
     async (id: number, email: string) => {
-      setUserId(id);
       setDisabledButtonsId(prev => [...prev, id]);
       const invitation = teamInvitations?.find(item => item?.user?.id === id);
       if (invitation) {
@@ -103,6 +115,27 @@ export const UsersScreen = () => {
     [teamInvitations, disabledButtonsId],
   );
 
+  const onDialogOpen = useCallback(
+    (id: number) => {
+      setUserId(id);
+      setDialogIsOpen(true);
+    },
+    [userId],
+  );
+
+  const onModalOpen = useCallback(() => {
+    setModalIsOpen(true);
+  }, [modalIsOpen]);
+
+  const onDelete = useCallback(async () => {
+    if (userId && teamId) {
+      await deleteUserInTeam(userId, teamId);
+      setDialogIsOpen(false);
+      fetchTeam(selectedTeamId);
+      fetchTeamInvitations(selectedTeamId);
+    }
+  }, [userId, teamId]);
+
   return (
     <View style={styles.users}>
       {teamIsLoading || isRefreshing || teamInvitationsIsLoading ? (
@@ -122,7 +155,6 @@ export const UsersScreen = () => {
                 id={item.id}
                 name={item.name}
                 email={item.email}
-                onPress={dialogOpen}
                 btnText={'Удалить'}
                 isActive={
                   activatedUsers?.includes(item.id) || item.id === creatorId
@@ -131,9 +163,28 @@ export const UsersScreen = () => {
                 isCreator={user?.id === creatorId && user?.id === item.id}
                 isInvitation={item.isInvitation}
                 isDisabled={disabledButtonsId.includes(item.id)}
+                onPress={onResendInvitation}
+                onButtonTextPress={onDialogOpen}
               />
             )}
           />
+          {team && Object.keys(team).length > 0 && (
+            <>
+              <AppIconButton onPress={onModalOpen} />
+              <Dialog
+                isOpen={dialogIsOpen}
+                setIsOpen={setDialogIsOpen}
+                onDelete={onDelete}
+                disabled={deleteUserInTeamIsLoading}
+              />
+              <ModalCreate
+                teamId={team.id}
+                isOpen={modalIsOpen}
+                usersInTeam={team.users}
+                setIsOpen={setModalIsOpen}
+              />
+            </>
+          )}
           {!team ||
             (Object.keys(team).length === 0 && (
               <AppTitle level="2" style={styles.messageCenter}>

@@ -29,9 +29,14 @@ export const ModalChange: FC<IModalChange> = ({
   isUrgently,
   date,
   projectId,
+  onUpdateData,
 }) => {
   const route = useRoute();
-  const {team} = useTeams();
+  const {team, updateTeamIsLoading, updateTeam, fetchTeams} = useTeams();
+  const {updateProjectIsLoading, fetchProjects, updateProject} = useProjects();
+  const {updateTaskIsLoading, fetchTasks, updateTask} = useTasks();
+
+  const [isWrapperDisabled, setIsWrapperDisabled] = useState(false);
 
   const [textValue, setTextValue] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -59,10 +64,6 @@ export const ModalChange: FC<IModalChange> = ({
       dateValue.getMonth() + 1
     }/${dateValue.getFullYear()}`;
   }, [dateValue]);
-
-  const {updateTeam, fetchTeams, updateTeamIsLoading} = useTeams();
-  const {fetchProjects, updateProject, updateProjectIsLoading} = useProjects();
-  const {fetchTasks, updateTask, updateTaskIsLoading} = useTasks();
 
   const itemsUsers = useMemo(() => {
     let filteredUsers;
@@ -131,24 +132,29 @@ export const ModalChange: FC<IModalChange> = ({
       }
     }
 
-    route.name === teamsRoute && (await updateTeam(id, textValue));
-    route.name === teamsRoute && (await fetchTeams());
+    if (route.name === teamsRoute) {
+      await updateTeam(id, textValue);
+      await fetchTeams();
+    }
 
-    route.name === teamRoute && teamId && (await updateProject(id, textValue));
-    route.name === teamRoute && teamId && (await fetchProjects(teamId));
+    if (route.name === teamRoute && teamId) {
+      await updateProject(id, textValue);
+      await fetchProjects(teamId);
+    }
 
-    route.name === projectRoute &&
-      projectId &&
-      (await updateTask(
+    if (route.name === projectRoute && projectId) {
+      await updateTask(
         id,
         textValue,
         responsiblePress,
         isDone ? doneStatus : inProgressStatus,
         isUrgentlyValue,
         dateValue,
-      ));
-    route.name === projectRoute && projectId && (await fetchTasks(projectId));
+      );
+      await fetchTasks(projectId);
+    }
 
+    onUpdateData();
     setIsOpen(false);
   }, [
     id,
@@ -163,7 +169,10 @@ export const ModalChange: FC<IModalChange> = ({
   ]);
 
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
+    <AppModal
+      isOpen={isOpen}
+      isWrapperDisabled={isWrapperDisabled}
+      setIsOpen={setIsOpen}>
       <TextField
         textValue={textValue}
         placeholder={'Введите текст'}
@@ -181,6 +190,7 @@ export const ModalChange: FC<IModalChange> = ({
             isDanger={isResponsibleError}
             items={itemsUsers}
             setAutocompletePress={setResponsiblePress}
+            setIsWrapperDisabled={setIsWrapperDisabled}
           />
           <CheckBox
             value={isUrgentlyValue}

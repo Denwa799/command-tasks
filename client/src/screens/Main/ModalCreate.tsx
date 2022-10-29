@@ -19,6 +19,7 @@ export const ModalCreate: FC<IModalCreate> = ({
   setIsOpen,
   teamId,
   projectId,
+  onUpdateData,
 }) => {
   const route = useRoute();
   const {user} = useAuth();
@@ -30,6 +31,8 @@ export const ModalCreate: FC<IModalCreate> = ({
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
   const [dangerText, setDangerText] = useState('Пустое поле');
+
+  const [isWrapperDisabled, setIsWrapperDisabled] = useState(false);
 
   const [autocompletePress, setAutocompletePress] = useState('');
   const [isAutocompleteError, setIsAutocompleteError] = useState(false);
@@ -128,25 +131,30 @@ export const ModalCreate: FC<IModalCreate> = ({
       }
     }
 
-    route.name === teamsRoute && (await createTeam(text, userId, emails));
-    route.name === teamsRoute && (await fetchTeams());
+    if (route.name === teamsRoute) {
+      await createTeam(text, userId, emails);
+      await fetchTeams();
+    }
 
-    route.name === teamRoute && teamId && (await createProject(teamId, text));
-    route.name === teamRoute && teamId && (await fetchProjects(teamId));
+    if (route.name === teamRoute && teamId) {
+      await createProject(teamId, text);
+      await fetchProjects(teamId);
+    }
 
-    route.name === projectRoute &&
-      projectId &&
-      (await createTask(
+    if (route.name === projectRoute && projectId) {
+      await createTask(
         projectId,
         text,
         autocompletePress,
         'inProgress',
         isUrgently,
         date,
-      ));
-    route.name === projectRoute && projectId && (await fetchTasks(projectId));
+      );
+      await fetchTasks(projectId);
+    }
 
     setIsOpen(false);
+    onUpdateData();
   }, [
     teamId,
     projectId,
@@ -159,7 +167,10 @@ export const ModalCreate: FC<IModalCreate> = ({
   ]);
 
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen}>
+    <AppModal
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      isWrapperDisabled={isWrapperDisabled}>
       <TextField
         textValue={text}
         placeholder={'Введите текст'}
@@ -193,6 +204,7 @@ export const ModalCreate: FC<IModalCreate> = ({
             isDanger={isAutocompleteError}
             items={itemsUsers}
             setAutocompletePress={setAutocompletePress}
+            setIsWrapperDisabled={setIsWrapperDisabled}
           />
           <CheckBox
             value={isUrgently}

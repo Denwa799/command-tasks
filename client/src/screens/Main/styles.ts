@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
   },
   list: {
     height: '95%',
+    flexGrow: 0,
   },
   messageCenter: {
     position: 'absolute',

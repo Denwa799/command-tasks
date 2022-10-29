@@ -9,4 +9,5 @@ export interface IDropdown {
     text?: string;
   }[];
   setAutocompletePress: (value: string) => void;
+  setIsWrapperDisabled: (value: boolean) => void;
 }
