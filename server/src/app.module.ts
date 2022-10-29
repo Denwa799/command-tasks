@@ -10,11 +10,28 @@ import { TasksModule } from './api/tasks/tasks.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessTokenGuard } from './api/auth/guards';
 import { InvitationsModule } from './api/invitations/invitations.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    MailerModule.forRoot({
+      transport: {
+        host: process.env.MAIL_HOST,
+        port: process.env.MAIL_PORT,
+        secure: true,
+        auth: {
+          type: 'login',
+          user: process.env.MAIL_USER,
+          pass: process.env.MAIL_PASS,
+        },
+        tls: {
+          rejectUnauthorized: false,
+        },
+      },
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -26,6 +43,7 @@ import { InvitationsModule } from './api/invitations/invitations.module';
       synchronize: true,
       autoLoadEntities: true,
     }),
+    MailModule,
     AuthModule,
     UsersModule,
     RolesModule,
