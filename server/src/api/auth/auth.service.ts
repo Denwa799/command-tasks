@@ -11,6 +11,7 @@ import { User } from 'src/api/users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Tokens } from './types';
+import { stringReverse } from 'src/utils';
 
 @Injectable()
 export class AuthService {
@@ -50,7 +51,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const hashPassword = await bcrypt.hash(userDto.password, 5);
+    const hashPassword = await bcrypt.hash(userDto.password, 10);
     const user = await this.userService.createUser({
       ...userDto,
       password: hashPassword,
@@ -68,6 +69,7 @@ export class AuthService {
 
   async logout(userId: number) {
     await this.userService.addRefreshToken(userId, null);
+    return 'Выход выполнен';
   }
 
   async refreshTokens(
@@ -83,7 +85,7 @@ export class AuthService {
 
     if (user) {
       const refreshTokenEquals = await bcrypt.compare(
-        refreshToken,
+        stringReverse(refreshToken),
         user.hashedRt,
       );
 
@@ -136,7 +138,7 @@ export class AuthService {
   }
 
   private async updateRtHash(userId: number, refreshToken: string) {
-    const hashedToken = await bcrypt.hash(refreshToken, 5);
+    const hashedToken = await bcrypt.hash(stringReverse(refreshToken), 10);
     await this.userService.addRefreshToken(userId, hashedToken);
   }
 
