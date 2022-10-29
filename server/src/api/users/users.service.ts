@@ -45,6 +45,67 @@ export class UsersService {
     throw new HttpException('Пользователи не найдены', HttpStatus.BAD_REQUEST);
   }
 
+  async getAllTeamUsers(
+    token: string,
+    teamId: number,
+    take = 50,
+    skip = 0,
+  ): Promise<{ count: number; users: User[] }> {
+    const decoded = await this.decodeToken(token);
+    if (!decoded)
+      throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+
+    const [users, usersCount] = await this.userRepository.findAndCount({
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        teams: {
+          id: true,
+          creator: {
+            id: true,
+          },
+          users: {
+            id: true,
+          },
+        },
+      },
+      relations: {
+        teams: {
+          users: true,
+          creator: true,
+        },
+      },
+      take,
+      skip,
+      order: {
+        id: 'DESC',
+      },
+      where: [
+        {
+          teams: {
+            id: teamId,
+            users: {
+              id: decoded.id,
+            },
+          },
+        },
+        {
+          teams: {
+            id: teamId,
+            creator: {
+              id: decoded.id,
+            },
+          },
+        },
+      ],
+    });
+    return {
+      count: usersCount,
+      users,
+    };
+  }
+
   async findUserByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { email },

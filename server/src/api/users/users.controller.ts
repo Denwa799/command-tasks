@@ -46,6 +46,22 @@ export class UsersController {
     return this.usersService.getAllUsers(reqParam.take, reqParam.skip);
   }
 
+  @ApiOperation({ summary: 'Получение всех пользователей' })
+  @ApiResponse({ status: 200, type: [User] })
+  @Get('team/:id')
+  getAllTeamUsers(
+    @Query() reqParam: PaginationQueryParamDto,
+    @Param('id') teamId: number,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.usersService.getAllTeamUsers(
+      token,
+      teamId,
+      reqParam.take,
+      reqParam.skip,
+    );
+  }
+
   @ApiOperation({ summary: 'Получение пользователей по email' })
   @ApiResponse({ status: 200, type: [User] })
   @Get('/email')
