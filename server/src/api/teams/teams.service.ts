@@ -71,15 +71,18 @@ export class TeamsService {
     const creator = await this.userService.findUserById(dto.creator);
     if (creator) {
       const users = [];
-      for (const email of dto.users) {
-        const user = await this.userService.findUserByEmail(email);
-        if (!user) {
-          throw new HttpException(
-            'Пользователь не найден',
-            HttpStatus.BAD_REQUEST,
-          );
+      users.push(creator);
+      if (users.length > 0) {
+        for (const email of dto.users) {
+          const user = await this.userService.findUserByEmail(email);
+          if (!user) {
+            throw new HttpException(
+              'Пользователь не найден',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          users.push(user);
         }
-        users.push(user);
       }
       const team = await this.teamRepository.create({
         name: dto.name,
@@ -89,13 +92,17 @@ export class TeamsService {
       });
       if (team) {
         const savedTeam = await this.teamRepository.save(team);
-        for (const user of users) {
-          const invitationBody = {
-            message: `Приглашение в команду ${dto.name} от ${creator.email}`,
-            teamId: savedTeam.id,
-            userEmail: user.email,
-          };
-          await this.invitationsService.create(invitationBody, token);
+        if (users.length > 0) {
+          for (const user of users) {
+            if (user.id !== creator.id) {
+              const invitationBody = {
+                message: `Приглашение в команду ${dto.name} от ${creator.email}`,
+                teamId: savedTeam.id,
+                userEmail: user.email,
+              };
+              await this.invitationsService.create(invitationBody, token);
+            }
+          }
         }
         return 'Команда создана';
       }

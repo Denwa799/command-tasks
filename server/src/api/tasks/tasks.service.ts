@@ -195,16 +195,18 @@ export class TasksService {
         },
       });
       const user = await this.userService.findUserByEmail(dto.responsible);
-      const userInTeam = task.project.team.users.find(
-        (item) => item.id === user.id,
-      );
+      let isUser = false;
+      if (task.project.team.users.length > 0) {
+        const userInTeam = task.project.team.users.find(
+          (item) => item.id === user.id,
+        );
+        isUser = task.project.team.activatedUsers.includes(userInTeam?.id);
+      }
 
       if (
         task &&
         task.project.team.creator.id === decoded.id &&
-        ((userInTeam &&
-          task.project.team.activatedUsers.includes(userInTeam?.id)) ||
-          task.project.team.creator.id === user.id)
+        (isUser || task.project.team.creator.id === user.id)
       ) {
         const newTask = await this.taskRepository.merge(task, {
           text: dto.text,
