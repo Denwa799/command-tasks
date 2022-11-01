@@ -34,6 +34,7 @@ export class TeamsService {
     skip = 0,
   ): Promise<{ count: number; teams: Team[] }> {
     const decoded = await this.decodeToken(token);
+    console.log(decoded);
     if (decoded) {
       const [teams, teamsCount] = await this.teamRepository.findAndCount({
         select: {

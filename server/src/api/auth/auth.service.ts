@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Tokens } from './types';
 import { stringReverse } from 'src/utils';
+import { UserActivationDto } from './dto/user-activation.dto';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,9 @@ export class AuthService {
     tokens: Tokens;
   }> {
     const user = await this.validateUser(userDto);
+    if (!user.isActive)
+      throw new HttpException('Email не подтвержден', HttpStatus.FORBIDDEN);
+
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
     const response = {
@@ -72,6 +76,28 @@ export class AuthService {
     return 'Выход выполнен';
   }
 
+  async userActivation(dto: UserActivationDto): Promise<string> {
+    const user = await this.userService.findUserByEmail(dto.email);
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
+    if (user.isActive)
+      throw new HttpException(
+        'Пользователь уже активирован',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const codeEquals = await bcrypt.compare(
+      String(dto.code),
+      user.hashedActiveCode,
+    );
+    if (!codeEquals)
+      throw new HttpException('Код не совпадает', HttpStatus.BAD_REQUEST);
+
+    await this.userService.changeUserIsActive(user, true);
+
+    return 'Email подтвержден';
+  }
+
   async refreshTokens(
     userId: number,
     refreshToken: string,
@@ -112,6 +138,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           roles: user.roles,
+          isActive: user.isActive,
         },
         {
           secret: process.env.PRIVATE_KEY || 'SECRET',
@@ -123,6 +150,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           roles: user.roles,
+          isActive: user.isActive,
         },
         {
           secret: process.env.PRIVATE_KEY_REFRESH || 'SECRET_REF',

@@ -12,6 +12,7 @@ import { AccessTokenGuard } from './api/auth/guards';
 import { InvitationsModule } from './api/invitations/invitations.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './mail/mail.module';
+import { IsActiveGuard } from './api/auth/guards/is-active.guard';
 
 @Module({
   imports: [
@@ -53,6 +54,10 @@ import { MailModule } from './mail/mail.module';
     InvitationsModule,
   ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: IsActiveGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard,

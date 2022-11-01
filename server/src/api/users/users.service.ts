@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/api/roles/roles.service';
 import { Like, Repository } from 'typeorm';
+import * as bcrypt from 'bcryptjs';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -112,7 +113,6 @@ export class UsersService {
       relations: ['roles'],
     });
     if (user) return user;
-    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
   async findUsersByEmail(
@@ -231,5 +231,29 @@ export class UsersService {
     user.teams.filter((id) => id !== teamId);
     await this.userRepository.save(user);
     return `Команда с id ${teamId} удалена у пользователя с id ${userId}`;
+  }
+
+  async addActivatedCode(id: number, code: number): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+    });
+
+    if (user) {
+      const hashCode = await bcrypt.hash(String(code), 10);
+      const newUser = await this.userRepository.merge(user, {
+        hashedActiveCode: hashCode,
+      });
+      this.userRepository.save(newUser);
+      return newUser;
+    }
+    throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+  }
+
+  async changeUserIsActive(user: User, isActive: boolean): Promise<User> {
+    const newUser = await this.userRepository.merge(user, {
+      isActive,
+    });
+    this.userRepository.save(newUser);
+    return newUser;
   }
 }

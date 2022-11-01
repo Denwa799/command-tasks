@@ -31,7 +31,7 @@ export class User {
 
   @ApiProperty({
     example: '$2a$05$0dUvdl56Pwh.',
-    description: 'Hashed refresh token',
+    description: 'Захешированный рефреш токен',
   })
   @Column({ nullable: true })
   @IsString()
@@ -52,6 +52,19 @@ export class User {
   @IsString()
   @Length(5, 20)
   password: string;
+
+  @ApiProperty({ example: 'true', description: 'Активирован аккаунт или нет' })
+  @Column({ default: false })
+  @IsBoolean()
+  isActive: boolean;
+
+  @ApiProperty({
+    example: '$2a$05$0dUvdl56Pwh.',
+    description: 'Захешированный код активации аккаунта',
+  })
+  @Column({ nullable: true })
+  @IsString()
+  hashedActiveCode: string;
 
   @ApiProperty({ example: 'true', description: 'Забанен или нет' })
   @Column({ default: false })
