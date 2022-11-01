@@ -1,24 +1,22 @@
-import { MailerService } from '@nestjs-modules/mailer';
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CheckEmailDto } from './dto/check-email.dto';
+import { MailService } from './mail.service';
 
 @ApiTags('Email')
 @Controller('email')
 export class MailController {
-  constructor(private readonly mailerService: MailerService) {}
+  constructor(private mailService: MailService) {}
 
+  @ApiOperation({ summary: 'Проверка работоспособности почты' })
+  @ApiResponse({ status: 200, description: 'Отправлено' })
   @Get('/test')
-  async sendTestEmail() {
-    await this.mailerService
-      .sendMail({
-        to: 'madara312000@yandex.ru',
-        from: 'denwa799@yandex.ru',
-        subject: 'Проверка nest js',
-        text: 'Это письмо с smtp сервера',
-      })
-      .catch((error) => {
-        console.log('error = ', error);
-      });
-    return 'Отправлено';
+  sendTestEmail() {
+    return this.mailService.sendTestEmail();
+  }
+
+  @Post('/check')
+  checkEmail(@Body() checkEmailDto: CheckEmailDto) {
+    return this.mailService.checkEmail(checkEmailDto);
   }
 }
