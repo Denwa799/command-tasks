@@ -26,7 +26,7 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Получение всех проектов в команде' })
   @ApiResponse({ status: 200, type: [Project] })
   @Get('team/:id')
-  getAllProjectTasks(
+  getAllTeamProjects(
     @Param('id') id: number,
     @Query() reqParam: PaginationQueryParamDto,
     @GetCurrentUser('accessToken') token: string,

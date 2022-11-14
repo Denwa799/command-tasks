@@ -9,6 +9,7 @@ import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
+import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -24,8 +25,18 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto): Promise<User> {
+    const hashPassword = await bcrypt.hash(
+      dto.password,
+      Number(process.env.HASH_SALT),
+    );
+
     const role = await this.roleService.getRoleByValue('user');
-    const user = await this.userRepository.create({ ...dto, roles: [role] });
+    const user = await this.userRepository.create({
+      email: dto.email,
+      password: hashPassword,
+      name: dto.name,
+      roles: [role],
+    });
     if (user) return this.userRepository.save(user);
     throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
   }
@@ -192,6 +203,38 @@ export class UsersService {
     throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
   }
 
+  async changePassword(
+    id: number,
+    dto: ChangeUserPasswordDto,
+    token: string,
+  ): Promise<string> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+
+    const decoded = await this.decodeToken(token);
+    if (!decoded || decoded.id !== user.id)
+      throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+
+    const passwordEquals = await bcrypt.compare(dto.password, user.password);
+    if (passwordEquals)
+      throw new HttpException(
+        'Пароль должен отличаться',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const hashPassword = await bcrypt.hash(
+      dto.password,
+      Number(process.env.HASH_SALT),
+    );
+    const newUser = await this.userRepository.merge(user, {
+      password: hashPassword,
+    });
+    await this.userRepository.save(newUser);
+
+    return 'Пароль был успешно сменен';
+  }
+
   async addRole(dto: AddRoleDto): Promise<AddRoleDto> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
@@ -239,7 +282,10 @@ export class UsersService {
     });
 
     if (user) {
-      const hashCode = await bcrypt.hash(String(code), 10);
+      const hashCode = await bcrypt.hash(
+        String(code),
+        Number(process.env.HASH_SALT),
+      );
       const newUser = await this.userRepository.merge(user, {
         hashedActiveCode: hashCode,
       });

@@ -55,7 +55,10 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const hashPassword = await bcrypt.hash(userDto.password, 10);
+    const hashPassword = await bcrypt.hash(
+      userDto.password,
+      Number(process.env.HASH_SALT),
+    );
     const user = await this.userService.createUser({
       ...userDto,
       password: hashPassword,
@@ -166,7 +169,10 @@ export class AuthService {
   }
 
   private async updateRtHash(userId: number, refreshToken: string) {
-    const hashedToken = await bcrypt.hash(stringReverse(refreshToken), 10);
+    const hashedToken = await bcrypt.hash(
+      stringReverse(refreshToken),
+      Number(process.env.HASH_SALT),
+    );
     await this.userService.addRefreshToken(userId, hashedToken);
   }
 
