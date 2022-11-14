@@ -1,9 +1,4 @@
-import {
-  LoginService,
-  PostService,
-  RefreshService,
-  RegistrationService,
-} from 'api';
+import {LoginService, RefreshService, RegistrationService} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -19,7 +14,6 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppLoader} from 'components/AppLoader';
 import {IUser} from 'models/IUser';
-import {getAccessToken} from 'utils/getSession';
 import {useTeams} from 'hooks/useTeams';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
@@ -112,8 +106,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const logoutHandler = useCallback(async () => {
     setIsLoading(true);
     try {
-      const tokenBearer = await getAccessToken();
-      tokenBearer && (await PostService(`${authPath}logout`, tokenBearer, {}));
       await EncryptedStorage.removeItem('user_session');
       setIsCheck(prev => !prev);
       cleanTeams();
@@ -148,10 +140,9 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       }
     } catch (error: any) {
       console.log('Ошибка обновления токена', error);
-      if (error.response.data.statusCode === 401) {
+      if (error.response.data.statusCode === (400 || 401)) {
         logoutHandler();
         Alert.alert('Авторизуйтесь заново');
-        Alert.alert('Давно не заходили в приложение');
       }
     } finally {
       setIsFirstRefresh(false);

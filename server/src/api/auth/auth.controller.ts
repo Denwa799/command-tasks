@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { RefreshTokenGuard } from './guards';
 import { GetCurrentUser, GetCurrentUserId, Public } from './decorators';
+import { UserActivationDto } from './dto/user-activation.dto';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -42,6 +43,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   logout(@GetCurrentUserId() userId: number) {
     return this.authService.logout(userId);
+  }
+
+  @ApiOperation({ summary: 'Активация аккаунта' })
+  @ApiResponse({ status: 200 })
+  @Public()
+  @Post('/activation')
+  @HttpCode(HttpStatus.OK)
+  userActivation(@Body() userActivationDto: UserActivationDto) {
+    return this.authService.userActivation(userActivationDto);
   }
 
   @ApiOperation({ summary: 'Обновление подключения' })

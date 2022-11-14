@@ -5,8 +5,10 @@ import { ProjectsService } from 'src/api/projects/projects.service';
 import { ArrayContains, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateStatusTaskDto } from './dto/update-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
+import { TaskStatusType } from './tasks.type';
 
 @Injectable()
 export class TasksService {
@@ -193,16 +195,18 @@ export class TasksService {
         },
       });
       const user = await this.userService.findUserByEmail(dto.responsible);
-      const userInTeam = task.project.team.users.find(
-        (item) => item.id === user.id,
-      );
+      let isUser = false;
+      if (task.project.team.users.length > 0) {
+        const userInTeam = task.project.team.users.find(
+          (item) => item.id === user.id,
+        );
+        isUser = task.project.team.activatedUsers.includes(userInTeam?.id);
+      }
 
       if (
         task &&
         task.project.team.creator.id === decoded.id &&
-        ((userInTeam &&
-          task.project.team.activatedUsers.includes(userInTeam?.id)) ||
-          task.project.team.creator.id === user.id)
+        (isUser || task.project.team.creator.id === user.id)
       ) {
         const newTask = await this.taskRepository.merge(task, {
           text: dto.text,
@@ -224,6 +228,74 @@ export class TasksService {
       throw new HttpException('Ошибка обновления задачи', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+  }
+
+  async updateStatus(
+    id: number,
+    dto: UpdateStatusTaskDto,
+    token,
+  ): Promise<{
+    id: number;
+    text: string;
+    status: TaskStatusType;
+    isUrgently: boolean;
+    date: Date;
+  }> {
+    const decoded = await this.decodeToken(token);
+    if (!decoded) {
+      throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+    }
+
+    const task = await this.taskRepository.findOne({
+      relations: {
+        project: {
+          team: {
+            creator: true,
+            users: true,
+          },
+        },
+      },
+      where: [
+        {
+          id,
+          project: {
+            team: {
+              creator: {
+                id: decoded.id,
+              },
+            },
+          },
+        },
+        {
+          id,
+          project: {
+            team: {
+              users: {
+                id: decoded.id,
+              },
+              activatedUsers: ArrayContains([decoded.id]),
+            },
+          },
+        },
+      ],
+    });
+    if (!task) {
+      throw new HttpException(
+        'Ошибка обновления задачи',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const newTask = await this.taskRepository.merge(task, {
+      status: dto.status,
+    });
+    const savedTask = await this.taskRepository.save(newTask);
+    return {
+      id: savedTask.id,
+      text: savedTask.text,
+      status: savedTask.status,
+      isUrgently: savedTask.isUrgently,
+      date: savedTask.date,
+    };
   }
 
   async getAllTasks(

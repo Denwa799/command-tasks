@@ -123,7 +123,9 @@ export class InvitationsService {
           take,
           skip,
           order: {
-            id: 'DESC',
+            user: {
+              id: 'DESC',
+            },
           },
           relations: ['team', 'user'],
         });

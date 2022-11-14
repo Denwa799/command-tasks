@@ -11,6 +11,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../users/users.entity';
+import { TaskStatusType } from './tasks.type';
 
 @Entity('tasks')
 export class Task {
@@ -32,7 +33,7 @@ export class Task {
   @ApiProperty({ example: 'inProgress', description: 'Статус' })
   @Column()
   @IsString()
-  status: string;
+  status: TaskStatusType;
 
   @ApiProperty({ example: 'false', description: 'Срочно или нет' })
   @Column()

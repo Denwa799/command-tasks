@@ -14,6 +14,7 @@ import { GetCurrentUser, Roles } from '../auth/decorators';
 import { RolesGuard } from '../auth/guards';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { PaginationQueryParamDto } from './dto/query-param.dto';
+import { UpdateStatusTaskDto } from './dto/update-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
 import { TasksService } from './tasks.service';
@@ -66,6 +67,17 @@ export class TasksController {
     @GetCurrentUser('accessToken') token: string,
   ) {
     return this.tasksService.delete(id, token);
+  }
+
+  @ApiOperation({ summary: 'Изменения статуса задачи' })
+  @ApiResponse({ status: 200, type: Task })
+  @Patch('/:id/status')
+  updateStatus(
+    @Param('id') id: number,
+    @Body() updateDto: UpdateStatusTaskDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.tasksService.updateStatus(id, updateDto, token);
   }
 
   @ApiOperation({ summary: 'Обновление задачи по id' })

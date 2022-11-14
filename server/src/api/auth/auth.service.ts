@@ -11,6 +11,8 @@ import { User } from 'src/api/users/users.entity';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login-user.dto';
 import { Tokens } from './types';
+import { stringReverse } from 'src/utils';
+import { UserActivationDto } from './dto/user-activation.dto';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +28,9 @@ export class AuthService {
     tokens: Tokens;
   }> {
     const user = await this.validateUser(userDto);
+    if (!user.isActive)
+      throw new HttpException('Email не подтвержден', HttpStatus.FORBIDDEN);
+
     const tokens = await this.generateTokens(user);
     await this.updateRtHash(user.id, tokens.refresh_token);
     const response = {
@@ -50,7 +55,10 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
-    const hashPassword = await bcrypt.hash(userDto.password, 5);
+    const hashPassword = await bcrypt.hash(
+      userDto.password,
+      Number(process.env.HASH_SALT),
+    );
     const user = await this.userService.createUser({
       ...userDto,
       password: hashPassword,
@@ -68,6 +76,29 @@ export class AuthService {
 
   async logout(userId: number) {
     await this.userService.addRefreshToken(userId, null);
+    return 'Выход выполнен';
+  }
+
+  async userActivation(dto: UserActivationDto): Promise<string> {
+    const user = await this.userService.findUserByEmail(dto.email);
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
+    if (user.isActive)
+      throw new HttpException(
+        'Пользователь уже активирован',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const codeEquals = await bcrypt.compare(
+      String(dto.code),
+      user.hashedActiveCode,
+    );
+    if (!codeEquals)
+      throw new HttpException('Код не совпадает', HttpStatus.BAD_REQUEST);
+
+    await this.userService.changeUserIsActive(user, true);
+
+    return 'Email подтвержден';
   }
 
   async refreshTokens(
@@ -83,7 +114,7 @@ export class AuthService {
 
     if (user) {
       const refreshTokenEquals = await bcrypt.compare(
-        refreshToken,
+        stringReverse(refreshToken),
         user.hashedRt,
       );
 
@@ -110,6 +141,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           roles: user.roles,
+          isActive: user.isActive,
         },
         {
           secret: process.env.PRIVATE_KEY || 'SECRET',
@@ -121,6 +153,7 @@ export class AuthService {
           id: user.id,
           email: user.email,
           roles: user.roles,
+          isActive: user.isActive,
         },
         {
           secret: process.env.PRIVATE_KEY_REFRESH || 'SECRET_REF',
@@ -136,7 +169,10 @@ export class AuthService {
   }
 
   private async updateRtHash(userId: number, refreshToken: string) {
-    const hashedToken = await bcrypt.hash(refreshToken, 5);
+    const hashedToken = await bcrypt.hash(
+      stringReverse(refreshToken),
+      Number(process.env.HASH_SALT),
+    );
     await this.userService.addRefreshToken(userId, hashedToken);
   }
 

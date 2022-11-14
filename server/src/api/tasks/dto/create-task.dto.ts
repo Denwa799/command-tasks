@@ -9,6 +9,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+import { TaskStatusType } from '../tasks.type';
 
 export class CreateTaskDto {
   @ApiProperty({ example: 'Найти персонал', description: 'Текст задачи' })
@@ -27,8 +28,8 @@ export class CreateTaskDto {
   @ApiProperty({ example: 'overdue', description: 'Статус' })
   @IsNotEmpty({ message: 'Пустое поле статуса' })
   @IsString({ message: 'Должно быть строкой' })
-  @Length(3, 20, { message: 'Не меньше 3 и не больше 20' })
-  readonly status: string;
+  @Length(4, 10, { message: 'Не меньше 4 и не больше 10' })
+  readonly status: TaskStatusType;
 
   @ApiProperty({ example: 'false', description: 'Срочно или нет' })
   @IsNotEmpty({ message: 'Пустое поле "срочно"' })
