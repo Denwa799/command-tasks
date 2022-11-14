@@ -84,7 +84,7 @@ export class UsersController {
   }
 
   @ApiOperation({ summary: 'Смена пароля пользователя по id' })
-  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 200, description: 'Пароль был успешно сменен' })
   @Patch('/change-password/:id')
   changePassword(
     @Param('id') id: number,

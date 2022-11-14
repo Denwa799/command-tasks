@@ -299,7 +299,21 @@ export class UsersService {
     const newUser = await this.userRepository.merge(user, {
       isActive,
     });
-    this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
+    return newUser;
+  }
+
+  async setNewPassword(user: User, password: string): Promise<User> {
+    const hashPassword = await bcrypt.hash(
+      password,
+      Number(process.env.HASH_SALT),
+    );
+
+    const newUser = await this.userRepository.merge(user, {
+      password: hashPassword,
+    });
+
+    await this.userRepository.save(newUser);
     return newUser;
   }
 }
