@@ -57,12 +57,6 @@ export const UsersScreen = () => {
         };
       });
       users = [...newUsers];
-      users.push({
-        id: team.creator?.id,
-        email: team.creator?.email,
-        name: team.creator?.name,
-        isInvitation: false,
-      });
     }
     return users;
   }, [team, teamInvitations]);

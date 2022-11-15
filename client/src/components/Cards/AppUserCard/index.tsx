@@ -41,20 +41,24 @@ export const AppUserCard: FC<IAppUserCard> = ({
             <AppText>Приглашение отклонено</AppText>
           )}
         </View>
-        {!isActive && isBtnVisible && (
-          <AppTextButton
-            onPress={onPressHandler}
-            isTextCenter
-            style={styles.sendBtn}
-            isDisabled={isDisabled}>
-            Отправить{'\n'}повторно
-          </AppTextButton>
-        )}
-        {isBtnVisible && !isCreator && (
-          <AppTextButton onPress={onButtonTextPressHandler}>
-            {btnText}
-          </AppTextButton>
-        )}
+        <View>
+          {!isActive && isBtnVisible && (
+            <AppTextButton
+              onPress={onPressHandler}
+              isTextCenter
+              style={styles.sendBtn}
+              isDisabled={isDisabled}>
+              Отправить{'\n'}повторно
+            </AppTextButton>
+          )}
+          {isBtnVisible && !isCreator && (
+            <AppTextButton
+              style={styles.deleteBtn}
+              onPress={onButtonTextPressHandler}>
+              {btnText}
+            </AppTextButton>
+          )}
+        </View>
       </AppContainer>
     </View>
   );

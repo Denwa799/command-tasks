@@ -6,6 +6,7 @@ export const styles = StyleSheet.create({
     backgroundColor: THEME.BACK_SECOND,
     marginVertical: 10,
     paddingVertical: 5,
+    paddingBottom: 10,
   },
   container: {
     flexDirection: 'row',
@@ -22,6 +23,12 @@ export const styles = StyleSheet.create({
     fontSize: 17,
   },
   sendBtn: {
-    paddingRight: 10,
+    width: 80,
+    textAlign: 'right',
+    marginBottom: 10,
+  },
+  deleteBtn: {
+    width: 80,
+    textAlign: 'right',
   },
 });
