@@ -2,7 +2,7 @@ import {DeleteService, GetService, PatchService, PostService} from 'api';
 import {takeNumber, variables} from 'constants/variables';
 import {ITask} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
 import {ITasksContext, ITasksProvider} from './types';
 
@@ -38,8 +38,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка задач');
+        ToastAndroid.show('Ошибка загрузки списка задач', ToastAndroid.SHORT);
       } finally {
         setTasksIsLoading(false);
       }
@@ -64,8 +63,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка задач');
+        ToastAndroid.show('Ошибка загрузки списка задач', ToastAndroid.SHORT);
       } finally {
         setMoreTasksIsLoading(false);
       }
@@ -102,8 +100,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка создания задачи');
+        ToastAndroid.show('Ошибка создания задачи', ToastAndroid.SHORT);
       } finally {
         setCreateTaskIsLoading(false);
       }
@@ -121,8 +118,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка удаления задачи');
+      ToastAndroid.show('Ошибка удаления задачи', ToastAndroid.SHORT);
     } finally {
       setDeleteTaskIsLoading(false);
     }
@@ -152,8 +148,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка обновления задачи');
+        ToastAndroid.show('Ошибка обновления задачи', ToastAndroid.SHORT);
       } finally {
         setUpdateTaskIsLoading(false);
       }

@@ -125,6 +125,7 @@ export const NotificationsScreen = () => {
             onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
               <AppMessageCard
+                key={item.id}
                 id={item.id}
                 message={item.message}
                 isAccepted={item.isAccepted}

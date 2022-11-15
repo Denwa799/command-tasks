@@ -2,7 +2,7 @@ import {DeleteService, GetService, PatchService, PostService} from 'api';
 import {takeNumber, variables} from 'constants/variables';
 import {ITeam} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
 import {ITeamsContext, ITeamsProvider} from './types';
 
@@ -44,8 +44,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка команд');
+        ToastAndroid.show('Ошибка загрузки списка команд', ToastAndroid.SHORT);
       } finally {
         setTeamsIsLoading(false);
       }
@@ -69,8 +68,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка команд');
+        ToastAndroid.show('Ошибка загрузки списка команд', ToastAndroid.SHORT);
       } finally {
         setMoreTeamsIsLoading(false);
       }
@@ -97,8 +95,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка загрузки команды');
+      ToastAndroid.show('Ошибка загрузки команды', ToastAndroid.SHORT);
     } finally {
       setTeamIsLoading(false);
     }
@@ -119,8 +116,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка создания команды');
+        ToastAndroid.show('Ошибка создания команды', ToastAndroid.SHORT);
       } finally {
         setCreateTeamIsLoading(false);
       }
@@ -138,8 +134,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка удаления команды');
+      ToastAndroid.show('Ошибка удаления команды', ToastAndroid.SHORT);
     } finally {
       setDeleteTeamIsLoading(false);
     }
@@ -159,8 +154,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка удаления пользователя');
+        ToastAndroid.show('Ошибка удаления пользователя', ToastAndroid.SHORT);
       } finally {
         setDeleteUserInTeamIsLoading(false);
       }
@@ -180,8 +174,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления команды');
+      ToastAndroid.show('Ошибка обновления команды', ToastAndroid.SHORT);
     } finally {
       setUpdateTeamIsLoading(false);
     }
@@ -201,8 +194,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка добавления пользователя');
+      ToastAndroid.show('Ошибка добавления пользователя', ToastAndroid.SHORT);
     } finally {
       setAddUserInTeamIsLoading(false);
     }

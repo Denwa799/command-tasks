@@ -6,13 +6,20 @@ import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
 
 export const AppItemsGrid: FC<IAppItemsGrid> = ({items, style, onDelete}) => {
+  const preparedData = items.map(item => {
+    return {
+      id: `${Math.random()}${item}`,
+      text: item,
+    };
+  });
+
   return (
     <View style={[styles.grid, style]}>
-      {items.map((item, index) => {
+      {preparedData.map((item, index) => {
         return (
-          <View key={`${Math.random()}item`} style={styles.item}>
+          <View key={item.id} style={styles.item}>
             <Text style={styles.text} numberOfLines={1}>
-              {item}
+              {item.text}
             </Text>
             <TouchableOpacity
               onPress={() => onDelete(index)}

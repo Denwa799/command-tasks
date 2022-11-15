@@ -314,6 +314,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               onRefresh={onRefresh}
               renderItem={({item}) => (
                 <AppCard
+                  key={item.id}
                   id={item?.id}
                   text={item.name ? item.name : item.text}
                   item={item}

@@ -18,6 +18,13 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
   isDanger,
   dangerText = 'Пустое поле',
 }) => {
+  const preparedData = data.map(item => {
+    return {
+      id: `${Math.random()}${item}`,
+      text: item,
+    };
+  });
+
   return (
     <View style={style}>
       <AppField
@@ -37,11 +44,11 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
             <AppLoader />
           ) : (
             <View>
-              {data.map(item => (
+              {preparedData.map(item => (
                 <AppNativeFeedbackBtn
-                  key={`${Math.random()}${item}`}
-                  onPress={() => onPress(item)}
-                  text={item}
+                  key={item.id}
+                  onPress={() => onPress(item.text)}
+                  text={item.text}
                   isBorderRadius
                   style={styles.item}
                 />
