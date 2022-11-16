@@ -30,8 +30,6 @@ export const NotificationsScreen = () => {
     deleteInvitation,
   } = useInvitations();
 
-  const {fetchTeams} = useTeams();
-
   const [fetchSkip, setFetchSkip] = useState(takeNumber);
   const [dataInvitations, setDataInvitations] = useState<IInvitations[]>([]);
 
@@ -106,7 +104,6 @@ export const NotificationsScreen = () => {
 
     setDialogIsOpen(false);
     fetchInvitations();
-    fetchTeams();
   }, [notificationId, isDelete]);
 
   return (
