@@ -7,12 +7,13 @@ export interface IAppCard {
   text: string;
   isColors?: boolean;
   isUrgently?: boolean;
+  isAdditionalButtons?: boolean;
   date?: Date;
   status?: TaskStatusType;
   responsible?: IUser;
   item: any;
   onOpen?: (id: number, creatorId: number) => void;
-  onDelete?: (id: number) => void;
+  onDialog?: (id: number, actualStatus: TaskStatusType | '') => void;
   onChange?: (
     id: number,
     text: string,

@@ -23,12 +23,13 @@ export const AppCard: FC<IAppCard> = ({
   text,
   isColors = false,
   isUrgently = false,
+  isAdditionalButtons = false,
   date,
   status,
   responsible,
   item,
   onOpen,
-  onDelete,
+  onDialog,
   onChange,
 }) => {
   const {user} = useAuth();
@@ -124,9 +125,12 @@ export const AppCard: FC<IAppCard> = ({
     }
   }, [id, creatorId, item, onOpen]);
 
-  const deleteHandler = useCallback(() => {
-    onDelete && onDelete(id);
-  }, [onDelete, id]);
+  const dialogHandler = useCallback(
+    (actualStatus: TaskStatusType | '' = '') => {
+      onDialog && onDialog(id, actualStatus);
+    },
+    [onDialog, id],
+  );
 
   const changeHandler = useCallback(() => {
     onChange &&
@@ -169,12 +173,28 @@ export const AppCard: FC<IAppCard> = ({
               <Anticon name="edit" size={24} color={iconColor} />
             </TouchableHighlight>
             <TouchableHighlight
-              onPress={deleteHandler}
+              onPress={() => dialogHandler()}
               underlayColor="none"
               style={styles.btn}>
               <Anticon name="delete" size={24} color={iconColor} />
             </TouchableHighlight>
           </View>
+        )}
+        {isAdditionalButtons && !isAccess && user?.id === responsible?.id && (
+          <TouchableHighlight
+            onPress={
+              status === doneStatus
+                ? () => dialogHandler(inProgressStatus)
+                : () => dialogHandler(doneStatus)
+            }
+            underlayColor="none"
+            style={[styles.btn, styles.additionalBtn]}>
+            <Anticon
+              name={status === doneStatus ? 'close' : 'check'}
+              size={24}
+              color={iconColor}
+            />
+          </TouchableHighlight>
         )}
       </View>
     </AppContainer>

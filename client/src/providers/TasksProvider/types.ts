@@ -1,4 +1,4 @@
-import {ITask} from 'models/ITasks';
+import {ITask, TaskStatusType} from 'models/ITasks';
 import {ReactNode} from 'react';
 
 export interface ITasksContext {
@@ -10,6 +10,7 @@ export interface ITasksContext {
   createTaskIsLoading: boolean;
   deleteTaskIsLoading: boolean;
   updateTaskIsLoading: boolean;
+  changeTaskStatusIsLoading: boolean;
   fetchTasks: (
     projectId: number,
     skip?: number,
@@ -24,7 +25,7 @@ export interface ITasksContext {
     projectId: number,
     text: string,
     responsible: string,
-    status: 'overdue' | 'inProgress' | 'done',
+    status: TaskStatusType,
     isUrgently: boolean,
     date: Date,
   ) => Promise<void>;
@@ -33,11 +34,12 @@ export interface ITasksContext {
     id: number,
     text: string,
     responsible: string,
-    status: 'overdue' | 'inProgress' | 'done',
+    status: TaskStatusType,
     isUrgently: boolean,
     date: Date,
   ) => Promise<void>;
   cleanMoreTasks: () => void;
+  changeTaskStatus: (id: number, status: TaskStatusType) => void;
 }
 
 export interface ITasksProvider {

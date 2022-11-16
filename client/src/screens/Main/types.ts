@@ -17,21 +17,23 @@ export interface IMainScreen {
 }
 
 export interface IModals {
-  createIsOpen: boolean;
-  setCreateIsOpen: (value: boolean) => void;
-  deleteIsOpen: boolean;
-  setDeleteIsOpen: (value: boolean) => void;
-  changeIsOpen: boolean;
-  setChangeIsOpen: (value: boolean) => void;
   id: number;
-  text: string;
   teamId?: number;
   projectId?: number;
+  text: string;
   responsibleEmail?: string;
-  status?: TaskStatusType;
+  dialogTitle?: string;
+  statusAction: TaskStatusType | '';
+  createIsOpen: boolean;
+  dialogIsOpen: boolean;
+  changeIsOpen: boolean;
   isUrgently?: boolean;
   date?: Date;
+  status?: TaskStatusType;
   onUpdateData: () => void;
+  setChangeIsOpen: (value: boolean) => void;
+  setDialogIsOpen: (value: boolean) => void;
+  setCreateIsOpen: (value: boolean) => void;
 }
 
 interface IModal {
@@ -56,8 +58,10 @@ export interface IModalChange extends IModal {
   projectId?: number;
 }
 
-export interface IModalDelete extends IModal {
+export interface IModalDialog extends IModal {
   id: number;
   teamId?: number;
   projectId?: number;
+  title?: string;
+  statusAction: TaskStatusType | '';
 }

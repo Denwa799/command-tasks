@@ -4,6 +4,8 @@ import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {
+  doneStatus,
+  inProgressStatus,
   projectRoute,
   takeNumber,
   teamRoute,
@@ -83,7 +85,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const [isCanUpdateData, setIsCanUpdateData] = useState(true);
 
   const [createIsOpen, setCreateIsOpen] = useState(false);
-  const [deleteIsOpen, setDeleteIsOpen] = useState(false);
+  const [dialogIsOpen, setDialogIsOpen] = useState(false);
   const [changeIsOpen, setChangeIsOpen] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -92,7 +94,18 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const [responsibleEmail, setResponsibleEmail] = useState('');
   const [status, setStatus] = useState<TaskStatusType>();
   const [isUrgently, setIsUrgently] = useState(false);
+  const [statusAction, setStatusAction] = useState<TaskStatusType | ''>('');
   const [date, setDate] = useState<Date>();
+
+  const dialogTitle = useMemo(() => {
+    if (statusAction === doneStatus) {
+      return 'Выполнили?';
+    }
+    if (statusAction === inProgressStatus) {
+      return 'Отменить выполнение?';
+    }
+    return 'Удалить?';
+  }, [statusAction]);
 
   const isLoading = useMemo(() => {
     if (route.name === teamsRoute) {
@@ -242,10 +255,14 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     setCreateIsOpen(true);
   }, []);
 
-  const onDelete = useCallback((itemId: number) => {
-    setId(itemId);
-    setDeleteIsOpen(true);
-  }, []);
+  const onDialog = useCallback(
+    (itemId: number, actualStatus: TaskStatusType | '') => {
+      setId(itemId);
+      setDialogIsOpen(true);
+      setStatusAction(actualStatus);
+    },
+    [],
+  );
 
   const onChange = useCallback(
     (
@@ -319,12 +336,13 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
                   text={item.name ? item.name : item.text}
                   item={item}
                   onOpen={onOpen}
-                  onDelete={onDelete}
+                  onDialog={onDialog}
                   onChange={onChange}
                   isColors={route.name === projectRoute}
                   responsible={item?.responsible}
                   status={item?.status}
                   isUrgently={item?.isUrgently}
+                  isAdditionalButtons={route.name === projectRoute}
                   date={item?.date}
                   creatorId={creatorId}
                 />
@@ -341,21 +359,23 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               <AppIconButton onPress={onAdd} />
             )}
             <Modals
-              createIsOpen={createIsOpen}
-              setCreateIsOpen={setCreateIsOpen}
               id={id}
-              deleteIsOpen={deleteIsOpen}
-              setDeleteIsOpen={setDeleteIsOpen}
-              changeIsOpen={changeIsOpen}
-              setChangeIsOpen={setChangeIsOpen}
-              text={text}
               teamId={route.name === teamRoute && params.teamId}
               projectId={route.name === projectRoute && params.projectId}
+              text={text}
               responsibleEmail={responsibleEmail}
-              status={status}
+              dialogTitle={dialogTitle}
+              statusAction={statusAction}
+              createIsOpen={createIsOpen}
+              dialogIsOpen={dialogIsOpen}
+              changeIsOpen={changeIsOpen}
               isUrgently={isUrgently}
               date={date}
+              status={status}
               onUpdateData={onUpdateData}
+              setCreateIsOpen={setCreateIsOpen}
+              setChangeIsOpen={setChangeIsOpen}
+              setDialogIsOpen={setDialogIsOpen}
             />
           </View>
         </>

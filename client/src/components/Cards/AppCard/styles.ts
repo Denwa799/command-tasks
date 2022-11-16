@@ -34,6 +34,10 @@ export const styles = StyleSheet.create({
   btnEdit: {
     marginRight: 15,
   },
+  additionalBtn: {
+    position: 'relative',
+    right: 20,
+  },
   colorsCard: {
     marginBottom: 4,
     paddingTop: 5,
