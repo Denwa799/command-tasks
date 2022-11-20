@@ -21,9 +21,9 @@ import {styles} from './styles';
 import {IMainScreen, TeamScreenNavigateType} from './types';
 import {AppTitle} from 'components/AppTitle';
 import {useAuth} from 'hooks/useAuth';
-import {AppCard} from 'components/Cards/AppCard';
 import {useTasks} from 'hooks/useTasks';
 import {useInvitations} from 'hooks/useInvitations';
+import {AppMainCard} from 'components/Cards/AppMainCard';
 
 export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const route = useRoute();
@@ -330,7 +330,8 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               refreshing={isFlatListRefreshing}
               onRefresh={onRefresh}
               renderItem={({item}) => (
-                <AppCard
+                <AppMainCard
+                  style={styles.card}
                   key={item.id}
                   id={item?.id}
                   text={item.name ? item.name : item.text}
