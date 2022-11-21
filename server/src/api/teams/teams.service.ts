@@ -34,7 +34,6 @@ export class TeamsService {
     skip = 0,
   ): Promise<{ count: number; teams: Team[] }> {
     const decoded = await this.decodeToken(token);
-    console.log(decoded);
     if (decoded) {
       const [teams, teamsCount] = await this.teamRepository.findAndCount({
         select: {
@@ -206,7 +205,8 @@ export class TeamsService {
         );
 
         await this.userService.removeTeam(team.id, user.id);
-        await this.invitationsService.delete(invitation.id, token);
+        if (invitation)
+          await this.invitationsService.delete(invitation.id, token);
 
         const newTeam = await this.teamRepository.preload({
           id: team.id,

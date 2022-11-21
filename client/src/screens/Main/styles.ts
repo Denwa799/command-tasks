@@ -14,6 +14,12 @@ export const styles = StyleSheet.create({
     height: '95%',
     flexGrow: 0,
   },
+  card: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    marginBottom: 8,
+  },
   messageCenter: {
     position: 'absolute',
     alignItems: 'center',

@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import {Alert} from 'react-native';
+import {Alert, ToastAndroid} from 'react-native';
 import {IAuthContext, IAuthProvider} from './types';
 import EncryptedStorage from 'react-native-encrypted-storage';
 import {AppPositionContainer} from 'components/AppPositionContainer';
@@ -73,7 +73,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           }),
         );
       } catch (error) {
-        Alert.alert('Ошибка регистрации');
+        ToastAndroid.show('Ошибка регистрации', ToastAndroid.SHORT);
       } finally {
         setIsLoading(false);
       }
@@ -97,7 +97,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       );
       setIsCheck(prev => !prev);
     } catch (error) {
-      Alert.alert('Ошибка авторизации');
+      ToastAndroid.show('Ошибка авторизации', ToastAndroid.SHORT);
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +110,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       setIsCheck(prev => !prev);
       cleanTeams();
     } catch (error) {
-      Alert.alert('Ошибка во время выхода');
+      ToastAndroid.show('Ошибка во время выхода', ToastAndroid.SHORT);
     } finally {
       setIsLoading(false);
     }
@@ -139,7 +139,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
         setIsCheck(prev => !prev);
       }
     } catch (error: any) {
-      console.log('Ошибка обновления токена', error);
       if (error.response.data.statusCode === (400 || 401)) {
         logoutHandler();
         Alert.alert('Авторизуйтесь заново');

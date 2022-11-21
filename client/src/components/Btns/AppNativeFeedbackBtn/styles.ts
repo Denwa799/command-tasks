@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   text: {
-    paddingLeft: 10,
     fontSize: SIZES.body3,
     color: THEME.TEXT_COLOR,
   },

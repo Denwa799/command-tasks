@@ -1,8 +1,8 @@
 import {DeleteService, GetService, PatchService, PostService} from 'api';
 import {takeNumber, variables} from 'constants/variables';
-import {ITask} from 'models/ITasks';
+import {ITask, TaskStatusType} from 'models/ITasks';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
 import {ITasksContext, ITasksProvider} from './types';
 
@@ -18,6 +18,8 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
   const [createTaskIsLoading, setCreateTaskIsLoading] = useState(false);
   const [deleteTaskIsLoading, setDeleteTaskIsLoading] = useState(false);
   const [updateTaskIsLoading, setUpdateTaskIsLoading] = useState(false);
+  const [changeTaskStatusIsLoading, setChangeTaskStatusIsLoading] =
+    useState(false);
 
   const tasksPath = `${variables.API_URL}${variables.TASKS}`;
 
@@ -38,8 +40,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка задач');
+        ToastAndroid.show('Ошибка загрузки списка задач', ToastAndroid.SHORT);
       } finally {
         setTasksIsLoading(false);
       }
@@ -64,8 +65,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка задач');
+        ToastAndroid.show('Ошибка загрузки списка задач', ToastAndroid.SHORT);
       } finally {
         setMoreTasksIsLoading(false);
       }
@@ -82,7 +82,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
       projectId: number,
       text: string,
       responsible: string,
-      status: 'overdue' | 'inProgress' | 'done',
+      status: TaskStatusType,
       isUrgently: boolean,
       date: Date,
     ) => {
@@ -102,8 +102,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка создания задачи');
+        ToastAndroid.show('Ошибка создания задачи', ToastAndroid.SHORT);
       } finally {
         setCreateTaskIsLoading(false);
       }
@@ -121,8 +120,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка удаления задачи');
+      ToastAndroid.show('Ошибка удаления задачи', ToastAndroid.SHORT);
     } finally {
       setDeleteTaskIsLoading(false);
     }
@@ -133,7 +131,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
       id: number,
       text: string,
       responsible: string,
-      status: 'overdue' | 'inProgress' | 'done',
+      status: TaskStatusType,
       isUrgently: boolean,
       date: Date,
     ) => {
@@ -152,10 +150,30 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка обновления задачи');
+        ToastAndroid.show('Ошибка обновления задачи', ToastAndroid.SHORT);
       } finally {
         setUpdateTaskIsLoading(false);
+      }
+    },
+    [],
+  );
+
+  const changeTaskStatus = useCallback(
+    async (id: number, status: TaskStatusType) => {
+      setChangeTaskStatusIsLoading(true);
+      try {
+        const tokenBearer = await getAccessToken();
+        if (tokenBearer) {
+          await PatchService(`${tasksPath}/${id}/status`, tokenBearer, {
+            status,
+          });
+        } else {
+          throw new Error('Ошибка сессии');
+        }
+      } catch (error) {
+        ToastAndroid.show('Ошибка смены статуса', ToastAndroid.SHORT);
+      } finally {
+        setChangeTaskStatusIsLoading(false);
       }
     },
     [],
@@ -171,12 +189,14 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
       createTaskIsLoading,
       deleteTaskIsLoading,
       updateTaskIsLoading,
+      changeTaskStatusIsLoading,
       fetchTasks,
       fetchMoreTasks,
       cleanMoreTasks,
       createTask,
       deleteTask,
       updateTask,
+      changeTaskStatus,
     }),
     [
       tasks,

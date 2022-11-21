@@ -8,6 +8,7 @@ import {AppNoInternetMessage} from 'components/AppNoInternetMessage';
 
 const App = () => {
   const netInfo = useNetInfo();
+
   const [isNetConnected, setIsNetConnected] = useState(false);
   const [isNetConnectedLoading, setIsNetConnectedLoading] = useState(false);
 

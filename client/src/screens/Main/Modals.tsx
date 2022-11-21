@@ -1,25 +1,27 @@
 import React, {FC} from 'react';
 import {ModalChange} from './ModalChange';
 import {ModalCreate} from './ModalCreate';
-import ModalDelete from './ModalDelete';
+import {ModalDialog} from './ModalDialog';
 import {IModals} from './types';
 
 export const Modals: FC<IModals> = ({
-  createIsOpen,
-  setCreateIsOpen,
   id,
-  deleteIsOpen,
-  setDeleteIsOpen,
-  changeIsOpen,
-  setChangeIsOpen,
-  text,
   teamId,
   projectId,
+  text,
   responsibleEmail,
-  status,
+  dialogTitle,
+  statusAction,
+  createIsOpen,
+  dialogIsOpen,
+  changeIsOpen,
   isUrgently,
   date,
+  status,
   onUpdateData,
+  setChangeIsOpen,
+  setDialogIsOpen,
+  setCreateIsOpen,
 }) => {
   return (
     <>
@@ -30,12 +32,14 @@ export const Modals: FC<IModals> = ({
         projectId={projectId}
         onUpdateData={onUpdateData}
       />
-      <ModalDelete
-        isOpen={deleteIsOpen}
-        setIsOpen={setDeleteIsOpen}
+      <ModalDialog
         id={id}
         teamId={teamId}
         projectId={projectId}
+        title={dialogTitle}
+        statusAction={statusAction}
+        isOpen={dialogIsOpen}
+        setIsOpen={setDialogIsOpen}
         onUpdateData={onUpdateData}
       />
       <ModalChange

@@ -2,7 +2,7 @@ import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {IUsersContext, IUsersProvider} from './types';
 import {getAccessToken} from 'utils/getSession';
 import {setUserNameSession} from 'utils/setSession';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {GetService, PatchService} from 'api';
 import {variables} from 'constants/variables';
 import {IUser} from 'models/IUser';
@@ -29,8 +29,7 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления пользователя');
+      ToastAndroid.show('Ошибка обновления пользователя', ToastAndroid.SHORT);
     } finally {
       setUpdateUserIsLoading(false);
     }
@@ -50,8 +49,7 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка поиска пользователя');
+      ToastAndroid.show('Ошибка поиска пользователя', ToastAndroid.SHORT);
     } finally {
       setFindUsersIsLoading(false);
     }

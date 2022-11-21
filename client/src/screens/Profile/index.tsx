@@ -11,6 +11,8 @@ import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
 import {ModalEdit} from './ModalEdit';
 import {useUsers} from 'hooks/useUsers';
+import {AppCard} from 'components/Cards/AppCard';
+import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
 
 export const ProfileScreen = () => {
   const [userName, setUserName] = useState('');
@@ -58,14 +60,26 @@ export const ProfileScreen = () => {
               <Anticon name="edit" size={26} color={THEME.TEXT_COLOR} />
             </TouchableHighlight>
           </View>
+          <AppContainer>
+            <View style={styles.row}>
+              <AppCard style={styles.card}>
+                <AppNativeFeedbackBtn
+                  text={'Сменить пароль'}
+                  onPress={() => console.log('Сменить пароль')}
+                  isBorderRadius
+                  isCenter
+                />
+              </AppCard>
+            </View>
+          </AppContainer>
+          <View style={styles.footer}>
+            <AppButton onPress={logout} title="Выйти" style={styles.logout} />
+          </View>
           <ModalEdit
             isOpen={editNameIsOpen}
             setIsOpen={setEditNameIsOpen}
             name={userName}
           />
-          <AppContainer style={styles.container}>
-            <AppButton onPress={logout} title="Выйти" style={styles.logout} />
-          </AppContainer>
         </>
       )}
     </View>

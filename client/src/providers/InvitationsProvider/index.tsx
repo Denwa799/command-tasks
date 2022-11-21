@@ -8,7 +8,7 @@ import {
 import {takeNumber, variables} from 'constants/variables';
 import {IInvitations} from 'models/IInvitations';
 import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
 import {IInvitationsContext, IInvitationsProvider} from './types';
 
@@ -69,8 +69,10 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка приглашений');
+        ToastAndroid.show(
+          'Ошибка загрузки списка приглашений',
+          ToastAndroid.SHORT,
+        );
       } finally {
         setInvitationsIsLoading(false);
       }
@@ -94,8 +96,10 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка приглашений');
+        ToastAndroid.show(
+          'Ошибка загрузки списка приглашений',
+          ToastAndroid.SHORT,
+        );
       } finally {
         setMoreInvitationsIsLoading(false);
       }
@@ -117,7 +121,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
+      ToastAndroid.show('Ошибка загрузки уведомлений', ToastAndroid.SHORT);
     } finally {
       setTeamInvitationsIsLoading(false);
     }
@@ -142,7 +146,6 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
       } finally {
         setCreateInvitationIsLoading(false);
       }
@@ -160,8 +163,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка удаления приглашения');
+      ToastAndroid.show('Ошибка удаления приглашения', ToastAndroid.SHORT);
     } finally {
       setDeleteInvitationIsLoading(false);
     }
@@ -180,8 +182,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка обновления приглашения');
+        ToastAndroid.show('Ошибка обновления приглашения', ToastAndroid.SHORT);
       } finally {
         setUpdateInvitationIsLoading(false);
       }
@@ -202,7 +203,6 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
     } finally {
       setUpdateInvitationReadIsLoading(false);
     }
@@ -218,8 +218,7 @@ export const InvitationsProvider: FC<IInvitationsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления приглашения');
+      ToastAndroid.show('Ошибка отправки приглашения', ToastAndroid.SHORT);
     } finally {
       setRecreateInvitationIsLoading(false);
     }

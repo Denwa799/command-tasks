@@ -16,6 +16,9 @@ export const styles = StyleSheet.create({
   item: {
     backgroundColor: THEME.BACK_SECOND,
   },
+  itemText: {
+    paddingLeft: 10,
+  },
   dangerInput: {
     borderColor: THEME.DANGER_COLOR,
     borderWidth: 1,

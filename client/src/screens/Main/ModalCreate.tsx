@@ -69,9 +69,16 @@ export const ModalCreate: FC<IModalCreate> = ({
           text: element.email,
         };
       });
+      if (user) {
+        data.push({
+          id: user.id,
+          title: user.name ? user.name : 'ФИО отсутствует',
+          text: user!.email,
+        });
+      }
     }
     return data;
-  }, [team]);
+  }, [team, user]);
 
   const autocompleteData = useMemo(() => {
     if (route.name === teamsRoute) {
@@ -115,13 +122,6 @@ export const ModalCreate: FC<IModalCreate> = ({
         setDangerText('Пустое поле');
       }
       return setIsTextError(true);
-    }
-
-    if (route.name === teamsRoute) {
-      if (emails.length === 0) {
-        setDangerAutocompleteText('Добавьте пользователя');
-        return setIsAutocompleteError(true);
-      }
     }
 
     if (route.name === projectRoute) {

@@ -2,7 +2,7 @@ import React, {createContext, FC, useCallback, useMemo, useState} from 'react';
 import {takeNumber, variables} from 'constants/variables';
 import {IProject} from 'models/ITasks';
 import {IProjectsContext, IProjectsProvider} from './types';
-import {Alert} from 'react-native';
+import {ToastAndroid} from 'react-native';
 import {getAccessToken} from 'utils/getSession';
 import {DeleteService, GetService, PatchService, PostService} from 'api';
 
@@ -43,8 +43,10 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка проектов');
+        ToastAndroid.show(
+          'Ошибка загрузки списка проектов',
+          ToastAndroid.SHORT,
+        );
       } finally {
         setProjectsIsLoading(false);
       }
@@ -72,8 +74,10 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
           throw new Error('Ошибка сессии');
         }
       } catch (error) {
-        console.log(error);
-        Alert.alert('Ошибка загрузки списка проектов');
+        ToastAndroid.show(
+          'Ошибка загрузки списка проектов',
+          ToastAndroid.SHORT,
+        );
       } finally {
         setMoreProjectsIsLoading(false);
       }
@@ -96,8 +100,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка загрузки проекта');
+      ToastAndroid.show('Ошибка загрузки проекта', ToastAndroid.SHORT);
     } finally {
       setProjectIsLoading(false);
     }
@@ -116,8 +119,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка создания проекта');
+      ToastAndroid.show('Ошибка создания проекта', ToastAndroid.SHORT);
     } finally {
       setCreateProjectIsLoading(false);
     }
@@ -133,8 +135,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка удаления проекта');
+      ToastAndroid.show('Ошибка удаления проекта', ToastAndroid.SHORT);
     } finally {
       setDeleteProjectIsLoading(false);
     }
@@ -152,8 +153,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
-      Alert.alert('Ошибка обновления проекта');
+      ToastAndroid.show('Ошибка обновления проекта', ToastAndroid.SHORT);
     } finally {
       setUpdateProjectIsLoading(false);
     }

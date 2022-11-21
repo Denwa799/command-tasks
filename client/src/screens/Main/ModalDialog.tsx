@@ -1,25 +1,34 @@
 import React, {FC, useCallback} from 'react';
-import {IModalDelete} from './types';
+import {IModalDialog} from './types';
 import {useTeams} from 'hooks/useTeams';
 import {useRoute} from '@react-navigation/native';
 import {useProjects} from 'hooks/useProjects';
-import {projectRoute, teamRoute, teamsRoute} from 'constants/variables';
+import {
+  doneStatus,
+  inProgressStatus,
+  projectRoute,
+  teamRoute,
+  teamsRoute,
+} from 'constants/variables';
 import {useTasks} from 'hooks/useTasks';
 import {AppDialog} from 'components/AppDialog';
 
-const ModalDelete: FC<IModalDelete> = ({
+export const ModalDialog: FC<IModalDialog> = ({
   isOpen,
-  setIsOpen,
   id,
   teamId,
   projectId,
+  title = 'Удалить',
+  statusAction,
   onUpdateData,
+  setIsOpen,
 }) => {
   const route = useRoute();
 
-  const {fetchTeams, deleteTeam, deleteTeamIsLoading} = useTeams();
-  const {deleteProject, fetchProjects, deleteProjectIsLoading} = useProjects();
-  const {fetchTasks, deleteTask, deleteTaskIsLoading} = useTasks();
+  const {deleteTeamIsLoading, fetchTeams, deleteTeam} = useTeams();
+  const {deleteProjectIsLoading, deleteProject, fetchProjects} = useProjects();
+  const {deleteTaskIsLoading, fetchTasks, deleteTask, changeTaskStatus} =
+    useTasks();
 
   const onClose = useCallback(() => {
     setIsOpen(false);
@@ -45,14 +54,25 @@ const ModalDelete: FC<IModalDelete> = ({
     setIsOpen(false);
   }, [id, teamId, projectId]);
 
+  const onChangeStatus = useCallback(async () => {
+    if (statusAction === doneStatus || statusAction === inProgressStatus) {
+      await changeTaskStatus(id, statusAction);
+    }
+    if (projectId) {
+      await fetchTasks(projectId);
+      onUpdateData();
+      setIsOpen(false);
+    }
+  }, [id, projectId, statusAction]);
+
   return (
     <AppDialog isOpen={isOpen} setIsOpen={setIsOpen}>
-      <AppDialog.Title>Удалить?</AppDialog.Title>
+      <AppDialog.Title>{title}</AppDialog.Title>
       <AppDialog.Actions>
         <AppDialog.Button title="Закрыть" onPress={onClose} />
         <AppDialog.Button
-          title="Удалить"
-          onPress={onDelete}
+          title="Подтвердить"
+          onPress={statusAction ? onChangeStatus : onDelete}
           disabled={
             deleteTeamIsLoading || deleteProjectIsLoading || deleteTaskIsLoading
           }
@@ -61,5 +81,3 @@ const ModalDelete: FC<IModalDelete> = ({
     </AppDialog>
   );
 };
-
-export default ModalDelete;

@@ -3,7 +3,6 @@ import {AppMessageCard} from 'components/Cards/AppMessageCard';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
 import {useInvitations} from 'hooks/useInvitations';
-import {useTeams} from 'hooks/useTeams';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
@@ -29,8 +28,6 @@ export const NotificationsScreen = () => {
     updateInvitationRead,
     deleteInvitation,
   } = useInvitations();
-
-  const {fetchTeams} = useTeams();
 
   const [fetchSkip, setFetchSkip] = useState(takeNumber);
   const [dataInvitations, setDataInvitations] = useState<IInvitations[]>([]);
@@ -106,7 +103,6 @@ export const NotificationsScreen = () => {
 
     setDialogIsOpen(false);
     fetchInvitations();
-    fetchTeams();
   }, [notificationId, isDelete]);
 
   return (
@@ -125,6 +121,7 @@ export const NotificationsScreen = () => {
             onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
               <AppMessageCard
+                key={item.id}
                 id={item.id}
                 message={item.message}
                 isAccepted={item.isAccepted}

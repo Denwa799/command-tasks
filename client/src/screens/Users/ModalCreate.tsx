@@ -2,6 +2,7 @@ import {AppAutocompleteField} from 'components/AppAutocompleteField';
 import {AppModal} from 'components/AppModal';
 import {useAuth} from 'hooks/useAuth';
 import {useDebounce} from 'hooks/useDebounce';
+import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
 import {useUsers} from 'hooks/useUsers';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
@@ -17,6 +18,7 @@ export const ModalCreate: FC<IModal> = ({
   const {foundUsers, findUsersIsLoading, searchUsersByEmail} = useUsers();
   const {selectedTeamId, addUserInTeamIsLoading, addUserInTeam, fetchTeam} =
     useTeams();
+  const {fetchTeamInvitations} = useInvitations();
 
   const [value, setValue] = useState('');
   const debouncedValue = useDebounce<string>(value, 500);
@@ -97,6 +99,7 @@ export const ModalCreate: FC<IModal> = ({
     await addUserInTeam(userId, teamId);
     setIsOpen(false);
     fetchTeam(selectedTeamId);
+    fetchTeamInvitations(selectedTeamId);
   }, [user, userId, teamId, selectedTeamId, usersInTeam]);
 
   return (

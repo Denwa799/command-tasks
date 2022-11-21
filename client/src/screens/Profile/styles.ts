@@ -7,8 +7,11 @@ export const styles = StyleSheet.create({
     backgroundColor: THEME.BACK_COLOR,
     height: '100%',
   },
-  container: {
-    height: '100%',
+  row: {
+    paddingTop: 10,
+    paddingBottom: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
@@ -29,9 +32,19 @@ export const styles = StyleSheet.create({
     color: THEME.TEXT_COLOR,
     fontSize: SIZES.h2,
   },
-  logout: {
+  card: {
+    flex: 1,
+    justifyContent: 'center',
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  footer: {
     position: 'absolute',
-    bottom: 110,
-    left: 15,
+    bottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  logout: {
+    width: '95%',
   },
 });
