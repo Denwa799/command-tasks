@@ -37,17 +37,14 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     marginLeft: 5,
     marginRight: 5,
-    paddingTop: 8,
-    paddingBottom: 8,
-    backgroundColor: 'green',
   },
-  textButton: {
-    color: THEME.TEXT_COLOR,
-    textAlign: 'center',
-    width: '100%',
-  },
-  logout: {
+  footer: {
     position: 'absolute',
     bottom: 20,
+    width: '100%',
+    alignItems: 'center',
+  },
+  logout: {
+    width: '95%',
   },
 });

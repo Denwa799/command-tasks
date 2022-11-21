@@ -11,8 +11,8 @@ import Anticon from 'react-native-vector-icons/AntDesign';
 import {THEME} from 'constants/theme';
 import {ModalEdit} from './ModalEdit';
 import {useUsers} from 'hooks/useUsers';
-import {AppTextButton} from 'components/Btns/AppTextButton';
 import {AppCard} from 'components/Cards/AppCard';
+import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
 
 export const ProfileScreen = () => {
   const [userName, setUserName] = useState('');
@@ -63,22 +63,26 @@ export const ProfileScreen = () => {
           <AppContainer>
             <View style={styles.row}>
               <AppCard style={styles.card}>
-                <AppTextButton
-                  style={styles.textButton}
-                  onPress={() => console.log('Сменить пароль')}>
-                  Сменить пароль
-                </AppTextButton>
+                <AppNativeFeedbackBtn
+                  text={'Сменить пароль'}
+                  onPress={() => console.log('Сменить пароль')}
+                  isBorderRadius
+                  isCenter
+                />
               </AppCard>
               <AppCard style={styles.card}>
-                <AppTextButton
-                  style={styles.textButton}
-                  onPress={() => console.log('Сменить тему')}>
-                  Сменить тему
-                </AppTextButton>
+                <AppNativeFeedbackBtn
+                  text={'Сменить тему'}
+                  onPress={() => console.log('Сменить тему')}
+                  isBorderRadius
+                  isCenter
+                />
               </AppCard>
             </View>
           </AppContainer>
-          <AppButton onPress={logout} title="Выйти" style={styles.logout} />
+          <View style={styles.footer}>
+            <AppButton onPress={logout} title="Выйти" style={styles.logout} />
+          </View>
           <ModalEdit
             isOpen={editNameIsOpen}
             setIsOpen={setEditNameIsOpen}

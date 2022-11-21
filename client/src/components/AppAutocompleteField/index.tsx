@@ -51,6 +51,7 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
                   text={item.text}
                   isBorderRadius
                   style={styles.item}
+                  textStyle={styles.itemText}
                 />
               ))}
             </View>
