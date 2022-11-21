@@ -235,6 +235,23 @@ export class UsersService {
     return 'Пароль был успешно сменен';
   }
 
+  async checkPasswordEquals(
+    dto: ChangeUserPasswordDto,
+    token: string,
+  ): Promise<boolean> {
+    const decoded = await this.decodeToken(token);
+    if (!decoded)
+      throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
+
+    const id = decoded.id;
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+
+    const passwordEquals = await bcrypt.compare(dto.password, user.password);
+    return passwordEquals;
+  }
+
   async addRole(dto: AddRoleDto): Promise<AddRoleDto> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
