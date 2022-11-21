@@ -1,4 +1,10 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { RolesService } from 'src/api/roles/roles.service';
@@ -10,6 +16,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './users.entity';
 import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
@@ -18,6 +25,8 @@ export class UsersService {
     private userRepository: Repository<User>,
     private roleService: RolesService,
     private jwtService: JwtService,
+    @Inject(forwardRef(() => MailService))
+    private mailService: MailService,
   ) {}
 
   private async decodeToken(token: string) {
@@ -231,6 +240,11 @@ export class UsersService {
       password: hashPassword,
     });
     await this.userRepository.save(newUser);
+    await this.mailService.sendMail(
+      user.email,
+      'Ваш пароль был сменен в приложении Tasks Tracker',
+      'В вашем аккаунте был обновлен пароль. Если это были не вы, проведите сброс пароля в приложении',
+    );
 
     return 'Пароль был успешно сменен';
   }

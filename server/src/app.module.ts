@@ -18,6 +18,7 @@ import { IsActiveGuard } from './api/auth/guards/is-active.guard';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      expandVariables: true,
     }),
     MailerModule.forRoot({
       transport: {
