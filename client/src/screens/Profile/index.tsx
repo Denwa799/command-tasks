@@ -70,14 +70,6 @@ export const ProfileScreen = () => {
                   isCenter
                 />
               </AppCard>
-              <AppCard style={styles.card}>
-                <AppNativeFeedbackBtn
-                  text={'Сменить тему'}
-                  onPress={() => console.log('Сменить тему')}
-                  isBorderRadius
-                  isCenter
-                />
-              </AppCard>
             </View>
           </AppContainer>
           <View style={styles.footer}>
