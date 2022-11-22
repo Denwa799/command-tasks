@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { UserEmailDto } from './dto/user-email.dto';
 import * as bcrypt from 'bcryptjs';
@@ -10,6 +16,7 @@ import { EmailRecoveryDto } from './dto/email-recovery.dto';
 export class MailService {
   constructor(
     private readonly mailerService: MailerService,
+    @Inject(forwardRef(() => UsersService))
     private usersService: UsersService,
   ) {}
 
@@ -25,8 +32,8 @@ export class MailService {
       await this.mailerService.sendMail({
         to: dto.email,
         from: process.env.MAIL_USER,
-        subject: 'Код подтверждения почты',
-        text: `Ваш код подтверждения: ${generatedCode}`,
+        subject: 'Код подтверждения почты в приложении Tasks Tracker',
+        text: `Ваш код подтверждения : ${generatedCode}`,
       });
       return 'Письмо отправлено';
     } catch (error) {
@@ -54,7 +61,7 @@ export class MailService {
       await this.mailerService.sendMail({
         to: dto.email,
         from: process.env.MAIL_USER,
-        subject: 'Новый пароль от аккаунта',
+        subject: 'Новый пароль от аккаунта в приложении Tasks Tracker',
         text: `Ваш новый пароль: ${newPassword}`,
       });
 
@@ -65,6 +72,24 @@ export class MailService {
         'Ошибка восстановления пароля',
         HttpStatus.BAD_GATEWAY,
       );
+    }
+  }
+
+  async sendMail(email, subject, text) {
+    const user = await this.usersService.findUserByEmail(email);
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
+
+    try {
+      await this.mailerService.sendMail({
+        to: email,
+        from: process.env.MAIL_USER,
+        subject,
+        text,
+      });
+    } catch (error) {
+      console.log('Ошибка отправки письма = ', error);
+      throw new HttpException('Ошибка отправки письма', HttpStatus.BAD_GATEWAY);
     }
   }
 }

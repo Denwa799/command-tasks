@@ -38,6 +38,16 @@ export class UsersController {
     return this.usersService.createUser(userDto);
   }
 
+  @ApiOperation({ summary: 'Проверка старого пароля пользователя' })
+  @ApiResponse({ status: 200, description: 'true' })
+  @Post('/check-password-equals')
+  checkPasswordEquals(
+    @Body() changeUserPasswordDto: ChangeUserPasswordDto,
+    @GetCurrentUser('accessToken') token: string,
+  ) {
+    return this.usersService.checkPasswordEquals(changeUserPasswordDto, token);
+  }
+
   @ApiOperation({ summary: 'Получение всех пользователей' })
   @ApiResponse({ status: 200, type: [User] })
   @Roles('admin')
