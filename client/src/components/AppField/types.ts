@@ -1,9 +1,13 @@
 export interface IAppField {
-  onChange: (value: string) => void;
   value: string;
   placeholder: string;
-  isSecure?: boolean;
-  isDanger?: boolean;
+  successText?: string;
+  warningText?: string;
   dangerText?: string;
+  isSecure?: boolean;
+  isSuccess?: boolean;
+  isWarning?: boolean;
+  isDanger?: boolean;
   style?: Object;
+  onChange: (value: string) => void;
 }

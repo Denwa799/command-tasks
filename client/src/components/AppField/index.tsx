@@ -5,13 +5,17 @@ import {styles} from './styles';
 import {IAppField} from './types';
 
 export const AppField: FC<IAppField> = ({
-  onChange,
   value,
   placeholder,
-  isSecure,
-  isDanger,
+  successText = 'Успех',
+  warningText = 'Проверка',
   dangerText = 'Пустое поле',
+  isSecure,
+  isSuccess,
+  isWarning,
+  isDanger,
   style,
+  onChange,
 }) => {
   return (
     <>
@@ -21,10 +25,24 @@ export const AppField: FC<IAppField> = ({
         value={value}
         secureTextEntry={isSecure}
         autoCapitalize="none"
-        style={[styles.input, isDanger && styles.dangerInput, style]}
+        style={[
+          styles.input,
+          isSuccess && styles.successInput,
+          isWarning && styles.warningInput,
+          isDanger && styles.dangerInput,
+          style,
+        ]}
         placeholderTextColor={THEME.SECOND_TEXT_COLOR}
       />
-      {isDanger && <Text style={styles.dangerText}>{dangerText}</Text>}
+      {isSuccess && !isWarning && !isDanger && (
+        <Text style={[styles.text, styles.successText]}>{successText}</Text>
+      )}
+      {isWarning && !isDanger && (
+        <Text style={[styles.text, styles.warningText]}>{warningText}</Text>
+      )}
+      {isDanger && (
+        <Text style={[styles.text, styles.dangerText]}>{dangerText}</Text>
+      )}
     </>
   );
 };

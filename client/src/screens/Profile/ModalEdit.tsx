@@ -5,7 +5,7 @@ import React, {FC, useCallback, useEffect, useState} from 'react';
 import {getUserId} from 'utils/getSession';
 import {IModalEdit} from './types';
 
-export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
+export const ModalEdit: FC<IModalEdit> = ({name, isOpen, setIsOpen}) => {
   const [nameValue, setNameValue] = useState(name);
   const [isNameError, setIsNameError] = useState(false);
   const [dangerNameText, setDangerNameText] = useState('Пустое поле');
@@ -14,8 +14,7 @@ export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
 
   useEffect(() => {
     setNameValue(name);
-    setIsNameError(false);
-  }, [isOpen]);
+  }, []);
 
   const nameHandler = useCallback(
     (value: string) => {

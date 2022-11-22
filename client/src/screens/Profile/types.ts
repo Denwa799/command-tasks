@@ -1,5 +1,10 @@
 export interface IModalEdit {
+  name: string;
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
-  name: string;
+}
+
+export interface IModalChangePassword {
+  isOpen: boolean;
+  setIsOpen: (value: boolean) => void;
 }
