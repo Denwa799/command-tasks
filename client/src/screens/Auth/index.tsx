@@ -7,6 +7,7 @@ import {styles} from './styles';
 import {IAuthData} from './types';
 import {AppButton} from 'components/Btns/AppButton';
 import {emailValidationReg} from 'utils/regularExpressions';
+import {AppTextButton} from 'components/Btns/AppTextButton';
 
 export const AuthScreen: FC = () => {
   const {isLoading, login, register} = useAuth();
@@ -149,11 +150,14 @@ export const AuthScreen: FC = () => {
                 onPress={authHandler}
                 title={isReg ? 'Зарегистрироваться' : 'Авторизоваться'}
               />
-              <Pressable onPress={onReg} style={styles.regBtn}>
-                <Text style={styles.text}>
+              <View style={styles.row}>
+                <AppTextButton onPress={onReg} style={styles.text}>
+                  Сбросить пароль
+                </AppTextButton>
+                <AppTextButton onPress={onReg} style={styles.text}>
                   {isReg ? 'Авторизация' : 'Регистрация'}
-                </Text>
-              </Pressable>
+                </AppTextButton>
+              </View>
             </>
           )}
         </View>

@@ -23,15 +23,17 @@ export const styles = StyleSheet.create({
     marginBottom: 9,
     fontSize: SIZES.h2,
   },
-  regBtn: {
-    width: '30%',
-    marginLeft: 'auto',
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
   },
   text: {
     color: THEME.TEXT_COLOR,
     fontWeight: 'bold',
     textAlign: 'right',
-    fontSize: SIZES.body5,
-    marginTop: 10,
+    fontSize: SIZES.body4,
+    marginLeft: 0,
+    marginRight: 0,
   },
 });
