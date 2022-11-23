@@ -15,9 +15,7 @@ export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
   isMainColor = false,
   disabled = false,
 }) => {
-  const handler = useCallback(() => {
-    !disabled && onPress();
-  }, [disabled]);
+  const handler = () => !disabled && onPress();
 
   return (
     <View style={[styles.btn, isBorderRadius && styles.borderRadius, style]}>

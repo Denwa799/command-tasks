@@ -8,11 +8,13 @@ export interface IUsersContext {
   updateUserIsLoading: boolean;
   passwordEqualsIsLoading: boolean;
   changePasswordIsLoading: boolean;
+  checkEmailIsLoading: boolean;
   searchUsersByEmail: (email: string) => void;
   updateUser: (id: number, name: string) => void;
   checkPasswordEquals: (password: string) => void;
   cleanPasswordEquals: () => void;
   changePassword: (id: number, password: string) => void;
+  checkEmail: (email: string) => void;
 }
 
 export interface IUsersProvider {

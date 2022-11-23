@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useState} from 'react';
+import React, {FC, useCallback, useEffect, useState} from 'react';
 import {AppModal} from 'components/AppModal';
 import {AppField} from 'components/AppField';
 import {IModal, IRecoveryData} from './types';
@@ -7,8 +7,12 @@ import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
 import {styles} from './styles';
 import {AppTitle} from 'components/AppTitle';
 import {AppPositionContainer} from 'components/AppPositionContainer';
+import {useUsers} from 'hooks/useUsers';
+import {emailValidationReg} from 'utils/regularExpressions';
 
 export const ModalRecovery: FC<IModal> = ({isOpen, isReg, setIsOpen}) => {
+  const {checkEmailIsLoading, checkEmail} = useUsers();
+
   const [data, setData] = useState<IRecoveryData>({} as IRecoveryData);
   const {email, code} = data;
 
@@ -19,7 +23,7 @@ export const ModalRecovery: FC<IModal> = ({isOpen, isReg, setIsOpen}) => {
   const [isEmailError, setIsEmailError] = useState(false);
   const [isCodeError, setIsCodeError] = useState(false);
 
-  const isDisabled = isEmailError || isCodeError;
+  const isDisabled = isEmailError || isCodeError || !email || !code;
 
   const emailHandler = useCallback(
     (value: string) => {
@@ -37,7 +41,13 @@ export const ModalRecovery: FC<IModal> = ({isOpen, isReg, setIsOpen}) => {
     [data],
   );
 
-  const sendCode = () => console.log('Отправка кода');
+  const sendCode = async () => {
+    if (!emailValidationReg.test(email)) {
+      setEmailErrorText('Некорректный email');
+      return setIsEmailError(true);
+    }
+    await checkEmail(email);
+  };
 
   const onClose = () => setIsOpen(false);
 

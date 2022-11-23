@@ -115,7 +115,7 @@ export const AuthScreen: FC = () => {
           ) : (
             <>
               <AppField
-                value={data.email}
+                value={email}
                 placeholder={'Введите email'}
                 keyboardType={'email-address'}
                 onChange={emailHandler}
@@ -123,7 +123,7 @@ export const AuthScreen: FC = () => {
                 dangerText={emailErrorText}
               />
               <AppField
-                value={data.password}
+                value={password}
                 placeholder={'Введите пароль'}
                 onChange={passwordHandler}
                 isSecure={true}
@@ -141,7 +141,7 @@ export const AuthScreen: FC = () => {
                     dangerText={secondPasswordErrorText}
                   />
                   <AppField
-                    value={data.name}
+                    value={name}
                     placeholder={'Введите ФИО'}
                     onChange={nameHandler}
                     isDanger={isNameError}

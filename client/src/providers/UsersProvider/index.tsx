@@ -17,8 +17,10 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
   const [updateUserIsLoading, setUpdateUserIsLoading] = useState(false);
   const [passwordEqualsIsLoading, setPasswordEqualsIsLoading] = useState(false);
   const [changePasswordIsLoading, setChangePasswordIsLoading] = useState(false);
+  const [checkEmailIsLoading, setCheckEmailIsLoading] = useState(false);
 
   const usersPath = `${variables.API_URL}${variables.USERS}`;
+  const mailPath = `${variables.API_URL}${variables.MAIL}`;
 
   const updateUser = useCallback(async (id: number, name: string) => {
     setUpdateUserIsLoading(true);
@@ -85,9 +87,6 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
   const changePassword = useCallback(async (id: number, password: string) => {
     setChangePasswordIsLoading(true);
     try {
-      console.log('id = ', id);
-      console.log('password = ', password);
-      console.log(`${usersPath}/change-password/${id}`);
       const tokenBearer = await getAccessToken();
       if (tokenBearer) {
         await PatchService(`${usersPath}/change-password/${id}`, tokenBearer, {
@@ -98,7 +97,6 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
         throw new Error('Ошибка сессии');
       }
     } catch (error) {
-      console.log(error);
       ToastAndroid.show('Ошибка смены пароля', ToastAndroid.SHORT);
     } finally {
       setChangePasswordIsLoading(false);
@@ -109,6 +107,20 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
     setPasswordIsEquals(false);
   }, []);
 
+  const checkEmail = useCallback(async (email: string) => {
+    setCheckEmailIsLoading(true);
+    try {
+      await PostService(`${mailPath}/check`, '', {
+        email,
+      });
+      ToastAndroid.show('Код отправлен', ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show('Ошибка отправки кода', ToastAndroid.SHORT);
+    } finally {
+      setCheckEmailIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       foundUsers,
@@ -117,11 +129,13 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
       updateUserIsLoading,
       passwordEqualsIsLoading,
       changePasswordIsLoading,
+      checkEmailIsLoading,
       searchUsersByEmail,
       updateUser,
       checkPasswordEquals,
       cleanPasswordEquals,
       changePassword,
+      checkEmail,
     }),
     [
       foundUsers,
@@ -130,6 +144,7 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
       updateUserIsLoading,
       passwordEqualsIsLoading,
       changePasswordIsLoading,
+      checkEmailIsLoading,
     ],
   );
 
