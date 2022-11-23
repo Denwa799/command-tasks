@@ -13,7 +13,7 @@ import {ModalEdit} from './ModalEdit';
 import {useUsers} from 'hooks/useUsers';
 import {AppCard} from 'components/Cards/AppCard';
 import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
-import ModalChangePassword from './ModalChangePassword';
+import {ModalChangePassword} from './ModalChangePassword';
 
 export const ProfileScreen = () => {
   const {user, logout} = useAuth();

@@ -5,5 +5,5 @@ import {styles} from './styles';
 import {IAppCard} from './types';
 
 export const AppCard: FC<IAppCard> = ({children, style}) => {
-  return <View style={[style, styles.card, BOX_SHADOW]}>{children}</View>;
+  return <View style={[styles.card, BOX_SHADOW, style]}>{children}</View>;
 };

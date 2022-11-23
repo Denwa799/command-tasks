@@ -6,7 +6,10 @@ import React, {FC, useEffect, useState} from 'react';
 import {getUserId} from 'utils/getSession';
 import {IModalChangePassword} from './types';
 
-const ModalChangePassword: FC<IModalChangePassword> = ({isOpen, setIsOpen}) => {
+export const ModalChangePassword: FC<IModalChangePassword> = ({
+  isOpen,
+  setIsOpen,
+}) => {
   const {
     passwordIsEquals,
     passwordEqualsIsLoading,
@@ -184,5 +187,3 @@ const ModalChangePassword: FC<IModalChangePassword> = ({isOpen, setIsOpen}) => {
     </AppModal>
   );
 };
-
-export default ModalChangePassword;

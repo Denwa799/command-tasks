@@ -10,6 +10,7 @@ export const AppField: FC<IAppField> = ({
   successText = 'Успех',
   warningText = 'Проверка',
   dangerText = 'Пустое поле',
+  keyboardType = 'default',
   isSecure,
   isSuccess,
   isWarning,
@@ -25,6 +26,7 @@ export const AppField: FC<IAppField> = ({
         value={value}
         secureTextEntry={isSecure}
         autoCapitalize="none"
+        keyboardType={keyboardType}
         style={[
           styles.input,
           isSuccess && styles.successInput,

@@ -36,4 +36,7 @@ export const styles = StyleSheet.create({
     marginLeft: 0,
     marginRight: 0,
   },
+  modalItems: {
+    marginTop: 10,
+  },
 });
