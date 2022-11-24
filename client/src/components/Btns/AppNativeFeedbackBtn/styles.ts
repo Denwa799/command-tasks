@@ -22,4 +22,7 @@ export const styles = StyleSheet.create({
   mainColor: {
     color: THEME.MAIN_COLOR,
   },
+  disabled: {
+    color: THEME.SECOND_TEXT_COLOR,
+  },
 });

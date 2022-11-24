@@ -1,4 +1,13 @@
-import {API_URL, AUTH, TEAMS, PROJECTS, TASKS, USERS, INVITATIONS, MAIL} from '@env';
+import {
+  API_URL,
+  AUTH,
+  TEAMS,
+  PROJECTS,
+  TASKS,
+  USERS,
+  INVITATIONS,
+  MAIL,
+} from '@env';
 
 export const variables = {
   API_URL,

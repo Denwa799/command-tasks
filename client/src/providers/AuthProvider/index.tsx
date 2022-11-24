@@ -1,4 +1,9 @@
-import {LoginService, RefreshService, RegistrationService} from 'api';
+import {
+  LoginService,
+  PostService,
+  RefreshService,
+  RegistrationService,
+} from 'api';
 import {variables} from 'constants/variables';
 import React, {
   createContext,
@@ -23,9 +28,12 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
 
   const [user, setUser] = useState<IUser | null>(null);
   const [isCheck, setIsCheck] = useState(false);
+  const [isEmailActivated, setIsEmailActivated] = useState(false);
   const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstRefresh, setIsFirstRefresh] = useState(true);
+  const [emailActivationIsLoading, setEmailActivationIsLoading] =
+    useState(false);
 
   const authPath = `${variables.API_URL}${variables.AUTH}`;
 
@@ -52,7 +60,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     checkSession();
   }, [isCheck, isFirstRefresh]);
 
-  const registerHandler = useCallback(
+  const register = useCallback(
     async (email: string, password: string, name: string = 'Нет имени') => {
       setIsLoading(true);
       try {
@@ -81,7 +89,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     [],
   );
 
-  const loginHandler = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     try {
       const response = await LoginService(`${authPath}login`, email, password);
@@ -103,7 +111,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
     }
   }, []);
 
-  const logoutHandler = useCallback(async () => {
+  const logout = useCallback(async () => {
     setIsLoading(true);
     try {
       await EncryptedStorage.removeItem('user_session');
@@ -140,11 +148,27 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       }
     } catch (error: any) {
       if (error.response.data.statusCode === (400 || 401)) {
-        logoutHandler();
+        logout();
         Alert.alert('Авторизуйтесь заново');
       }
     } finally {
       setIsFirstRefresh(false);
+    }
+  }, []);
+
+  const emailActivation = useCallback(async (email: string, code: number) => {
+    setEmailActivationIsLoading(true);
+    setIsEmailActivated(false);
+    try {
+      await PostService(`${authPath}activation`, '', {
+        email,
+        code,
+      });
+      setIsEmailActivated(true);
+    } catch (error) {
+      ToastAndroid.show('Ошибка активации аккаунта', ToastAndroid.SHORT);
+    } finally {
+      setEmailActivationIsLoading(false);
     }
   }, []);
 
@@ -157,12 +181,15 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       user,
+      isEmailActivated,
       isLoading,
-      login: loginHandler,
-      register: registerHandler,
-      logout: logoutHandler,
+      emailActivationIsLoading,
+      login,
+      register,
+      logout,
+      emailActivation,
     }),
-    [user, isLoading],
+    [user, isEmailActivated, isLoading, emailActivationIsLoading],
   );
 
   return (

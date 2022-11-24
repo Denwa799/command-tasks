@@ -170,6 +170,7 @@ export const AuthScreen: FC = () => {
           isOpen={modalIsOpen}
           isReg={isReg}
           setIsOpen={setModalIsOpen}
+          setIsReg={setIsReg}
         />
       )}
     </View>

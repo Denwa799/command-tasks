@@ -12,12 +12,15 @@ export const UsersContext = createContext<IUsersContext>({} as IUsersContext);
 export const UsersProvider: FC<IUsersProvider> = ({children}) => {
   const [foundUsers, setFoundUsers] = useState([] as IUser[]);
   const [passwordIsEquals, setPasswordIsEquals] = useState(false);
+  const [passwordIsRecovery, setPasswordIsRecovery] = useState(false);
 
   const [findUsersIsLoading, setFindUsersIsLoading] = useState(false);
   const [updateUserIsLoading, setUpdateUserIsLoading] = useState(false);
   const [passwordEqualsIsLoading, setPasswordEqualsIsLoading] = useState(false);
   const [changePasswordIsLoading, setChangePasswordIsLoading] = useState(false);
   const [checkEmailIsLoading, setCheckEmailIsLoading] = useState(false);
+  const [passwordRecoveryIsLoading, setPasswordRecoveryIsLoading] =
+    useState(false);
 
   const usersPath = `${variables.API_URL}${variables.USERS}`;
   const mailPath = `${variables.API_URL}${variables.MAIL}`;
@@ -121,30 +124,51 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
     }
   }, []);
 
+  const passwordRecovery = useCallback(async (email: string, code: number) => {
+    setPasswordRecoveryIsLoading(true);
+    setPasswordIsRecovery(false);
+    try {
+      await PostService(`${mailPath}/password-recovery`, '', {
+        email,
+        code,
+      });
+      setPasswordIsRecovery(true);
+    } catch (error) {
+      ToastAndroid.show('Ошибка восстановления пароля', ToastAndroid.SHORT);
+    } finally {
+      setPasswordRecoveryIsLoading(false);
+    }
+  }, []);
+
   const value = useMemo(
     () => ({
       foundUsers,
       passwordIsEquals,
+      passwordIsRecovery,
       findUsersIsLoading,
       updateUserIsLoading,
       passwordEqualsIsLoading,
       changePasswordIsLoading,
       checkEmailIsLoading,
+      passwordRecoveryIsLoading,
       searchUsersByEmail,
       updateUser,
       checkPasswordEquals,
       cleanPasswordEquals,
       changePassword,
       checkEmail,
+      passwordRecovery,
     }),
     [
       foundUsers,
       passwordIsEquals,
+      passwordIsRecovery,
       findUsersIsLoading,
       updateUserIsLoading,
       passwordEqualsIsLoading,
       changePasswordIsLoading,
       checkEmailIsLoading,
+      passwordRecoveryIsLoading,
     ],
   );
 

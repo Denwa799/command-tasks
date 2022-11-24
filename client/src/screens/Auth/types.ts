@@ -9,6 +9,7 @@ export interface IModal {
   isOpen: boolean;
   isReg: boolean;
   setIsOpen: (value: boolean) => void;
+  setIsReg: (value: boolean) => void;
 }
 
 export interface IRecoveryData {

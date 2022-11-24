@@ -1,5 +1,5 @@
 import {THEME} from 'constants/theme';
-import React, {FC, useCallback} from 'react';
+import React, {FC} from 'react';
 import {Text, TouchableNativeFeedback, View} from 'react-native';
 import {styles} from './styles';
 import {IAppNativeFeedbackBtn} from './types';
@@ -33,6 +33,7 @@ export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
               isCenter && styles.center,
               isMainColor && styles.mainColor,
               textStyle,
+              disabled && styles.disabled,
             ]}>
             {text}
           </Text>
