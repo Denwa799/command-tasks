@@ -36,11 +36,6 @@ export const ModalCreate: FC<IModal> = ({
   }, [foundUsers]);
 
   useEffect(() => {
-    setValue('');
-    setIsError(false);
-  }, [isOpen]);
-
-  useEffect(() => {
     if (debouncedValue.length > 0) {
       searchUsersByEmail(debouncedValue.toLowerCase());
     }
@@ -63,23 +58,20 @@ export const ModalCreate: FC<IModal> = ({
     foundUser && setUserId(foundUser.id);
   }, [pressEmail]);
 
-  const onClose = useCallback(() => {
+  const onClose = () => {
     setIsOpen(false);
-  }, []);
+  };
 
-  const onChange = useCallback((itemValue: string) => {
+  const onChange = (itemValue: string) => {
     setValue(itemValue);
     setIsError(false);
-  }, []);
+  };
 
-  const onPress = useCallback(
-    (email: string) => {
-      setIsError(false);
-      setPressEmail(email);
-      setValue(email);
-    },
-    [pressEmail],
-  );
+  const onPress = (email: string) => {
+    setIsError(false);
+    setPressEmail(email);
+    setValue(email);
+  };
 
   const onCreate = useCallback(async () => {
     if (!pressEmail) {
@@ -107,20 +99,20 @@ export const ModalCreate: FC<IModal> = ({
       <AppAutocompleteField
         placeholder={'Введите email'}
         value={value}
-        onChange={onChange}
+        dangerText={errorText}
         data={data}
-        onPress={onPress}
         isDisplay={isDisplay}
         isLoading={findUsersIsLoading}
         isDanger={isError}
-        dangerText={errorText}
+        onChange={onChange}
+        onPress={onPress}
       />
       <AppModal.Actions>
         <AppModal.Button title="Закрыть" onPress={onClose} />
         <AppModal.Button
           title="Добавить"
-          onPress={onCreate}
           disabled={addUserInTeamIsLoading}
+          onPress={onCreate}
         />
       </AppModal.Actions>
     </AppModal>

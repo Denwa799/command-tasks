@@ -5,16 +5,16 @@ import {styles} from './styles';
 import {THEME} from 'constants/theme';
 
 export const AppButton: FC<IAppButton> = ({
-  onPress,
   title,
   colors = [THEME.MAIN_COLOR, THEME.THIRD_COLOR],
   style,
+  onPress,
 }) => {
   return (
     <TouchableHighlight
-      onPress={onPress}
       underlayColor={colors[1]}
-      style={[{backgroundColor: colors[0]}, styles.button, style]}>
+      style={[{backgroundColor: colors[0]}, styles.button, style]}
+      onPress={onPress}>
       <Text style={styles.text}>{title}</Text>
     </TouchableHighlight>
   );

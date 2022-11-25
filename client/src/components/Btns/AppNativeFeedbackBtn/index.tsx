@@ -6,14 +6,14 @@ import {IAppNativeFeedbackBtn} from './types';
 
 export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
   text,
-  onPress,
   color = THEME.MAIN_COLOR,
-  style,
-  textStyle,
   isBorderRadius = false,
   isCenter = false,
   isMainColor = false,
   disabled = false,
+  style,
+  textStyle,
+  onPress,
 }) => {
   const handler = () => !disabled && onPress();
 

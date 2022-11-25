@@ -5,9 +5,9 @@ import {ModalButtonType} from './types';
 
 export const ModalButton = ({
   title,
+  disabled,
   styleContainer,
   onPress,
-  disabled,
 }: ModalButtonType) => {
   return (
     <AppNativeButton

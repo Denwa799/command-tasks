@@ -8,11 +8,11 @@ import {AppDialogType} from './types';
 export const AppDialog = ({
   children,
   isOpen,
-  setIsOpen,
   style,
+  setIsOpen,
 }: AppDialogType) => {
   return (
-    <AppModal isOpen={isOpen} setIsOpen={setIsOpen} style={style}>
+    <AppModal isOpen={isOpen} style={style} setIsOpen={setIsOpen}>
       {children}
     </AppModal>
   );

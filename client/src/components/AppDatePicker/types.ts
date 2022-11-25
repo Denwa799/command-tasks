@@ -1,7 +1,7 @@
 export interface IAppDatePicker {
-  date: Date;
-  isOpen: boolean;
-  onConfirm: (date: Date) => void;
-  onCancel: () => void;
   title?: string;
+  isOpen: boolean;
+  date: Date;
+  onCancel: () => void;
+  onConfirm: (date: Date) => void;
 }

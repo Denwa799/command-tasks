@@ -30,9 +30,7 @@ export const ModalDialog: FC<IModalDialog> = ({
   const {deleteTaskIsLoading, fetchTasks, deleteTask, changeTaskStatus} =
     useTasks();
 
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+  const onClose = () => setIsOpen(false);
 
   const onDelete = useCallback(async () => {
     if (route.name === teamsRoute) {

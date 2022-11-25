@@ -15,18 +15,18 @@ import {DatePicker} from './DatePicker';
 import {useAuth} from 'hooks/useAuth';
 
 export const ModalCreate: FC<IModalCreate> = ({
-  isOpen,
-  setIsOpen,
   teamId,
   projectId,
+  isOpen,
+  setIsOpen,
   onUpdateData,
 }) => {
   const route = useRoute();
   const {user} = useAuth();
   const {foundUsers} = useUsers();
-  const {team, createTeam, fetchTeams, createTeamIsLoading} = useTeams();
-  const {createProject, fetchProjects, createProjectIsLoading} = useProjects();
-  const {fetchTasks, createTask, createTaskIsLoading} = useTasks();
+  const {team, createTeamIsLoading, createTeam, fetchTeams} = useTeams();
+  const {createProjectIsLoading, createProject, fetchProjects} = useProjects();
+  const {createTaskIsLoading, fetchTasks, createTask} = useTasks();
 
   const [text, setText] = useState('');
   const [isTextError, setIsTextError] = useState(false);
@@ -95,20 +95,7 @@ export const ModalCreate: FC<IModalCreate> = ({
     }
   }, [user]);
 
-  useEffect(() => {
-    setText('');
-    setIsTextError(false);
-    setIsUrgently(false);
-    setAutocompletePress('');
-    setIsAutocompleteError(false);
-    setEmails([]);
-    setIsUrgently(false);
-    setIsPickerOpen(false);
-  }, [isOpen]);
-
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-  }, [isOpen]);
+  const onClose = () => setIsOpen(false);
 
   const onCreate = useCallback(async () => {
     if (!text || text.length < 3 || text.length > 50) {

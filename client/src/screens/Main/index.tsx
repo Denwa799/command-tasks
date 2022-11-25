@@ -15,7 +15,7 @@ import {useProjects} from 'hooks/useProjects';
 import {useTeams} from 'hooks/useTeams';
 import {IProject, ITask, ITeam, TaskStatusType} from 'models/ITasks';
 import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
-import {Alert, FlatList, View} from 'react-native';
+import {FlatList, ToastAndroid, View} from 'react-native';
 import {Modals} from './Modals';
 import {styles} from './styles';
 import {IMainScreen, TeamScreenNavigateType} from './types';
@@ -209,7 +209,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     setIsCanUpdateData(true);
   };
 
-  const onOpen = useCallback(async (itemId: number, itemCreatorId: number) => {
+  const onOpen = async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
       setSelectedTeamId(itemId);
       await fetchProjects(itemId);
@@ -226,7 +226,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         teamId: params.teamId,
       });
     }
-  }, []);
+  };
 
   const onRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -245,44 +245,36 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
       }
       setFetchSkip(takeNumber);
     } catch {
-      Alert.alert('Ошибка обновления');
+      ToastAndroid.show('Ошибка обновления', ToastAndroid.SHORT);
     } finally {
       setIsRefreshing(false);
     }
   }, [params, teams, projects, tasks]);
 
-  const onAdd = useCallback(() => {
-    setCreateIsOpen(true);
-  }, []);
+  const onAdd = () => setCreateIsOpen(true);
 
-  const onDialog = useCallback(
-    (itemId: number, actualStatus: TaskStatusType | '') => {
-      setId(itemId);
-      setDialogIsOpen(true);
-      setStatusAction(actualStatus);
-    },
-    [],
-  );
+  const onDialog = (itemId: number, actualStatus: TaskStatusType | '') => {
+    setId(itemId);
+    setDialogIsOpen(true);
+    setStatusAction(actualStatus);
+  };
 
-  const onChange = useCallback(
-    (
-      itemId: number,
-      itemText: string,
-      itemResponsibleEmail: string | undefined,
-      itemStatus: TaskStatusType | undefined,
-      itemIsUrgently: boolean | undefined,
-      itemDate: Date | undefined,
-    ) => {
-      setId(itemId);
-      setChangeIsOpen(true);
-      setText(itemText);
-      itemResponsibleEmail && setResponsibleEmail(itemResponsibleEmail);
-      itemStatus && setStatus(itemStatus);
-      itemIsUrgently !== undefined && setIsUrgently(itemIsUrgently);
-      itemDate !== undefined && setDate(itemDate);
-    },
-    [],
-  );
+  const onChange = (
+    itemId: number,
+    itemText: string,
+    itemResponsibleEmail: string | undefined,
+    itemStatus: TaskStatusType | undefined,
+    itemIsUrgently: boolean | undefined,
+    itemDate: Date | undefined,
+  ) => {
+    setId(itemId);
+    setChangeIsOpen(true);
+    setText(itemText);
+    itemResponsibleEmail && setResponsibleEmail(itemResponsibleEmail);
+    itemStatus && setStatus(itemStatus);
+    itemIsUrgently !== undefined && setIsUrgently(itemIsUrgently);
+    itemDate !== undefined && setDate(itemDate);
+  };
 
   const onLoadMore = useCallback(async () => {
     if (route.name === teamsRoute) {
@@ -331,21 +323,21 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               onRefresh={onRefresh}
               renderItem={({item}) => (
                 <AppMainCard
-                  style={styles.card}
                   key={item.id}
                   id={item?.id}
+                  creatorId={creatorId}
                   text={item.name ? item.name : item.text}
-                  item={item}
-                  onOpen={onOpen}
-                  onDialog={onDialog}
-                  onChange={onChange}
                   isColors={route.name === projectRoute}
-                  responsible={item?.responsible}
-                  status={item?.status}
                   isUrgently={item?.isUrgently}
                   isAdditionalButtons={route.name === projectRoute}
                   date={item?.date}
-                  creatorId={creatorId}
+                  responsible={item?.responsible}
+                  status={item?.status}
+                  item={item}
+                  style={styles.card}
+                  onOpen={onOpen}
+                  onDialog={onDialog}
+                  onChange={onChange}
                 />
               )}
               onEndReached={onLoadMore}

@@ -3,7 +3,7 @@ import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {useAuth} from 'hooks/useAuth';
 import {AppContainer} from 'layouts/AppContainer';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 import {getUserName} from 'utils/getSession';
 import {styles} from './styles';
@@ -42,9 +42,9 @@ export const ProfileScreen = () => {
     }
   }, [user]);
 
-  const onEditName = useCallback(() => {
+  const onEditName = () => {
     setEditNameIsOpen(true);
-  }, []);
+  };
 
   const onChangePassword = () => {
     setChangePasswordIsOpen(true);
@@ -72,9 +72,9 @@ export const ProfileScreen = () => {
               <AppCard style={styles.card}>
                 <AppNativeFeedbackBtn
                   text={'Сменить пароль'}
-                  onPress={onChangePassword}
                   isBorderRadius
                   isCenter
+                  onPress={onChangePassword}
                 />
               </AppCard>
             </View>

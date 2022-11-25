@@ -41,9 +41,9 @@ export const TaskNavigation = () => {
   const notificationsButton = useMemo(() => {
     return (
       <AppNavigationBtn
-        onPress={notificationsHandler}
         style={styles.iconRight}
-        onNotification={isNewNotification}>
+        onNotification={isNewNotification}
+        onPress={notificationsHandler}>
         <Ionicon
           name="notifications-outline"
           size={24}
@@ -55,7 +55,7 @@ export const TaskNavigation = () => {
 
   const usersButton = useMemo(() => {
     return (
-      <AppNavigationBtn onPress={usersHandler} style={styles.iconRight}>
+      <AppNavigationBtn style={styles.iconRight} onPress={usersHandler}>
         <Anticon name="adduser" size={24} color={THEME.TEXT_COLOR} />
       </AppNavigationBtn>
     );

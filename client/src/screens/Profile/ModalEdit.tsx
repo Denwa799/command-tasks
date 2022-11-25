@@ -10,23 +10,20 @@ export const ModalEdit: FC<IModalEdit> = ({name, isOpen, setIsOpen}) => {
   const [isNameError, setIsNameError] = useState(false);
   const [dangerNameText, setDangerNameText] = useState('Пустое поле');
 
-  const {updateUser, updateUserIsLoading} = useUsers();
+  const {updateUserIsLoading, updateUser} = useUsers();
 
   useEffect(() => {
     setNameValue(name);
   }, []);
 
-  const nameHandler = useCallback(
-    (value: string) => {
-      setNameValue(value);
-      setIsNameError(false);
-    },
-    [nameValue],
-  );
+  const nameHandler = (value: string) => {
+    setNameValue(value);
+    setIsNameError(false);
+  };
 
-  const onClose = useCallback(async () => {
+  const onClose = () => {
     setIsOpen(false);
-  }, []);
+  };
 
   const onEdit = useCallback(async () => {
     if (!nameValue || nameValue.length < 3 || nameValue.length > 50) {

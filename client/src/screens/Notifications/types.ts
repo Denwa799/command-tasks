@@ -2,10 +2,10 @@ import {ViewToken} from 'react-native';
 
 export type DialogType = {
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
-  onAccept: () => void;
   disabled: boolean;
   isDelete?: boolean;
+  setIsOpen: (value: boolean) => void;
+  onAccept: () => void;
 };
 
 export type OnViewableItemsChangedType = (info: {

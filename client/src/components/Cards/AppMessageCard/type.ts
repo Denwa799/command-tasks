@@ -1,10 +1,10 @@
 export interface IAppMessageCard {
   id: number;
   message: string;
-  isAccepted: boolean;
   btnText?: string;
   secondBtnText?: string;
+  isAccepted: boolean;
+  disabled?: boolean;
   onPress?: (id: number) => void;
   onSecondPress?: (id: number) => void;
-  disabled?: boolean;
 }

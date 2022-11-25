@@ -22,9 +22,9 @@ export const TextField: FC<ITextField> = ({
     <AppField
       value={textValue}
       placeholder={placeholder}
-      onChange={onChange}
-      isDanger={isDanger}
       dangerText={dangerText}
+      isDanger={isDanger}
+      onChange={onChange}
     />
   );
 };

@@ -16,7 +16,7 @@ export type ModalChildrenType = {
 
 export type ModalButtonType = {
   title: string;
+  disabled?: boolean;
   styleContainer?: Object;
   onPress: () => void;
-  disabled?: boolean;
 };

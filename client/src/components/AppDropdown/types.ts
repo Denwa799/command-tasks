@@ -1,16 +1,16 @@
 export interface IAppDropdown {
-  onPress: () => void;
   placeholder?: string;
-  style?: Object;
+  color?: string;
+  dangerText?: string;
   isOpen: boolean;
-  setIsOpen: (value: boolean) => void;
+  isDanger?: boolean;
+  style?: Object;
   items: {
     id: number;
     title: string;
     text?: string;
   }[];
+  onPress: () => void;
+  setIsOpen: (value: boolean) => void;
   onItemClick: (id: number, name: string, email: string) => void;
-  color?: string;
-  isDanger?: boolean;
-  dangerText?: string;
 }

@@ -4,7 +4,7 @@ import {AppTitle} from 'components/AppTitle';
 import {AppContainer} from 'layouts/AppContainer';
 import {styles} from './styles';
 
-export const AppNoInternetMessage = ({}) => {
+export const AppNoInternetMessage = () => {
   return (
     <AppContainer>
       <AppPositionContainer isCenter>

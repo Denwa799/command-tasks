@@ -15,15 +15,15 @@ import {AppTitle} from 'components/AppTitle';
 
 export const AppDropdown: FC<IAppDropdown> = ({
   placeholder = 'Выбрать',
-  onPress,
-  style,
-  isOpen,
-  setIsOpen,
-  items,
-  onItemClick,
   color = THEME.MAIN_COLOR,
-  isDanger,
   dangerText = 'Не выбрано',
+  isOpen,
+  isDanger,
+  style,
+  items,
+  onPress,
+  setIsOpen,
+  onItemClick,
 }) => {
   return (
     <>
@@ -39,10 +39,10 @@ export const AppDropdown: FC<IAppDropdown> = ({
       {isDanger && <Text style={styles.dangerText}>{dangerText}</Text>}
       <AppModal
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
         wrapperStyle={styles.modalWrapper}
         style={styles.modal}
-        contentStyle={styles.modalContent}>
+        contentStyle={styles.modalContent}
+        setIsOpen={setIsOpen}>
         {items.length > 0 ? (
           items.map(item => {
             return (

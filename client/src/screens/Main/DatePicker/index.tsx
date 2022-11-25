@@ -33,8 +33,8 @@ export const DatePicker: FC<IDatePicker> = ({
       <AppText style={styles.date}>{selectedDate}</AppText>
       <AppTextButton onPress={onOpen}>Выбрать дату</AppTextButton>
       <AppDatePicker
-        date={date}
         isOpen={isPickerOpen}
+        date={date}
         onConfirm={onConfirm}
         onCancel={onCancel}
       />

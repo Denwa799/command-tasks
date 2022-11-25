@@ -22,11 +22,11 @@ export const AppField: FC<IAppField> = ({
     <>
       <TextInput
         placeholder={placeholder}
-        onChangeText={onChange}
-        value={value}
-        secureTextEntry={isSecure}
         autoCapitalize="none"
+        value={value}
         keyboardType={keyboardType}
+        placeholderTextColor={THEME.SECOND_TEXT_COLOR}
+        secureTextEntry={isSecure}
         style={[
           styles.input,
           isSuccess && styles.successInput,
@@ -34,7 +34,7 @@ export const AppField: FC<IAppField> = ({
           isDanger && styles.dangerInput,
           style,
         ]}
-        placeholderTextColor={THEME.SECOND_TEXT_COLOR}
+        onChangeText={onChange}
       />
       {isSuccess && !isWarning && !isDanger && (
         <Text style={[styles.text, styles.successText]}>{successText}</Text>
