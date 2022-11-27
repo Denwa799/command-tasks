@@ -66,6 +66,11 @@ export class User {
   @IsString()
   hashedActiveCode: string;
 
+  @ApiProperty({ example: 'true', description: 'Премиум аккаунт или нет' })
+  @Column({ default: false })
+  @IsBoolean()
+  isPremium: boolean;
+
   @ApiProperty({ example: 'true', description: 'Забанен или нет' })
   @Column({ default: false })
   @IsBoolean()
