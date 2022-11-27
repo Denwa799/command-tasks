@@ -3,7 +3,7 @@ import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {useAuth} from 'hooks/useAuth';
 import {AppContainer} from 'layouts/AppContainer';
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Text, TouchableHighlight, View} from 'react-native';
 import {getUserName} from 'utils/getSession';
 import {styles} from './styles';
@@ -13,16 +13,19 @@ import {ModalEdit} from './ModalEdit';
 import {useUsers} from 'hooks/useUsers';
 import {AppCard} from 'components/Cards/AppCard';
 import {AppNativeFeedbackBtn} from 'components/Btns/AppNativeFeedbackBtn';
+import {ModalChangePassword} from './ModalChangePassword';
 
 export const ProfileScreen = () => {
+  const {user, logout} = useAuth();
+  const {updateUserIsLoading} = useUsers();
+
   const [userName, setUserName] = useState('');
   const [userNameIsLoading, setUserNameIsLoading] = useState(false);
   const [editNameIsOpen, setEditNameIsOpen] = useState(false);
 
   const [userEmail, setUserEmail] = useState('');
 
-  const {user, logout} = useAuth();
-  const {updateUserIsLoading} = useUsers();
+  const [changePasswordIsOpen, setChangePasswordIsOpen] = useState(false);
 
   useEffect(() => {
     const getName = async () => {
@@ -39,9 +42,13 @@ export const ProfileScreen = () => {
     }
   }, [user]);
 
-  const onEditName = useCallback(() => {
+  const onEditName = () => {
     setEditNameIsOpen(true);
-  }, []);
+  };
+
+  const onChangePassword = () => {
+    setChangePasswordIsOpen(true);
+  };
 
   return (
     <View style={styles.profile}>
@@ -65,9 +72,9 @@ export const ProfileScreen = () => {
               <AppCard style={styles.card}>
                 <AppNativeFeedbackBtn
                   text={'Сменить пароль'}
-                  onPress={() => console.log('Сменить пароль')}
                   isBorderRadius
                   isCenter
+                  onPress={onChangePassword}
                 />
               </AppCard>
             </View>
@@ -75,11 +82,19 @@ export const ProfileScreen = () => {
           <View style={styles.footer}>
             <AppButton onPress={logout} title="Выйти" style={styles.logout} />
           </View>
-          <ModalEdit
-            isOpen={editNameIsOpen}
-            setIsOpen={setEditNameIsOpen}
-            name={userName}
-          />
+          {editNameIsOpen && (
+            <ModalEdit
+              name={userName}
+              isOpen={editNameIsOpen}
+              setIsOpen={setEditNameIsOpen}
+            />
+          )}
+          {changePasswordIsOpen && (
+            <ModalChangePassword
+              isOpen={changePasswordIsOpen}
+              setIsOpen={setChangePasswordIsOpen}
+            />
+          )}
         </>
       )}
     </View>

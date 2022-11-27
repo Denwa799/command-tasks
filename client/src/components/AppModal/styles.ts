@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   wrapper: {
     backgroundColor: THEME.BLACK_60_COLOR,
     width: '100%',
-    height: '100%',
+    height: '120%',
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',

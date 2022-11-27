@@ -22,8 +22,8 @@ export const AppItemsGrid: FC<IAppItemsGrid> = ({items, style, onDelete}) => {
               {item.text}
             </Text>
             <TouchableOpacity
-              onPress={() => onDelete(index)}
-              activeOpacity={0.3}>
+              activeOpacity={0.3}
+              onPress={() => onDelete(index)}>
               <Anticon name="delete" size={18} color={THEME.RED_COLOR} />
             </TouchableOpacity>
           </View>

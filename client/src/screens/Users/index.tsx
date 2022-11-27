@@ -109,17 +109,14 @@ export const UsersScreen = () => {
     [teamInvitations, disabledButtonsId],
   );
 
-  const onDialogOpen = useCallback(
-    (id: number) => {
-      setUserId(id);
-      setDialogIsOpen(true);
-    },
-    [userId],
-  );
+  const onDialogOpen = (id: number) => {
+    setUserId(id);
+    setDialogIsOpen(true);
+  };
 
-  const onModalOpen = useCallback(() => {
+  const onModalOpen = () => {
     setModalIsOpen(true);
-  }, [modalIsOpen]);
+  };
 
   const onDelete = useCallback(async () => {
     if (userId && teamId) {
@@ -139,9 +136,9 @@ export const UsersScreen = () => {
       ) : (
         <>
           <FlatList
+            refreshing={isRefreshing}
             data={data}
             style={styles.list}
-            refreshing={isRefreshing}
             onRefresh={onRefresh}
             renderItem={({item}) => (
               <AppUserCard
@@ -165,18 +162,22 @@ export const UsersScreen = () => {
           {team && Object.keys(team).length > 0 && (
             <>
               <AppIconButton onPress={onModalOpen} />
-              <Dialog
-                isOpen={dialogIsOpen}
-                setIsOpen={setDialogIsOpen}
-                onDelete={onDelete}
-                disabled={deleteUserInTeamIsLoading}
-              />
-              <ModalCreate
-                teamId={team.id}
-                isOpen={modalIsOpen}
-                usersInTeam={team.users}
-                setIsOpen={setModalIsOpen}
-              />
+              {dialogIsOpen && (
+                <Dialog
+                  isOpen={dialogIsOpen}
+                  disabled={deleteUserInTeamIsLoading}
+                  setIsOpen={setDialogIsOpen}
+                  onDelete={onDelete}
+                />
+              )}
+              {modalIsOpen && (
+                <ModalCreate
+                  teamId={team.id}
+                  isOpen={modalIsOpen}
+                  usersInTeam={team.users}
+                  setIsOpen={setModalIsOpen}
+                />
+              )}
             </>
           )}
           {!team ||

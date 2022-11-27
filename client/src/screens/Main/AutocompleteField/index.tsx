@@ -53,19 +53,16 @@ export const AutocompleteField: FC<IAutocompleteField> = ({
     }
   }, [data, value, pressText, debouncedValue]);
 
-  const onAutocomplete = useCallback((itemValue: string) => {
+  const onAutocomplete = () => (itemValue: string) => {
     setValue(itemValue);
     onError(false);
-  }, []);
+  };
 
-  const onAutocompletePress = useCallback(
-    (email: string) => {
-      onError(false);
-      onPress(email);
-      setValue(email);
-    },
-    [pressText],
-  );
+  const onAutocompletePress = () => (email: string) => {
+    onError(false);
+    onPress(email);
+    setValue(email);
+  };
 
   const onDelete = useCallback(
     (index: number) => {
@@ -116,14 +113,14 @@ export const AutocompleteField: FC<IAutocompleteField> = ({
       <AppAutocomplete
         placeholder="Введите email пользователя"
         value={value}
+        dangerText={dangerText}
         data={data}
         isDisplay={isDisplay}
         isLoading={findUsersIsLoading}
+        isDanger={error}
         onChange={onAutocomplete}
         onPress={onAutocompletePress}
         onAdd={onAdd}
-        isDanger={error}
-        dangerText={dangerText}
       />
       <AppItemsGrid items={emails} onDelete={onDelete} />
     </>

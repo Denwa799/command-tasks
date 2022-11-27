@@ -3,11 +3,11 @@ import DatePicker from 'react-native-date-picker';
 import {IAppDatePicker} from './types';
 
 export const AppDatePicker: FC<IAppDatePicker> = ({
-  date,
-  isOpen = false,
-  onConfirm,
-  onCancel,
   title = 'Выберите дату',
+  isOpen = false,
+  date,
+  onCancel,
+  onConfirm,
 }) => {
   const minimumDate = useMemo(() => {
     return new Date();
@@ -15,16 +15,16 @@ export const AppDatePicker: FC<IAppDatePicker> = ({
 
   return (
     <DatePicker
+      title={title}
+      cancelText="Выйти"
+      confirmText="Подтвердить"
       mode="date"
-      date={date}
       modal
       open={isOpen}
-      onConfirm={onConfirm}
-      onCancel={onCancel}
-      title={title}
-      confirmText="Подтвердить"
-      cancelText="Выйти"
+      date={date}
       minimumDate={minimumDate}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
     />
   );
 };

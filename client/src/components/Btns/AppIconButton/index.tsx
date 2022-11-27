@@ -6,12 +6,12 @@ import {THEME} from 'constants/theme';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 
 export const AppIconButton: FC<IAppIconButton> = ({
-  onPress,
-  colors = [THEME.MAIN_COLOR, THEME.THIRD_COLOR],
-  style,
   children,
   size = 34,
+  colors = [THEME.MAIN_COLOR, THEME.THIRD_COLOR],
+  style,
   textStyle,
+  onPress,
 }) => {
   return (
     <TouchableHighlight

@@ -5,12 +5,12 @@ import {IAppNavigationBtn} from './types';
 
 export const AppNavigationBtn: FC<IAppNavigationBtn> = ({
   children,
-  onPress,
-  style,
   onNotification = false,
+  style,
+  onPress,
 }) => {
   return (
-    <TouchableOpacity activeOpacity={0.3} onPress={onPress} style={style}>
+    <TouchableOpacity activeOpacity={0.3} style={style} onPress={onPress}>
       {children}
       {onNotification && <View style={styles.notification} />}
     </TouchableOpacity>

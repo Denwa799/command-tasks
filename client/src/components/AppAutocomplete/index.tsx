@@ -8,37 +8,37 @@ import {IAppAutocomplete} from './types';
 
 export const AppAutocomplete: FC<IAppAutocomplete> = ({
   value,
+  placeholder,
+  dangerText,
   data,
-  onChange,
-  onPress,
   isDisplay,
   isLoading,
-  onAdd,
-  placeholder,
   isDanger,
-  dangerText,
+  onAdd,
+  onChange,
+  onPress,
 }) => {
   return (
     <View style={styles.autocompleteContainer}>
       <AppAutocompleteField
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        dangerText={dangerText}
         data={data}
-        onPress={onPress}
         isDisplay={isDisplay}
         isLoading={isLoading}
-        style={styles.autocomplete}
         isDanger={isDanger}
-        dangerText={dangerText}
+        style={styles.autocomplete}
+        onChange={onChange}
+        onPress={onPress}
       />
       <View style={styles.addBtnContainer}>
         <AppIconButton
-          onPress={onAdd}
-          style={styles.addBtn}
           size={25}
           colors={[THEME.BACK_SECOND, THEME.BACK_90_COLOR]}
+          style={styles.addBtn}
           textStyle={styles.addBtnText}
+          onPress={onAdd}
         />
       </View>
     </View>

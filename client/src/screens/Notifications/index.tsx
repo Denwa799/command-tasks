@@ -56,22 +56,22 @@ export const NotificationsScreen = () => {
     !updateInvitationReadIsLoading && updateInvitationRead(newInvitationsId);
   }, [newInvitationsId]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = () => {
     fetchInvitations();
     setFetchSkip(takeNumber);
-  }, []);
+  };
 
-  const onAcceptDialogOpen = useCallback((id: number) => {
+  const onAcceptDialogOpen = (id: number) => {
     setNotificationId(id);
     setIsDelete(false);
     setDialogIsOpen(true);
-  }, []);
+  };
 
-  const onDeleteDialogOpen = useCallback((id: number) => {
+  const onDeleteDialogOpen = (id: number) => {
     setNotificationId(id);
     setIsDelete(true);
     setDialogIsOpen(true);
-  }, []);
+  };
 
   const onViewableItemsChanged = useCallback<OnViewableItemsChangedType>(
     info => {
@@ -114,9 +114,11 @@ export const NotificationsScreen = () => {
       ) : (
         <>
           <FlatList
+            onEndReached={onLoadMore}
+            onEndReachedThreshold={0.1}
+            refreshing={invitationsIsLoading || moreInvitationsIsLoading}
             data={data}
             style={styles.list}
-            refreshing={invitationsIsLoading || moreInvitationsIsLoading}
             onRefresh={onRefresh}
             onViewableItemsChanged={onViewableItemsChanged}
             renderItem={({item}) => (
@@ -124,27 +126,27 @@ export const NotificationsScreen = () => {
                 key={item.id}
                 id={item.id}
                 message={item.message}
+                secondBtnText={'Удалить'}
                 isAccepted={item.isAccepted}
                 onPress={onAcceptDialogOpen}
                 onSecondPress={onDeleteDialogOpen}
-                secondBtnText={'Удалить'}
               />
             )}
-            onEndReached={onLoadMore}
-            onEndReachedThreshold={0.1}
           />
           {(!invitations || invitations.length === 0) && (
             <AppTitle level="2" style={styles.messageCenter}>
               Уведомлений нет
             </AppTitle>
           )}
-          <Dialog
-            isOpen={dialogIsOpen}
-            setIsOpen={setDialogIsOpen}
-            onAccept={onAccept}
-            disabled={updateInvitationIsLoading || deleteInvitationIsLoading}
-            isDelete={isDelete}
-          />
+          {dialogIsOpen && (
+            <Dialog
+              isOpen={dialogIsOpen}
+              disabled={updateInvitationIsLoading || deleteInvitationIsLoading}
+              isDelete={isDelete}
+              setIsOpen={setDialogIsOpen}
+              onAccept={onAccept}
+            />
+          )}
         </>
       )}
     </View>

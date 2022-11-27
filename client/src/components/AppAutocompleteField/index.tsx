@@ -7,16 +7,16 @@ import {styles} from './styles';
 import {IAppAutocompleteField} from './types';
 
 export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
-  onChange,
-  onPress,
-  placeholder = '',
-  data,
   value,
+  placeholder = '',
+  dangerText = 'Пустое поле',
+  data,
   isDisplay,
   isLoading,
-  style,
   isDanger,
-  dangerText = 'Пустое поле',
+  style,
+  onChange,
+  onPress,
 }) => {
   const preparedData = data.map(item => {
     return {
@@ -29,12 +29,12 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
     <View style={style}>
       <AppField
         value={value}
-        onChange={onChange}
         placeholder={placeholder}
         style={[
           isDisplay && !isDanger && styles.input,
           isDanger && styles.dangerInput,
         ]}
+        onChange={onChange}
       />
       {isDanger && <Text style={styles.dangerText}>{dangerText}</Text>}
 
@@ -47,11 +47,11 @@ export const AppAutocompleteField: FC<IAppAutocompleteField> = ({
               {preparedData.map(item => (
                 <AppNativeFeedbackBtn
                   key={item.id}
-                  onPress={() => onPress(item.text)}
                   text={item.text}
                   isBorderRadius
                   style={styles.item}
                   textStyle={styles.itemText}
+                  onPress={() => onPress(item.text)}
                 />
               ))}
             </View>

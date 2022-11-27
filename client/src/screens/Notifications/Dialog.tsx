@@ -1,17 +1,17 @@
 import {AppDialog} from 'components/AppDialog';
-import React, {useCallback} from 'react';
+import React from 'react';
 import {DialogType} from './types';
 
 export const Dialog = ({
   isOpen,
-  setIsOpen,
-  onAccept,
   disabled,
   isDelete = false,
+  setIsOpen,
+  onAccept,
 }: DialogType) => {
-  const onClose = useCallback(() => {
+  const onClose = () => {
     setIsOpen(false);
-  }, []);
+  };
 
   return (
     <AppDialog isOpen={isOpen} setIsOpen={setIsOpen}>

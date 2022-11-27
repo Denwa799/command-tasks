@@ -1,23 +1,21 @@
 import {THEME} from 'constants/theme';
-import React, {FC, useCallback} from 'react';
+import React, {FC} from 'react';
 import {Text, TouchableNativeFeedback, View} from 'react-native';
 import {styles} from './styles';
 import {IAppNativeFeedbackBtn} from './types';
 
 export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
   text,
-  onPress,
   color = THEME.MAIN_COLOR,
-  style,
-  textStyle,
   isBorderRadius = false,
   isCenter = false,
   isMainColor = false,
   disabled = false,
+  style,
+  textStyle,
+  onPress,
 }) => {
-  const handler = useCallback(() => {
-    !disabled && onPress();
-  }, [disabled]);
+  const handler = () => !disabled && onPress();
 
   return (
     <View style={[styles.btn, isBorderRadius && styles.borderRadius, style]}>
@@ -35,6 +33,7 @@ export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
               isCenter && styles.center,
               isMainColor && styles.mainColor,
               textStyle,
+              disabled && styles.disabled,
             ]}>
             {text}
           </Text>

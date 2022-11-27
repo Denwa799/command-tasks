@@ -4,13 +4,13 @@ import {styles} from './styles';
 import {IAppTextButton} from './types';
 
 export const AppTextButton: FC<IAppTextButton> = ({
-  children,
-  style,
-  onPress,
-  containerStyle,
-  isTextCenter = false,
   numberOfLines,
+  children,
+  isTextCenter = false,
   isDisabled = false,
+  style,
+  containerStyle,
+  onPress,
 }) => {
   const handler = useCallback(() => {
     !isDisabled && onPress();

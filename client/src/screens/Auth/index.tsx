@@ -2,23 +2,21 @@ import React, {FC, useCallback, useState} from 'react';
 import {AppField} from 'components/AppField';
 import {AppLoader} from 'components/AppLoader';
 import {useAuth} from 'hooks/useAuth';
-import {Pressable, Text, View} from 'react-native';
+import {Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAuthData} from './types';
 import {AppButton} from 'components/Btns/AppButton';
 import {emailValidationReg} from 'utils/regularExpressions';
+import {AppTextButton} from 'components/Btns/AppTextButton';
+import {ModalRecovery} from './ModalRecovery';
 
 export const AuthScreen: FC = () => {
   const {isLoading, login, register} = useAuth();
   const [data, setData] = useState<IAuthData>({} as IAuthData);
   const [isReg, setIsReg] = useState(false);
-  const {email, password, name} = data;
-  const [secondPassword, setSecondPassword] = useState('');
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const {email, password, secondPassword, name} = data;
 
-  const [isEmailError, setIsEmailError] = useState(false);
-  const [isNameError, setIsNameError] = useState(false);
-  const [isPasswordError, setIsPasswordError] = useState(false);
-  const [isSecondPasswordError, setIsSecondPasswordError] = useState(false);
   const [emailErrorText, setEmailErrorText] = useState(
     'Слишком короткий email',
   );
@@ -28,6 +26,10 @@ export const AuthScreen: FC = () => {
   const [secondPasswordErrorText, setSecondPasswordErrorText] = useState(
     'Пароль меньше 5 символов',
   );
+  const [isEmailError, setIsEmailError] = useState(false);
+  const [isNameError, setIsNameError] = useState(false);
+  const [isPasswordError, setIsPasswordError] = useState(false);
+  const [isSecondPasswordError, setIsSecondPasswordError] = useState(false);
 
   const emailHandler = useCallback(
     (value: string) => {
@@ -55,15 +57,15 @@ export const AuthScreen: FC = () => {
 
   const secondPasswordHandler = useCallback(
     (value: string) => {
-      setSecondPassword(value);
+      setData({...data, secondPassword: value});
       setIsSecondPasswordError(false);
     },
-    [secondPassword],
+    [data],
   );
 
-  const onReg = useCallback(() => {
-    setIsReg(prev => !prev);
-  }, []);
+  const onModal = () => setModalIsOpen(true);
+
+  const onReg = () => setIsReg(prev => !prev);
 
   const authHandler = useCallback(async () => {
     if (!email || email.length < 8) {
@@ -94,8 +96,9 @@ export const AuthScreen: FC = () => {
         return setIsSecondPasswordError(true);
       }
       await register(email.toLocaleLowerCase(), password, name);
+    } else {
+      await login(email.toLocaleLowerCase(), password);
     }
-    await login(email.toLocaleLowerCase(), password);
 
     setData({} as IAuthData);
   }, [email, name, isReg, password, secondPassword]);
@@ -112,14 +115,15 @@ export const AuthScreen: FC = () => {
           ) : (
             <>
               <AppField
-                value={data.email}
+                value={email}
                 placeholder={'Введите email'}
+                keyboardType={'email-address'}
                 onChange={emailHandler}
                 isDanger={isEmailError}
                 dangerText={emailErrorText}
               />
               <AppField
-                value={data.password}
+                value={password}
                 placeholder={'Введите пароль'}
                 onChange={passwordHandler}
                 isSecure={true}
@@ -137,7 +141,7 @@ export const AuthScreen: FC = () => {
                     dangerText={secondPasswordErrorText}
                   />
                   <AppField
-                    value={data.name}
+                    value={name}
                     placeholder={'Введите ФИО'}
                     onChange={nameHandler}
                     isDanger={isNameError}
@@ -149,15 +153,26 @@ export const AuthScreen: FC = () => {
                 onPress={authHandler}
                 title={isReg ? 'Зарегистрироваться' : 'Авторизоваться'}
               />
-              <Pressable onPress={onReg} style={styles.regBtn}>
-                <Text style={styles.text}>
+              <View style={styles.row}>
+                <AppTextButton onPress={onModal} style={styles.text}>
+                  {isReg ? 'Подтвердить email' : 'Сбросить пароль'}
+                </AppTextButton>
+                <AppTextButton onPress={onReg} style={styles.text}>
                   {isReg ? 'Авторизация' : 'Регистрация'}
-                </Text>
-              </Pressable>
+                </AppTextButton>
+              </View>
             </>
           )}
         </View>
       </View>
+      {modalIsOpen && (
+        <ModalRecovery
+          isOpen={modalIsOpen}
+          isReg={isReg}
+          setIsOpen={setModalIsOpen}
+          setIsReg={setIsReg}
+        />
+      )}
     </View>
   );
 };

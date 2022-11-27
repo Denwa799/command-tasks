@@ -5,10 +5,10 @@ import {IAppHorizontalContainer} from './types';
 
 export const AppPositionContainer: FC<IAppHorizontalContainer> = ({
   children,
-  style,
   isHorizontal,
   isHorizontalCenter,
   isCenter,
+  style,
 }) => {
   return (
     <View

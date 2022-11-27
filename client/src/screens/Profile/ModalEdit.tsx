@@ -5,29 +5,25 @@ import React, {FC, useCallback, useEffect, useState} from 'react';
 import {getUserId} from 'utils/getSession';
 import {IModalEdit} from './types';
 
-export const ModalEdit: FC<IModalEdit> = ({isOpen, setIsOpen, name}) => {
+export const ModalEdit: FC<IModalEdit> = ({name, isOpen, setIsOpen}) => {
   const [nameValue, setNameValue] = useState(name);
   const [isNameError, setIsNameError] = useState(false);
   const [dangerNameText, setDangerNameText] = useState('Пустое поле');
 
-  const {updateUser, updateUserIsLoading} = useUsers();
+  const {updateUserIsLoading, updateUser} = useUsers();
 
   useEffect(() => {
     setNameValue(name);
-    setIsNameError(false);
-  }, [isOpen]);
-
-  const nameHandler = useCallback(
-    (value: string) => {
-      setNameValue(value);
-      setIsNameError(false);
-    },
-    [nameValue],
-  );
-
-  const onClose = useCallback(async () => {
-    setIsOpen(false);
   }, []);
+
+  const nameHandler = (value: string) => {
+    setNameValue(value);
+    setIsNameError(false);
+  };
+
+  const onClose = () => {
+    setIsOpen(false);
+  };
 
   const onEdit = useCallback(async () => {
     if (!nameValue || nameValue.length < 3 || nameValue.length > 50) {

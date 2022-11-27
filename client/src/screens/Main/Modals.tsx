@@ -25,36 +25,42 @@ export const Modals: FC<IModals> = ({
 }) => {
   return (
     <>
-      <ModalCreate
-        isOpen={createIsOpen}
-        setIsOpen={setCreateIsOpen}
-        teamId={teamId}
-        projectId={projectId}
-        onUpdateData={onUpdateData}
-      />
-      <ModalDialog
-        id={id}
-        teamId={teamId}
-        projectId={projectId}
-        title={dialogTitle}
-        statusAction={statusAction}
-        isOpen={dialogIsOpen}
-        setIsOpen={setDialogIsOpen}
-        onUpdateData={onUpdateData}
-      />
-      <ModalChange
-        isOpen={changeIsOpen}
-        setIsOpen={setChangeIsOpen}
-        id={id}
-        text={text}
-        teamId={teamId}
-        responsibleEmail={responsibleEmail}
-        status={status}
-        isUrgently={isUrgently}
-        date={date}
-        projectId={projectId}
-        onUpdateData={onUpdateData}
-      />
+      {createIsOpen && (
+        <ModalCreate
+          isOpen={createIsOpen}
+          setIsOpen={setCreateIsOpen}
+          teamId={teamId}
+          projectId={projectId}
+          onUpdateData={onUpdateData}
+        />
+      )}
+      {dialogIsOpen && (
+        <ModalDialog
+          id={id}
+          teamId={teamId}
+          projectId={projectId}
+          title={dialogTitle}
+          statusAction={statusAction}
+          isOpen={dialogIsOpen}
+          setIsOpen={setDialogIsOpen}
+          onUpdateData={onUpdateData}
+        />
+      )}
+      {changeIsOpen && (
+        <ModalChange
+          isOpen={changeIsOpen}
+          setIsOpen={setChangeIsOpen}
+          id={id}
+          text={text}
+          teamId={teamId}
+          responsibleEmail={responsibleEmail}
+          status={status}
+          isUrgently={isUrgently}
+          date={date}
+          projectId={projectId}
+          onUpdateData={onUpdateData}
+        />
+      )}
     </>
   );
 };

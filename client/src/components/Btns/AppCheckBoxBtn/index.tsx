@@ -5,8 +5,8 @@ import {AppCheckBox} from '../AppCheckBox';
 import {IAppCheckBoxBtn} from './types';
 
 export const AppCheckBoxBtn: FC<IAppCheckBoxBtn> = ({
-  value,
   text,
+  value,
   styles,
   onPress,
 }) => {

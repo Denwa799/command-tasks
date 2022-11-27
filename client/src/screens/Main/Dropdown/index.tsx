@@ -29,14 +29,14 @@ export const Dropdown: FC<IDropdown> = ({
   return (
     <AppDropdown
       placeholder={autocompletePress ? autocompletePress : placeholder}
-      onPress={selectUserHandler}
-      style={styles.appDropdown}
       isOpen={selectIsOpen}
-      setIsOpen={setSelectIsOpen}
+      style={styles.appDropdown}
       items={items ? items : []}
-      onItemClick={onDropdownItemClick}
       isDanger={isDanger}
       dangerText={dangerText}
+      onPress={selectUserHandler}
+      setIsOpen={setSelectIsOpen}
+      onItemClick={onDropdownItemClick}
     />
   );
 };

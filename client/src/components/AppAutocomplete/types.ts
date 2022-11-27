@@ -1,12 +1,12 @@
 export interface IAppAutocomplete {
-  onChange: (value: string) => void;
-  onPress: (value: string) => void;
-  onAdd: () => void;
-  data: string[];
   value: string;
   placeholder?: string;
+  dangerText?: string;
+  data: string[];
   isDisplay?: boolean;
   isLoading?: boolean;
   isDanger?: boolean;
-  dangerText?: string;
+  onChange: (value: string) => void;
+  onPress: (value: string) => void;
+  onAdd: () => void;
 }

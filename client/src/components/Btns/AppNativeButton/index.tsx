@@ -5,17 +5,17 @@ import {IAppNativeButton} from './types';
 
 export const AppNativeButton: FC<IAppNativeButton> = ({
   title,
+  disabled,
   styleContainer,
   onPress,
-  disabled,
 }) => {
   return (
     <View style={styleContainer}>
       <Button
         title={title}
         color={THEME.MAIN_COLOR}
-        onPress={onPress}
         disabled={disabled}
+        onPress={onPress}
       />
     </View>
   );

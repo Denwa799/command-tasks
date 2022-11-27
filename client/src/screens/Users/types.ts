@@ -2,9 +2,9 @@ import {IUser} from 'models/IUser';
 
 export type DialogType = {
   isOpen: boolean;
+  disabled: boolean;
   setIsOpen: (value: boolean) => void;
   onDelete: () => void;
-  disabled: boolean;
 };
 
 export interface IModal {

@@ -91,15 +91,6 @@ export const ModalChange: FC<IModalChange> = ({
       isUrgently !== undefined && setIsUrgentlyValue(isUrgently);
       date && setDateValue(new Date(date));
     }
-    if (!isOpen) {
-      setTextValue('');
-      setIsTextError(false);
-      setResponsiblePress('');
-      setIsResponsibleError(false);
-      setStatusValue(inProgressStatus);
-      setIsUrgentlyValue(false);
-      setDateValue(new Date());
-    }
   }, [isOpen]);
 
   useEffect(() => {
@@ -107,9 +98,7 @@ export const ModalChange: FC<IModalChange> = ({
     statusValue !== doneStatus && setIsDone(false);
   }, [statusValue]);
 
-  const onClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+  const onClose = () => setIsOpen(false);
 
   const onSave = useCallback(async () => {
     if (!textValue || textValue.length < 3 || textValue.length > 50) {

@@ -1,10 +1,10 @@
 import {ReactNode} from 'react';
 
 export interface IAppIconButton {
-  onPress: () => void;
+  children?: ReactNode;
+  size?: number;
   colors?: [string, string];
   style?: Object;
   textStyle?: Object;
-  children?: ReactNode;
-  size?: number;
+  onPress: () => void;
 }
