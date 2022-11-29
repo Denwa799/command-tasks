@@ -72,6 +72,7 @@ export const ModalChange: FC<IModalChange> = ({
       filteredUsers = team.users.filter(element =>
         team.activatedUsers.includes(element.id),
       );
+      filteredUsers.push(team.creator);
       data = filteredUsers.map(element => {
         return {
           id: element.id,
