@@ -8,7 +8,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateStatusTaskDto } from './dto/update-status.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './tasks.entity';
-import { TaskStatusType } from './tasks.type';
+import { doneStatus, inProgressStatus, TaskStatusType } from './tasks.type';
 
 @Injectable()
 export class TasksService {
@@ -109,8 +109,11 @@ export class TasksService {
   }
 
   async create(dto: CreateTaskDto, token): Promise<{ id: number }> {
+    const correctStatus =
+      dto.status === doneStatus || dto.status === inProgressStatus;
+
     const decoded = await this.decodeToken(token);
-    if (decoded) {
+    if (decoded && correctStatus) {
       const project = await this.projectService.getProjectById(
         dto.projectId,
         token,
@@ -172,8 +175,11 @@ export class TasksService {
     date: Date;
     responsible: string;
   }> {
+    const correctStatus =
+      dto.status === doneStatus || dto.status === inProgressStatus;
+
     const decoded = await this.decodeToken(token);
-    if (decoded) {
+    if (decoded && correctStatus) {
       const task = await this.taskRepository.findOne({
         where: {
           id,
@@ -241,6 +247,8 @@ export class TasksService {
     isUrgently: boolean;
     date: Date;
   }> {
+    const correctStatus = doneStatus || inProgressStatus;
+
     const decoded = await this.decodeToken(token);
     if (!decoded) {
       throw new HttpException('Ошибка авторизации', HttpStatus.UNAUTHORIZED);
@@ -279,7 +287,7 @@ export class TasksService {
         },
       ],
     });
-    if (!task) {
+    if (!task || !correctStatus) {
       throw new HttpException(
         'Ошибка обновления задачи',
         HttpStatus.BAD_REQUEST,
