@@ -137,7 +137,6 @@ export class TeamsService {
         where: [
           {
             id,
-            users: { id: decoded.id },
             activatedUsers: ArrayContains([decoded.id]),
           },
           { id, creator: { id: decoded.id } },
@@ -174,28 +173,50 @@ export class TeamsService {
     const decoded = await this.decodeToken(token);
     if (decoded) {
       const team = await this.teamRepository.findOne({
-        where: {
-          id,
-          creator: {
-            id: decoded.id,
+        where: [
+          {
+            id,
+            creator: {
+              id: decoded.id,
+            },
           },
-        },
+          {
+            id,
+            activatedUsers: ArrayContains([decoded.id]),
+          },
+        ],
         relations: {
           users: true,
           invitations: {
             user: true,
           },
+          creator: true,
         },
       });
       const user = await this.userService.findUserById(userId);
       if (team && user) {
+        if (team.creator.id !== decoded.id) {
+          if (user.id !== decoded.id) {
+            throw new HttpException(
+              'Нельзя удалять других пользователей',
+              HttpStatus.FORBIDDEN,
+            );
+          }
+        } else {
+          if (user.id === decoded.id) {
+            throw new HttpException(
+              'Создатель команды не может удалить сам себя',
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+        }
         const userInTeam = team.users.find((item) => item.id === user.id);
         const invitation = team.invitations.find(
           (item) => item.user.id === user.id,
         );
         if (!userInTeam)
           throw new HttpException(
-            'Ошибка удаления пользователя в команде',
+            'Пользователь не найден',
             HttpStatus.NOT_FOUND,
           );
 
