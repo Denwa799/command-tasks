@@ -79,9 +79,9 @@ export const ProfileScreen = () => {
               </AppCard>
             </View>
           </AppContainer>
-          <View style={styles.footer}>
+          <AppPositionContainer isBottom isHorizontalCenter>
             <AppButton onPress={logout} title="Выйти" style={styles.logout} />
-          </View>
+          </AppPositionContainer>
           {editNameIsOpen && (
             <ModalEdit
               name={userName}

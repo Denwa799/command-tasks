@@ -8,8 +8,13 @@ export const styles = StyleSheet.create({
     height: '100%',
   },
   list: {
-    height: '95%',
     flexGrow: 0,
+  },
+  heightPercent95: {
+    height: '95%',
+  },
+  heightPercent92: {
+    height: '92%',
   },
   messageCenter: {
     position: 'absolute',
@@ -19,5 +24,8 @@ export const styles = StyleSheet.create({
     left: 0,
     right: 0,
     textAlign: 'center',
+  },
+  logout: {
+    width: '95%',
   },
 });

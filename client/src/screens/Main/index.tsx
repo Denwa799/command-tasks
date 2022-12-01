@@ -35,6 +35,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     loadedMoreTeams,
     teamsIsLoading,
     moreTeamsIsLoading,
+    teamsIsCanUpdate,
     teamIsLoading,
     selectedTeamId,
     fetchTeams,
@@ -42,6 +43,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
     cleanMoreTeams,
     setSelectedTeamId,
     fetchTeam,
+    onTeamsIsCanUpdate,
   } = useTeams();
   const {
     projects,
@@ -173,21 +175,24 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   }, []);
 
   useEffect(() => {
-    if (isCanUpdateData) {
+    if (teamsIsCanUpdate || isCanUpdateData) {
       if (route.name === teamsRoute && teams) {
         setDataTeams(teams);
         setIsCanUpdateData(false);
+        onTeamsIsCanUpdate(false);
       }
       if (route.name === teamRoute && projects) {
         setDataProjects(projects);
         setIsCanUpdateData(false);
+        onTeamsIsCanUpdate(false);
       }
       if (route.name === projectRoute && tasks) {
         setDataTasks(tasks);
         setIsCanUpdateData(false);
+        onTeamsIsCanUpdate(false);
       }
     }
-  }, [teams, projects, tasks, isCanUpdateData]);
+  }, [teams, projects, tasks, isCanUpdateData, teamsIsCanUpdate]);
 
   useEffect(() => {
     if (loadedMoreTeams.length > 0) {
@@ -243,6 +248,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         await fetchTasks(params.projectId);
         tasks && setDataTasks(tasks);
       }
+      setIsCanUpdateData(true);
       setFetchSkip(takeNumber);
     } catch {
       ToastAndroid.show('Ошибка обновления', ToastAndroid.SHORT);

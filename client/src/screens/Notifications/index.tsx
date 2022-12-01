@@ -10,6 +10,7 @@ import {styles} from './styles';
 import {OnViewableItemsChangedType} from './types';
 import {takeNumber} from 'constants/variables';
 import {IInvitations} from 'models/IInvitations';
+import {useTeams} from 'hooks/useTeams';
 
 export const NotificationsScreen = () => {
   const {
@@ -28,6 +29,8 @@ export const NotificationsScreen = () => {
     updateInvitationRead,
     deleteInvitation,
   } = useInvitations();
+
+  const {fetchTeams, onTeamsIsCanUpdate} = useTeams();
 
   const [fetchSkip, setFetchSkip] = useState(takeNumber);
   const [dataInvitations, setDataInvitations] = useState<IInvitations[]>([]);
@@ -103,6 +106,8 @@ export const NotificationsScreen = () => {
 
     setDialogIsOpen(false);
     fetchInvitations();
+    await fetchTeams();
+    onTeamsIsCanUpdate(true);
   }, [notificationId, isDelete]);
 
   return (

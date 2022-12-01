@@ -11,4 +11,9 @@ export const styles = StyleSheet.create({
   horizontalCenter: {
     alignItems: 'center',
   },
+  bottom: {
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
+  },
 });

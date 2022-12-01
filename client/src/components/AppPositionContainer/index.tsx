@@ -8,6 +8,7 @@ export const AppPositionContainer: FC<IAppHorizontalContainer> = ({
   isHorizontal,
   isHorizontalCenter,
   isCenter,
+  isBottom,
   style,
 }) => {
   return (
@@ -16,6 +17,7 @@ export const AppPositionContainer: FC<IAppHorizontalContainer> = ({
         isHorizontal && styles.horizontal,
         isHorizontalCenter && styles.horizontalCenter,
         isCenter && styles.center,
+        isBottom && styles.bottom,
         style,
       ]}>
       {children}
