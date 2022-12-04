@@ -15,7 +15,6 @@ import { RolesGuard } from '../auth/guards';
 import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { ChangeUserPasswordDto } from './dto/change-user-password.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import {
   EmailQueryParamDto,
   PaginationQueryParamDto,
@@ -28,15 +27,6 @@ import { UsersService } from './users.service';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
-
-  @ApiOperation({ summary: 'Создание пользователя' })
-  @ApiResponse({ status: 200, type: User })
-  @Roles('admin')
-  @UseGuards(RolesGuard)
-  @Post()
-  create(@Body() userDto: CreateUserDto) {
-    return this.usersService.createUser(userDto);
-  }
 
   @ApiOperation({ summary: 'Проверка старого пароля пользователя' })
   @ApiResponse({ status: 200, description: 'true' })

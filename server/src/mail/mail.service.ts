@@ -44,8 +44,16 @@ export class MailService {
 
   async passwordRecovery(dto: EmailRecoveryDto): Promise<string> {
     const user = await this.usersService.findUserByEmail(dto.email);
-    if (!user)
+    if (!user) {
       throw new HttpException('Пользователь не найден', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!user.isActive) {
+      throw new HttpException(
+        'Пользователь не подтвердил email',
+        HttpStatus.FORBIDDEN,
+      );
+    }
 
     const codeEquals = await bcrypt.compare(
       String(dto.code),

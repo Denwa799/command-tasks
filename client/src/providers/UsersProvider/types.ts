@@ -4,7 +4,6 @@ import {ReactNode} from 'react';
 export interface IUsersContext {
   foundUsers: IUser[];
   passwordIsEquals: boolean;
-  passwordIsRecovery: boolean;
   findUsersIsLoading: boolean;
   updateUserIsLoading: boolean;
   passwordEqualsIsLoading: boolean;
@@ -17,7 +16,10 @@ export interface IUsersContext {
   cleanPasswordEquals: () => void;
   changePassword: (id: number, password: string) => void;
   checkEmail: (email: string) => void;
-  passwordRecovery: (email: string, code: number) => void;
+  passwordRecovery: (
+    email: string,
+    code: number,
+  ) => Promise<string | undefined>;
 }
 
 export interface IUsersProvider {

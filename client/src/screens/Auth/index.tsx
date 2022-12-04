@@ -2,7 +2,7 @@ import React, {FC, useCallback, useState} from 'react';
 import {AppField} from 'components/AppField';
 import {AppLoader} from 'components/AppLoader';
 import {useAuth} from 'hooks/useAuth';
-import {Text, View} from 'react-native';
+import {Alert, Text, View} from 'react-native';
 import {styles} from './styles';
 import {IAuthData} from './types';
 import {AppButton} from 'components/Btns/AppButton';
@@ -95,12 +95,18 @@ export const AuthScreen: FC = () => {
         setSecondPasswordErrorText('Пароли не совпадают');
         return setIsSecondPasswordError(true);
       }
-      await register(email.toLocaleLowerCase(), password, name);
+      const response = await register(
+        email.toLocaleLowerCase(),
+        password,
+        name,
+      );
+      if (response) {
+        Alert.alert('Подтвердите свой email для активации аккаунта');
+        setModalIsOpen(true);
+      }
     } else {
       await login(email.toLocaleLowerCase(), password);
     }
-
-    setData({} as IAuthData);
   }, [email, name, isReg, password, secondPassword]);
 
   return (
@@ -167,6 +173,7 @@ export const AuthScreen: FC = () => {
       </View>
       {modalIsOpen && (
         <ModalRecovery
+          userEmail={email}
           isOpen={modalIsOpen}
           isReg={isReg}
           setIsOpen={setModalIsOpen}

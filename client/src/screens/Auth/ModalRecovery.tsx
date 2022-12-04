@@ -13,6 +13,7 @@ import {useAuth} from 'hooks/useAuth';
 import {ToastAndroid} from 'react-native';
 
 export const ModalRecovery: FC<IModal> = ({
+  userEmail,
   isOpen,
   isReg,
   setIsOpen,
@@ -20,13 +21,11 @@ export const ModalRecovery: FC<IModal> = ({
 }) => {
   const {
     checkEmailIsLoading,
-    passwordIsRecovery,
     passwordRecoveryIsLoading,
     passwordRecovery,
     checkEmail,
   } = useUsers();
-  const {isEmailActivated, emailActivationIsLoading, emailActivation} =
-    useAuth();
+  const {emailActivationIsLoading, emailActivation} = useAuth();
 
   const [data, setData] = useState<IRecoveryData>({} as IRecoveryData);
   const {email, code} = data;
@@ -59,6 +58,12 @@ export const ModalRecovery: FC<IModal> = ({
 
     return () => clearTimeout(timer);
   }, [codeTimerSeconds]);
+
+  useEffect(() => {
+    if (userEmail) {
+      setData({...data, email: userEmail});
+    }
+  }, []);
 
   const emailHandler = useCallback(
     (value: string) => {
@@ -101,15 +106,15 @@ export const ModalRecovery: FC<IModal> = ({
       return setIsCodeError(true);
     }
     if (isReg) {
-      await emailActivation(email, Number(code));
-      if (isEmailActivated) {
+      const response = await emailActivation(email, Number(code));
+      if (response) {
         ToastAndroid.show('Email подтвержден', ToastAndroid.SHORT);
         setIsReg(false);
         setIsOpen(false);
       }
     } else {
-      await passwordRecovery(email, Number(code));
-      if (passwordIsRecovery) {
+      const response = await passwordRecovery(email, Number(code));
+      if (response) {
         ToastAndroid.show(
           'Новый пароль отправлен на email',
           ToastAndroid.SHORT,

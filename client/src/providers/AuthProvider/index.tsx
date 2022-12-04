@@ -20,6 +20,7 @@ import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppLoader} from 'components/AppLoader';
 import {IUser} from 'models/IUser';
 import {useTeams} from 'hooks/useTeams';
+import axios from 'axios';
 
 export const AuthContext = createContext<IAuthContext>({} as IAuthContext);
 
@@ -28,7 +29,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
 
   const [user, setUser] = useState<IUser | null>(null);
   const [isCheck, setIsCheck] = useState(false);
-  const [isEmailActivated, setIsEmailActivated] = useState(false);
   const [isAuthLoad, setIsAuthLoad] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstRefresh, setIsFirstRefresh] = useState(true);
@@ -70,18 +70,20 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
           password,
           name,
         );
-        await EncryptedStorage.setItem(
-          'user_session',
-          JSON.stringify({
-            id: response.data.id,
-            email: response.data.email,
-            name: response.data.name,
-            access_token: response.data.tokens.access_token,
-            refresh_token: response.data.tokens.refresh_token,
-          }),
-        );
-      } catch (error) {
-        ToastAndroid.show('Ошибка регистрации', ToastAndroid.SHORT);
+        return response.data.email;
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 405) {
+            ToastAndroid.show(
+              'Пользователь с таким email уже существует',
+              ToastAndroid.SHORT,
+            );
+          } else {
+            ToastAndroid.show('Ошибка регистрации', ToastAndroid.SHORT);
+          }
+        } else {
+          ToastAndroid.show('Ошибка регистрации', ToastAndroid.SHORT);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -104,8 +106,19 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
         }),
       );
       setIsCheck(prev => !prev);
-    } catch (error) {
-      ToastAndroid.show('Ошибка авторизации', ToastAndroid.SHORT);
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          ToastAndroid.show('Email не подтвержден', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show(
+            'Неправильный email или пароль',
+            ToastAndroid.SHORT,
+          );
+        }
+      } else {
+        ToastAndroid.show('Ошибка авторизации', ToastAndroid.SHORT);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -158,13 +171,12 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
 
   const emailActivation = useCallback(async (email: string, code: number) => {
     setEmailActivationIsLoading(true);
-    setIsEmailActivated(false);
     try {
-      await PostService(`${authPath}activation`, '', {
+      const response = await PostService(`${authPath}activation`, '', {
         email,
         code,
       });
-      setIsEmailActivated(true);
+      return response.data;
     } catch (error) {
       ToastAndroid.show('Ошибка активации аккаунта', ToastAndroid.SHORT);
     } finally {
@@ -181,7 +193,6 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   const value = useMemo(
     () => ({
       user,
-      isEmailActivated,
       isLoading,
       emailActivationIsLoading,
       login,
@@ -189,7 +200,7 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
       logout,
       emailActivation,
     }),
-    [user, isEmailActivated, isLoading, emailActivationIsLoading],
+    [user, isLoading, emailActivationIsLoading],
   );
 
   return (
