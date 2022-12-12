@@ -16,6 +16,8 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
   const [team, setTeam] = useState<ITeam | null>(null);
   const [selectedTeamId, setSelectedTeamId] = useState(0);
 
+  const [teamsIsCanUpdate, setTeamsIsCanUpdate] = useState(false);
+
   const [teamsIsLoading, setTeamsIsLoading] = useState(false);
   const [moreTeamsIsLoading, setMoreTeamsIsLoading] = useState(false);
   const [teamIsLoading, setTeamIsLoading] = useState(false);
@@ -82,6 +84,10 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
 
   const cleanMoreTeams = useCallback(() => {
     setLoadedMoreTeams([]);
+  }, []);
+
+  const onTeamsIsCanUpdate = useCallback((value: boolean) => {
+    setTeamsIsCanUpdate(value);
   }, []);
 
   const fetchTeam = useCallback(async (id: number) => {
@@ -207,6 +213,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       loadedMoreTeams,
       team,
       selectedTeamId,
+      teamsIsCanUpdate,
       teamsIsLoading,
       moreTeamsIsLoading,
       teamIsLoading,
@@ -226,6 +233,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       setSelectedTeamId,
       deleteUserInTeam,
       addUserInTeam,
+      onTeamsIsCanUpdate,
     }),
     [
       teams,
@@ -233,6 +241,7 @@ export const TeamsProvider: FC<ITeamsProvider> = ({children}) => {
       loadedMoreTeams,
       teamsIsLoading,
       moreTeamsIsLoading,
+      teamsIsCanUpdate,
       team,
       selectedTeamId,
       teamIsLoading,

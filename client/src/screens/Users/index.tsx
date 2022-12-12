@@ -1,8 +1,12 @@
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppLoader} from 'components/AppLoader';
 import {AppPositionContainer} from 'components/AppPositionContainer';
 import {AppTitle} from 'components/AppTitle';
+import {AppButton} from 'components/Btns/AppButton';
 import {AppIconButton} from 'components/Btns/AppIconButton';
 import {AppUserCard} from 'components/Cards/AppUserCard';
+import {teamsRoute} from 'constants/variables';
 import {useAuth} from 'hooks/useAuth';
 import {useInvitations} from 'hooks/useInvitations';
 import {useTeams} from 'hooks/useTeams';
@@ -11,15 +15,21 @@ import {FlatList, View} from 'react-native';
 import {Dialog} from './Dialog';
 import {ModalCreate} from './ModalCreate';
 import {styles} from './styles';
+import {UsersScreenNavigateType} from './types';
 
 export const UsersScreen = () => {
+  const navigation =
+    useNavigation<NativeStackNavigationProp<UsersScreenNavigateType>>();
+
   const {
     team,
     teamIsLoading,
     selectedTeamId,
     deleteUserInTeamIsLoading,
     fetchTeam,
+    fetchTeams,
     deleteUserInTeam,
+    onTeamsIsCanUpdate,
   } = useTeams();
   const {user} = useAuth();
   const {
@@ -42,6 +52,7 @@ export const UsersScreen = () => {
   const [disabledButtonsId, setDisabledButtonsId] = useState<number[]>([]);
 
   const [dialogIsOpen, setDialogIsOpen] = useState(false);
+  const [dialogQuitIsOpen, setDialogQuitIsOpen] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   const data = useMemo(() => {
@@ -60,6 +71,11 @@ export const UsersScreen = () => {
     }
     return users;
   }, [team, teamInvitations]);
+
+  const listStyles = [
+    styles.list,
+    user?.id === creatorId ? styles.heightPercent95 : styles.heightPercent92,
+  ];
 
   useEffect(() => {
     fetchTeam(selectedTeamId);
@@ -127,6 +143,19 @@ export const UsersScreen = () => {
     }
   }, [userId, teamId]);
 
+  const onQuitDialogOpen = () => {
+    setDialogQuitIsOpen(true);
+  };
+
+  const onQuit = useCallback(async () => {
+    if (user && teamId) {
+      await deleteUserInTeam(user.id, teamId);
+      navigation.navigate(teamsRoute, {});
+      await fetchTeams();
+      onTeamsIsCanUpdate(true);
+    }
+  }, [user, teamId]);
+
   return (
     <View style={styles.users}>
       {teamIsLoading || isRefreshing || teamInvitationsIsLoading ? (
@@ -138,7 +167,7 @@ export const UsersScreen = () => {
           <FlatList
             refreshing={isRefreshing}
             data={data}
-            style={styles.list}
+            style={listStyles}
             onRefresh={onRefresh}
             renderItem={({item}) => (
               <AppUserCard
@@ -159,15 +188,37 @@ export const UsersScreen = () => {
               />
             )}
           />
+
           {team && Object.keys(team).length > 0 && (
             <>
-              <AppIconButton onPress={onModalOpen} />
-              {dialogIsOpen && (
+              {user?.id === creatorId && (
+                <AppIconButton onPress={onModalOpen} />
+              )}
+              {user?.id !== creatorId && (
+                <AppPositionContainer isBottom isHorizontalCenter>
+                  <AppButton
+                    onPress={onQuitDialogOpen}
+                    title="Выйти из команды"
+                    style={styles.logout}
+                  />
+                </AppPositionContainer>
+              )}
+
+              {(dialogIsOpen || dialogQuitIsOpen) && (
                 <Dialog
-                  isOpen={dialogIsOpen}
+                  title={
+                    dialogQuitIsOpen
+                      ? 'Выйти из команды?'
+                      : 'Удалить пользователя?'
+                  }
+                  buttonText={dialogQuitIsOpen ? 'Выйти' : 'Удалить'}
+                  isOpen={dialogIsOpen || dialogQuitIsOpen}
+                  dialogQuitIsOpen={dialogQuitIsOpen}
                   disabled={deleteUserInTeamIsLoading}
                   setIsOpen={setDialogIsOpen}
+                  setQuiteIsOpen={setDialogQuitIsOpen}
                   onDelete={onDelete}
+                  onQuit={onQuit}
                 />
               )}
               {modalIsOpen && (

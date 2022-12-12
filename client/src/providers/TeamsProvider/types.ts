@@ -15,6 +15,7 @@ export interface ITeamsContext {
   updateTeamIsLoading: boolean;
   addUserInTeamIsLoading: boolean;
   deleteUserInTeamIsLoading: boolean;
+  teamsIsCanUpdate: boolean;
   fetchTeams: (skip?: number, take?: number) => Promise<void>;
   fetchMoreTeams: (skip?: number, take?: number) => Promise<void>;
   cleanTeams: () => void;
@@ -26,6 +27,7 @@ export interface ITeamsContext {
   addUserInTeam: (userId: number, teamId: number) => Promise<void>;
   setSelectedTeamId: (value: number) => void;
   deleteUserInTeam: (userId: number, teamId: number) => Promise<void>;
+  onTeamsIsCanUpdate: (value: boolean) => void;
 }
 
 export interface ITeamsProvider {

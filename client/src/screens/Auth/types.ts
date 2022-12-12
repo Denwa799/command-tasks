@@ -6,6 +6,7 @@ export interface IAuthData {
 }
 
 export interface IModal {
+  userEmail?: string;
   isOpen: boolean;
   isReg: boolean;
   setIsOpen: (value: boolean) => void;

@@ -38,12 +38,6 @@ export const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
   },
-  footer: {
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
-    alignItems: 'center',
-  },
   logout: {
     width: '95%',
   },

@@ -46,7 +46,6 @@ export class AuthService {
     id: number;
     email: string;
     name: string;
-    tokens: Tokens;
   }> {
     const candidate = await this.userService.findUserByEmail(userDto.email);
     if (candidate) {
@@ -63,13 +62,10 @@ export class AuthService {
       ...userDto,
       password: hashPassword,
     });
-    const tokens = await this.generateTokens(user);
-    await this.updateRtHash(user.id, tokens.refresh_token);
     const response = {
       id: user.id,
       email: user.email,
       name: user.name,
-      tokens,
     };
     return response;
   }
@@ -88,7 +84,8 @@ export class AuthService {
         'Пользователь уже активирован',
         HttpStatus.BAD_REQUEST,
       );
-
+    if (!user.hashedActiveCode)
+      throw new HttpException('Код небыл отправлен', HttpStatus.BAD_REQUEST);
     const codeEquals = await bcrypt.compare(
       String(dto.code),
       user.hashedActiveCode,

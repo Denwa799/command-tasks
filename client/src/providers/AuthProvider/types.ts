@@ -3,13 +3,16 @@ import {ReactNode} from 'react';
 
 export interface IAuthContext {
   user: IUser | null;
-  isEmailActivated: boolean;
   isLoading: boolean;
   emailActivationIsLoading: boolean;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    name: string,
+  ) => Promise<string | undefined>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  emailActivation: (email: string, code: number) => void;
+  emailActivation: (email: string, code: number) => Promise<string | undefined>;
 }
 
 export interface IAuthProvider {

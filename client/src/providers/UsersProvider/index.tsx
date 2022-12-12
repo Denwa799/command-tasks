@@ -6,13 +6,13 @@ import {ToastAndroid} from 'react-native';
 import {GetService, PatchService, PostService} from 'api';
 import {variables} from 'constants/variables';
 import {IUser} from 'models/IUser';
+import axios from 'axios';
 
 export const UsersContext = createContext<IUsersContext>({} as IUsersContext);
 
 export const UsersProvider: FC<IUsersProvider> = ({children}) => {
   const [foundUsers, setFoundUsers] = useState([] as IUser[]);
   const [passwordIsEquals, setPasswordIsEquals] = useState(false);
-  const [passwordIsRecovery, setPasswordIsRecovery] = useState(false);
 
   const [findUsersIsLoading, setFindUsersIsLoading] = useState(false);
   const [updateUserIsLoading, setUpdateUserIsLoading] = useState(false);
@@ -126,15 +126,22 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
 
   const passwordRecovery = useCallback(async (email: string, code: number) => {
     setPasswordRecoveryIsLoading(true);
-    setPasswordIsRecovery(false);
     try {
-      await PostService(`${mailPath}/password-recovery`, '', {
+      const response = await PostService(`${mailPath}/password-recovery`, '', {
         email,
         code,
       });
-      setPasswordIsRecovery(true);
-    } catch (error) {
-      ToastAndroid.show('Ошибка восстановления пароля', ToastAndroid.SHORT);
+      return response.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          ToastAndroid.show('Email не подтвержден', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show('Ошибка восстановления пароля', ToastAndroid.SHORT);
+        }
+      } else {
+        ToastAndroid.show('Ошибка восстановления пароля', ToastAndroid.SHORT);
+      }
     } finally {
       setPasswordRecoveryIsLoading(false);
     }
@@ -144,7 +151,6 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
     () => ({
       foundUsers,
       passwordIsEquals,
-      passwordIsRecovery,
       findUsersIsLoading,
       updateUserIsLoading,
       passwordEqualsIsLoading,
@@ -162,7 +168,6 @@ export const UsersProvider: FC<IUsersProvider> = ({children}) => {
     [
       foundUsers,
       passwordIsEquals,
-      passwordIsRecovery,
       findUsersIsLoading,
       updateUserIsLoading,
       passwordEqualsIsLoading,

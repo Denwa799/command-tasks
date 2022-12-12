@@ -5,7 +5,6 @@ import {
   IsEmail,
   IsNumber,
   IsString,
-  Length,
 } from 'class-validator';
 import { Role } from 'src/api/roles/roles.entity';
 import {
@@ -50,7 +49,6 @@ export class User {
   @ApiProperty({ example: '123Abc', description: 'Пароль' })
   @Column()
   @IsString()
-  @Length(5, 20)
   password: string;
 
   @ApiProperty({ example: 'true', description: 'Активирован аккаунт или нет' })
