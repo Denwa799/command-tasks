@@ -13,6 +13,7 @@ import { InvitationsModule } from './api/invitations/invitations.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './mail/mail.module';
 import { IsActiveGuard } from './api/auth/guards/is-active.guard';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -45,6 +46,10 @@ import { IsActiveGuard } from './api/auth/guards/is-active.guard';
       synchronize: true,
       autoLoadEntities: true,
     }),
+    ThrottlerModule.forRoot({
+      ttl: 30,
+      limit: 20,
+    }),
     MailModule,
     AuthModule,
     UsersModule,
@@ -62,6 +67,10 @@ import { IsActiveGuard } from './api/auth/guards/is-active.guard';
     {
       provide: APP_GUARD,
       useClass: AccessTokenGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
     },
   ],
 })

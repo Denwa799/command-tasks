@@ -154,7 +154,7 @@ export class AuthService {
         },
         {
           secret: process.env.PRIVATE_KEY_REFRESH || 'SECRET_REF',
-          expiresIn: '7d',
+          expiresIn: '30d',
         },
       ),
     ]);
