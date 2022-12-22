@@ -72,7 +72,7 @@ export class TeamsService {
     if (creator) {
       const users = [];
       users.push(creator);
-      if (users.length > 0) {
+      if (dto.users.length > 0) {
         for (const email of dto.users) {
           const user = await this.userService.findUserByEmail(email);
           if (!user) {

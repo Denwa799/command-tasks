@@ -87,7 +87,7 @@ export class TeamsController {
     return this.teamsService.delete(id, token);
   }
 
-  @ApiOperation({ summary: 'Обновление команды по id' })
+  @ApiOperation({ summary: 'Добавление пользователя в команду по id' })
   @ApiResponse({ status: 200, type: Team })
   @Patch('/:id/user/:userId')
   addUser(

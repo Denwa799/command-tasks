@@ -10,6 +10,7 @@ services:
       - /server/.env
     volumes:
       - ./server/src:/usr/src/app/src
+      - ./server/node_modules:/usr/src/app/node_modules
 
   api_db:
     env_file:
