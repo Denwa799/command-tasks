@@ -61,7 +61,15 @@ export const ModalRecovery: FC<IModal> = ({
 
   useEffect(() => {
     if (userEmail) {
+      const sendCode = async () => {
+        setCodeTimerSeconds(60);
+        await checkEmail(userEmail.toLocaleLowerCase());
+      };
+
       setData({...data, email: userEmail});
+      if (emailValidationReg.test(userEmail)) {
+        sendCode();
+      }
     }
   }, []);
 
