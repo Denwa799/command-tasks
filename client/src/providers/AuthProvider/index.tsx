@@ -190,10 +190,9 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   }, []);
 
   useEffect(() => {
-    //const fourteenMinutes = 840000;
-    const oneMinute = 30000;
+    const fourteenMinutes = 840000;
     refreshHandler();
-    setInterval(() => refreshHandler(), oneMinute);
+    setInterval(() => refreshHandler(), fourteenMinutes);
   }, []);
 
   const value = useMemo(
