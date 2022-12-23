@@ -160,6 +160,11 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
         setIsCheck(prev => !prev);
       }
     } catch (error: any) {
+      if (error.message === 'Network Error') {
+        setTimeout(() => {
+          refreshHandler();
+        }, 5000);
+      }
       if (error.response.data.statusCode === (400 || 401)) {
         logout();
         Alert.alert('Авторизуйтесь заново');
@@ -185,9 +190,10 @@ export const AuthProvider: FC<IAuthProvider> = ({children}) => {
   }, []);
 
   useEffect(() => {
-    const fourteenMinutes = 840000;
+    //const fourteenMinutes = 840000;
+    const oneMinute = 30000;
     refreshHandler();
-    setInterval(() => refreshHandler(), fourteenMinutes);
+    setInterval(() => refreshHandler(), oneMinute);
   }, []);
 
   const value = useMemo(
