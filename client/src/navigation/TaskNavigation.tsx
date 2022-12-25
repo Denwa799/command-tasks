@@ -82,6 +82,7 @@ export const TaskNavigation = () => {
         headerTintColor: THEME.TEXT_COLOR,
         gestureEnabled: true,
         gestureDirection: 'horizontal',
+        gestureResponseDistance: 100,
         transitionSpec: {
           open: {
             animation: 'spring',
@@ -115,7 +116,7 @@ export const TaskNavigation = () => {
         component={NotificationsScreen}
         options={{
           title: 'Уведомления',
-          gestureDirection: 'vertical',
+          gestureEnabled: false,
           cardStyleInterpolator:
             CardStyleInterpolators.forFadeFromBottomAndroid,
         }}
@@ -125,7 +126,7 @@ export const TaskNavigation = () => {
         component={UsersScreen}
         options={{
           title: 'Пользователи в команде',
-          gestureDirection: 'vertical',
+          gestureEnabled: false,
           cardStyleInterpolator:
             CardStyleInterpolators.forFadeFromBottomAndroid,
         }}

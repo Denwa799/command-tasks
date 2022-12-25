@@ -16,11 +16,11 @@ export const styles = StyleSheet.create({
   modal: {
     zIndex: 1,
     top: '30%',
-    left: '7%',
+    left: '5%',
     position: 'absolute',
     backgroundColor:
       colorScheme === 'dark' ? THEME.BLACK_COLOR : THEME.WHITE_COLOR,
-    width: '85%',
+    width: '90%',
     borderRadius: SIZES.radius,
     maxHeight: 400,
   },
