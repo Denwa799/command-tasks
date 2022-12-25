@@ -11,7 +11,7 @@ import {useProjects} from 'hooks/useProjects';
 import {useTasks} from 'hooks/useTasks';
 import {useTeams} from 'hooks/useTeams';
 import {TaskStatusType} from 'models/ITasks';
-import React, {FC, useCallback, useEffect, useMemo, useState} from 'react';
+import React, {FC, useCallback, useEffect, useLayoutEffect, useMemo, useState} from 'react';
 import {IModalChange} from './types';
 import {TextField} from './TextField';
 import {Dropdown} from './Dropdown';
@@ -84,7 +84,7 @@ export const ModalChange: FC<IModalChange> = ({
     return data;
   }, [team]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen) {
       setTextValue(text);
       responsibleEmail && setResponsiblePress(responsibleEmail);
