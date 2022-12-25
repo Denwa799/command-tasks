@@ -16,13 +16,26 @@ export const styles = StyleSheet.create({
   modal: {
     zIndex: 1,
     top: '30%',
-    left: '10%',
+    left: '7%',
     position: 'absolute',
     backgroundColor:
       colorScheme === 'dark' ? THEME.BLACK_COLOR : THEME.WHITE_COLOR,
-    width: '80%',
+    width: '85%',
     borderRadius: SIZES.radius,
     maxHeight: 400,
+  },
+  deviceHeight685: {
+    top: '28%',
+    maxHeight: 380,
+  },
+  deviceHeight592: {
+    top: '15%',
+  },
+  deviceHeight540: {
+    maxHeight: 340,
+  },
+  deviceHeight480: {
+    maxHeight: 250,
   },
   content: {
     padding: 20,

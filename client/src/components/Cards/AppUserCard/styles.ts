@@ -23,12 +23,12 @@ export const styles = StyleSheet.create({
     fontSize: 17,
   },
   sendBtn: {
-    width: 80,
+    width: 82,
     textAlign: 'right',
     marginBottom: 10,
   },
   deleteBtn: {
-    width: 80,
+    width: 82,
     textAlign: 'right',
   },
 });

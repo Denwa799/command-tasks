@@ -349,7 +349,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               onEndReached={onLoadMore}
               onEndReachedThreshold={0.1}
             />
-            {(!data || data.length === 0) && (
+            {(!data || data.length === 0) && !isCanUpdateData && (
               <AppTitle level="2" style={styles.messageCenter}>
                 Список пуст
               </AppTitle>

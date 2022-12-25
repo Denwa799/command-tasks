@@ -69,7 +69,7 @@ export const ModalDialog: FC<IModalDialog> = ({
       <AppDialog.Actions>
         <AppDialog.Button title="Закрыть" onPress={onClose} />
         <AppDialog.Button
-          title="Подтвердить"
+          title="Выполнить"
           onPress={statusAction ? onChangeStatus : onDelete}
           disabled={
             deleteTeamIsLoading || deleteProjectIsLoading || deleteTaskIsLoading

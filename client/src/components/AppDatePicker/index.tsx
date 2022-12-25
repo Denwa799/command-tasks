@@ -1,3 +1,4 @@
+import {THEME} from 'constants/theme';
 import React, {FC, useMemo} from 'react';
 import DatePicker from 'react-native-date-picker';
 import {IAppDatePicker} from './types';
@@ -16,6 +17,7 @@ export const AppDatePicker: FC<IAppDatePicker> = ({
   return (
     <DatePicker
       title={title}
+      textColor={THEME.TEXT_COLOR}
       cancelText="Выйти"
       confirmText="Подтвердить"
       mode="date"

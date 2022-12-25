@@ -4,6 +4,7 @@ import {StyleSheet} from 'react-native';
 export const styles = StyleSheet.create({
   btn: {
     backgroundColor: 'transparent',
+    overflow: 'hidden',
   },
   text: {
     fontSize: SIZES.body3,
