@@ -26,6 +26,7 @@ export const TasksProvider: FC<ITasksProvider> = ({children}) => {
   const fetchTasks = useCallback(
     async (projectId: number, skip: number = 0, take: number = takeNumber) => {
       setTasksIsLoading(true);
+      setTasks(null);
       try {
         const tokenBearer = await getAccessToken();
         if (tokenBearer) {

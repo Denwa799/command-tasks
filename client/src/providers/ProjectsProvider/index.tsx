@@ -29,6 +29,7 @@ export const ProjectsProvider: FC<IProjectsProvider> = ({children}) => {
   const fetchProjects = useCallback(
     async (teamId: number, skip: number = 0, take: number = takeNumber) => {
       setProjectsIsLoading(true);
+      setProjects(null);
       try {
         const tokenBearer = await getAccessToken();
         if (tokenBearer) {

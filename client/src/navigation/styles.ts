@@ -13,6 +13,6 @@ export const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   iconRight: {
-    marginRight: 5,
+    marginRight: 15,
   },
 });

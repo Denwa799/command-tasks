@@ -1,5 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {
+  CardStyleInterpolators,
+  createStackNavigator,
+} from '@react-navigation/stack';
 import {THEME} from 'constants/theme';
 import {MainScreen} from 'screens/Main';
 import Ionicon from 'react-native-vector-icons/Ionicons';
@@ -11,13 +14,22 @@ import {UsersScreen} from 'screens/Users';
 import {AppNavigationBtn} from 'components/Btns/AppNavigationBtn';
 import {useInvitations} from 'hooks/useInvitations';
 
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 export const TaskNavigation = () => {
   const navigation = useNavigation();
   const {invitations, checkedInvitationsId} = useInvitations();
 
   const [isNewNotification, setIsNewNotification] = useState(false);
+
+  const config = {
+    stiffness: 700,
+    damping: 50,
+    mass: 1,
+    overshootClamping: false,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  };
 
   useEffect(() => {
     const newInvitation = invitations?.find(
@@ -68,7 +80,20 @@ export const TaskNavigation = () => {
           backgroundColor: THEME.BACK_COLOR,
         },
         headerTintColor: THEME.TEXT_COLOR,
-        animation: 'fade_from_bottom',
+        gestureEnabled: true,
+        gestureDirection: 'horizontal',
+        transitionSpec: {
+          open: {
+            animation: 'spring',
+            config,
+          },
+          close: {
+            animation: 'spring',
+            config,
+          },
+        },
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        headerMode: 'float',
       }}>
       <Stack.Screen
         name="Teams"
@@ -90,6 +115,9 @@ export const TaskNavigation = () => {
         component={NotificationsScreen}
         options={{
           title: 'Уведомления',
+          gestureDirection: 'vertical',
+          cardStyleInterpolator:
+            CardStyleInterpolators.forFadeFromBottomAndroid,
         }}
       />
       <Stack.Screen
@@ -97,6 +125,9 @@ export const TaskNavigation = () => {
         component={UsersScreen}
         options={{
           title: 'Пользователи в команде',
+          gestureDirection: 'vertical',
+          cardStyleInterpolator:
+            CardStyleInterpolators.forFadeFromBottomAndroid,
         }}
       />
     </Stack.Navigator>

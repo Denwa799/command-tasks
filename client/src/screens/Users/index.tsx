@@ -55,29 +55,7 @@ export const UsersScreen = () => {
   const [dialogQuitIsOpen, setDialogQuitIsOpen] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  // let data = useMemo(() => {
-  //   let users;
-  //   if (team?.users && teamInvitations) {
-  //     const newUsers = team.users.map(item => {
-  //       const invitation = teamInvitations.find(
-  //         obj => obj?.user?.id === item.id,
-  //       );
-  //       return {
-  //         ...item,
-  //         isInvitation: !!invitation,
-  //       };
-  //     });
-  //     users = [...newUsers];
-  //   }
-  //   return users;
-  // }, [team, teamInvitations]);
-
-  const listStyles = [
-    styles.list,
-    user?.id === creatorId ? styles.heightPercent95 : styles.heightPercent92,
-  ];
-
-  const dataForming = () => {
+  let data = useMemo(() => {
     let users;
     if (team?.users && teamInvitations) {
       const newUsers = team.users.map(item => {
@@ -92,9 +70,12 @@ export const UsersScreen = () => {
       users = [...newUsers];
     }
     return users;
-  };
+  }, [team, teamInvitations]);
 
-  let data = dataForming();
+  const listStyles = [
+    styles.list,
+    user?.id === creatorId ? styles.heightPercent95 : styles.heightPercent92,
+  ];
 
   useEffect(() => {
     fetchTeam(selectedTeamId);

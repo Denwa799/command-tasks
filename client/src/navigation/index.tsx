@@ -1,10 +1,11 @@
 import React from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {AuthNavigation} from './AutnNavigation';
+import {THEME} from 'constants/theme';
 
 export const AppNavigation = () => {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={{colors: {background: THEME.BACK_COLOR}}}>
       <AuthNavigation />
     </NavigationContainer>
   );
