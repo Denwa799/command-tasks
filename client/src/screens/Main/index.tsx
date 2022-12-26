@@ -181,18 +181,26 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
         setIsCanUpdateData(false);
         onTeamsIsCanUpdate(false);
       }
-      if (route.name === teamRoute && projects) {
+      if (route.name === teamRoute && projects && !projectsIsLoading) {
         setDataProjects(projects);
         setIsCanUpdateData(false);
         onTeamsIsCanUpdate(false);
       }
-      if (route.name === projectRoute && tasks) {
+      if (route.name === projectRoute && tasks && !tasksIsLoading) {
         setDataTasks(tasks);
         setIsCanUpdateData(false);
         onTeamsIsCanUpdate(false);
       }
     }
-  }, [teams, projects, tasks, isCanUpdateData, teamsIsCanUpdate]);
+  }, [
+    teams,
+    projects,
+    tasks,
+    isCanUpdateData,
+    teamsIsCanUpdate,
+    projectsIsLoading,
+    tasksIsLoading,
+  ]);
 
   useEffect(() => {
     if (loadedMoreTeams.length > 0) {
@@ -217,14 +225,14 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
   const onOpen = async (itemId: number, itemCreatorId: number) => {
     if (route.name === teamsRoute) {
       setSelectedTeamId(itemId);
-      await fetchProjects(itemId);
+      fetchProjects(itemId);
       navigation.navigate(teamRoute, {
         teamId: itemId,
         creatorId: itemCreatorId ? itemCreatorId : 0,
       });
     }
     if (route.name === teamRoute) {
-      await fetchTasks(itemId);
+      fetchTasks(itemId);
       navigation.navigate(projectRoute, {
         projectId: itemId,
         creatorId: itemCreatorId ? itemCreatorId : 0,
@@ -349,7 +357,7 @@ export const MainScreen: FC<IMainScreen> = ({route: {params}}) => {
               onEndReached={onLoadMore}
               onEndReachedThreshold={0.1}
             />
-            {(!data || data.length === 0) && (
+            {(!data || data.length === 0) && !isCanUpdateData && (
               <AppTitle level="2" style={styles.messageCenter}>
                 Список пуст
               </AppTitle>

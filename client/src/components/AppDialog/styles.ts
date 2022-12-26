@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
     color: THEME.TEXT_COLOR,
     marginLeft: 'auto',
     marginRight: 'auto',
+    textAlign: 'center',
   },
   actions: {
     flex: 1,

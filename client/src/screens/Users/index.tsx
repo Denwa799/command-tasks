@@ -55,7 +55,7 @@ export const UsersScreen = () => {
   const [dialogQuitIsOpen, setDialogQuitIsOpen] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
-  const data = useMemo(() => {
+  let data = useMemo(() => {
     let users;
     if (team?.users && teamInvitations) {
       const newUsers = team.users.map(item => {
@@ -194,7 +194,7 @@ export const UsersScreen = () => {
               {user?.id === creatorId && (
                 <AppIconButton onPress={onModalOpen} />
               )}
-              {user?.id !== creatorId && (
+              {user?.id !== creatorId && creatorId !== 0 && (
                 <AppPositionContainer isBottom isHorizontalCenter>
                   <AppButton
                     onPress={onQuitDialogOpen}

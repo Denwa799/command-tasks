@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   list: {
-    height: '95%',
+    height: '92%',
     flexGrow: 0,
   },
   card: {
@@ -24,7 +24,7 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
-    top: 350,
+    top: '45%',
     left: 0,
     right: 0,
     textAlign: 'center',

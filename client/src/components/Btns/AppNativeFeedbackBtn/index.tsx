@@ -21,6 +21,7 @@ export const AppNativeFeedbackBtn: FC<IAppNativeFeedbackBtn> = ({
     <View style={[styles.btn, isBorderRadius && styles.borderRadius, style]}>
       <TouchableNativeFeedback
         onPress={handler}
+        useForeground
         background={
           !disabled
             ? TouchableNativeFeedback.Ripple(color, isBorderRadius)

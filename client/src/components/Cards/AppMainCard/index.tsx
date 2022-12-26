@@ -143,7 +143,7 @@ export const AppMainCard: FC<IAppMainCard> = ({
       <AppCard style={cardStyles}>
         <TouchableOpacity
           style={[styles.cardHandler, !isAccess && styles.noAccess]}
-          activeOpacity={0.9}
+          activeOpacity={isColors ? 1 : 0.2}
           onPress={openHandler}>
           <Text style={textStyles}>{text}</Text>
           {responsible && (

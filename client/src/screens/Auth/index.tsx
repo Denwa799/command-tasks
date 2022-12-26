@@ -101,7 +101,7 @@ export const AuthScreen: FC = () => {
         name,
       );
       if (response) {
-        Alert.alert('Подтвердите свой email для активации аккаунта');
+        Alert.alert('На email отправлен код подтверждения аккаунта');
         setModalIsOpen(true);
       }
     } else {

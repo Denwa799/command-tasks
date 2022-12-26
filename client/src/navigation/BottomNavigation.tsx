@@ -11,12 +11,12 @@ import {TaskNavigation} from './TaskNavigation';
 const Tab = createBottomTabNavigator();
 
 export const BottomNavigation = () => {
-  const mainScreenButton = useCallback((color: string) => {
-    return <Ionicon name="ios-list" size={24} color={color} />;
+  const mainScreenButton = useCallback((color: string, focused: boolean) => {
+    return <Ionicon name="ios-list" size={focused ? 28 : 24} color={color} />;
   }, []);
 
-  const profileScreenButton = useCallback((color: string) => {
-    return <Anticon name="user" size={24} color={color} />;
+  const profileScreenButton = useCallback((color: string, focused: boolean) => {
+    return <Anticon name="user" size={focused ? 28 : 24} color={color} />;
   }, []);
 
   return (
@@ -34,7 +34,8 @@ export const BottomNavigation = () => {
         component={TaskNavigation}
         options={{
           tabBarLabel: 'Задачи',
-          tabBarIcon: (options: ITabBarIcon) => mainScreenButton(options.color),
+          tabBarIcon: (options: ITabBarIcon) =>
+            mainScreenButton(options.color, options.focused),
         }}
       />
       <Tab.Screen
@@ -43,7 +44,7 @@ export const BottomNavigation = () => {
         options={{
           tabBarLabel: 'Профиль',
           tabBarIcon: (options: ITabBarIcon) =>
-            profileScreenButton(options.color),
+            profileScreenButton(options.color, options.focused),
         }}
       />
     </Tab.Navigator>
