@@ -282,10 +282,21 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ id: dto.userId });
     if (!user)
       throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+
     user.banned = true;
     user.banReason = dto.banReason;
     await this.userRepository.save(user);
     return `Пользователь с id ${user.id} заблокирован`;
+  }
+
+  async changePremiumStatus(id): Promise<string> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user)
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+
+    user.isPremium = !user.isPremium;
+    const newUser = await this.userRepository.save(user);
+    return `Премиум статус: ${newUser.isPremium}`;
   }
 
   async removeTeam(teamId, userId) {

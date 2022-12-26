@@ -105,6 +105,15 @@ export class UsersController {
     return this.usersService.update(id, updateDto, token);
   }
 
+  @ApiOperation({ summary: 'Изменение премиум статуса пользователя' })
+  @ApiResponse({ status: 200, description: 'Премиум статус: true' })
+  @Roles('admin')
+  @UseGuards(RolesGuard)
+  @Patch('/premium/:id')
+  changePremiumStatus(@Param('id') id: number) {
+    return this.usersService.changePremiumStatus(id);
+  }
+
   @ApiOperation({ summary: 'Выдать роль' })
   @ApiResponse({ status: 200 })
   @Roles('admin')
