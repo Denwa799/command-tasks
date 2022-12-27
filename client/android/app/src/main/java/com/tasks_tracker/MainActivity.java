@@ -1,4 +1,4 @@
-package com.command_tasks;
+package com.tasks_tracker;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
