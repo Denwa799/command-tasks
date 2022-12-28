@@ -1,4 +1,4 @@
-package com.command_tasks.newarchitecture.components;
+package com.tasks_tracker.newarchitecture.components;
 
 import com.facebook.jni.HybridData;
 import com.facebook.proguard.annotations.DoNotStrip;

@@ -1,4 +1,4 @@
-package com.command_tasks.newarchitecture.modules;
+package com.tasks_tracker.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;
