@@ -10,12 +10,12 @@ const App = () => {
   const netInfo = useNetInfo();
 
   const [isNetConnected, setIsNetConnected] = useState(false);
-  const [isNetConnectedLoading, setIsNetConnectedLoading] = useState(false);
+  const [isNetConnectedLoading, setIsNetConnectedLoading] = useState(true);
 
   useEffect(() => {
-    netInfo.isConnected === null
-      ? setIsNetConnectedLoading(true)
-      : setIsNetConnectedLoading(false);
+    if (netInfo.isConnected !== null) {
+      setIsNetConnectedLoading(false);
+    }
 
     if (netInfo.isConnected === true) {
       setIsNetConnected(true);
